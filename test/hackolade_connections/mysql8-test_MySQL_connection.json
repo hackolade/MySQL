@@ -1,0 +1,22 @@
+{
+    "name": "mysql8-test",
+    "host": "local.test",
+    "connectionSourceType": "database",
+    "port": "33308",
+    "databaseName": "sakila",
+    "userName": "root",
+    "userPassword": "secret",
+    "sslType": "TRUST_SERVER_CLIENT_CERTIFICATES",
+    "certAuthority": "/Users/bigorn0/dev/hackolade/MySQL/test/ssl/ca-cert.pem",
+    "clientCert": "/Users/bigorn0/dev/hackolade/MySQL/test/ssl/client-cert.pem",
+    "clientPrivateKey": "/Users/bigorn0/dev/hackolade/MySQL/test/ssl/client-key.pem",
+    "ssh": false,
+    "ssh_host": "",
+    "ssh_port": 22,
+    "ssh_user": "",
+    "ssh_method": "privateKey",
+    "ssh_key_file": "",
+    "ssh_key_passphrase": "",
+    "ssh_password": "",
+    "target": "MySQL"
+}

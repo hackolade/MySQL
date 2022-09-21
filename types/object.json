@@ -1,0 +1,29 @@
+{
+	"name": "object",
+	"parentType": "document",
+	"structureType": true,
+	"defaultValues": {
+		"subtype": "object",
+		"properties": []
+	},
+	"subtypes": {
+		"object": {
+			"childValueType": [
+				"char",
+				"binary",
+				"datetime",
+				"enum",
+				"geometry",
+				"inet6",
+				"numeric",
+				"rowversion",
+				"set",
+				"sql_variant",
+				"table",
+				"xml",
+				"reference",
+				"multiple"
+			]
+		}
+	}
+}

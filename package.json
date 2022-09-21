@@ -1,0 +1,55 @@
+{
+    "name": "MySQL",
+    "version": "0.1.0",
+    "versionDate": "2022-09-16",
+    "author": "hackolade",
+    "engines": {
+        "hackolade": "6.4.0",
+        "hackoladePlugin": "1.2.0"
+    },
+    "contributes": {
+        "target": {
+            "applicationTarget": "MySQL",
+            "title": "MySQL",
+            "versions": [
+                "v5.x",
+                "v8.x"
+            ]
+        },
+        "features": {
+            "nestedCollections": false,
+            "disablePatternField": false,
+            "disableMultipleTypes": true,
+            "enableForwardEngineering": true,
+            "disableReverseEngineering": false,
+            "disableChoices": true,
+            "enableJsonType": true,
+            "useJsonTypesWithComplexTypes": true,
+            "reverseSchemaIntoOneColumn": true,
+			"disableDenormalization": true,
+			"enableComplexTypesNormalization": true,
+            "views": {
+                "enabled": true,
+                "viewLevel": "model",
+                "disablePipelines": true
+            },
+            "relationships": {
+                "compositeRelationships": true
+            },
+            "FEScriptCommentsSupported": true,
+            "enableFetchSystemEntitiesCheckbox": true,
+            "discoverRelationships": true
+        }
+    },
+    "description": "Hackolade plugin for MySQL",
+    "icon_url": "logo.jpg",
+    "disabled": false,
+    "scripts": {
+        "start-test-instances": "pushd ./test > /dev/null; bash startInstance.sh; popd > /dev/null",
+        "stop-test-instances": "pushd ./test > /dev/null; bash stopInstance.sh; popd > /dev/null",
+        "sync": "echo $PWD; rsync -ar ./ $HOME/.hackolade/plugins/MySQL",
+        "hck": "DEBUG=mysql* Hackolade",
+        "get-mysql5-health":"docker inspect test-mysql5-1 --format='{{json (index .State.Health.Log 4)}}'",
+        "get-mysql8-health":"docker inspect test-mysql8-1 --format='{{json (index .State.Health.Log 4)}}'"
+    }
+}

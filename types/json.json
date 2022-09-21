@@ -1,0 +1,55 @@
+{
+	"name": "json",
+	"erdAbbreviation": "<json>",
+	"dtdAbbreviation": "{json}",
+	"parentType": "json",
+	"hiddenOnEntity": "view",
+	"jsonType": {
+		"order": 1,
+		"name": "json",
+		"jsonRoot": true
+	},
+	"defaultValues": {
+		"default": "",
+		"comments":"",
+		"additionalProperties": false,
+		"properties": []
+	},
+	"subtypes": {
+        "object": {
+            "parentType": "jsonObject",
+            "childValueType": [
+                "jsonString",
+                "jsonNumber",
+                "jsonObject",
+                "jsonArray",
+                "jsonBoolean",
+                "jsonNull"
+            ]
+        },
+        "array": {
+            "parentType": "jsonArray",
+            "childValueType": [
+                "jsonString",
+                "jsonNumber",
+                "jsonObject",
+                "jsonArray",
+                "jsonBoolean",
+                "jsonNull"
+            ]
+        },
+        "string": {
+            "parentType": "jsonString"
+        },
+        "number": {
+            "parentType": "jsonNumber"
+        },
+        "boolean": {
+            "parentType": "jsonBoolean"
+        },
+        "null": {
+            "parentType": "jsonNull"
+        }
+    }
+	
+}

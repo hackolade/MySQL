@@ -1,0 +1,9 @@
+[mysqld]
+tls_version = TLSv1.2
+ssl_cert=/certs/server-cert.pem
+ssl_key=/certs/server-key.pem
+ssl_ca=/certs/ca-cert.pem
+
+require_secure_transport=ON
+
+innodb_use_native_aio=0

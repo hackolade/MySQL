@@ -1,0 +1,11 @@
+{
+  "name": "MySQL",
+  "version": "1.0.0",
+  "description": "Mysql reverse engineering module",
+  "author": "Hackolade",
+  "dependencies": {
+    "mysql2": "^2.3.3",
+    "tunnel-ssh": "^4.1.6"
+  },
+  "installed": true
+}

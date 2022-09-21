@@ -1,0 +1,1729 @@
+/*
+* Copyright © 2016-2020 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Group",
+				"propertyKeyword": "grpProp",
+				"propertyType": "group",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+// “groupInput” can have the following states - 0 items, 1 item, and many items.
+// “blockInput” has only 2 states - 0 items or 1 item. 
+// This gives us an easy way to represent it as an object and not as an array internally which is beneficial for processing 
+// and forward-engineering in particular.
+			{
+				"propertyName": "Block",
+				"propertyKeyword": "grpProp",
+				"propertyType": "block",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"propertyType": "fieldList",
+				"template": "orderedList"
+			}, 
+			{
+				"propertyName": "List with attribute",
+				"propertyKeyword": "keyListOrder",
+				"propertyType": "fieldList",
+				"template": "orderedList",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
+			}
+
+*/
+
+[
+  {
+    "lowerTab": "Details",
+    "structure": [
+      {
+        "propertyName": "Comments",
+        "propertyKeyword": "description",
+        "shouldValidate": false,
+        "propertyTooltip": "comments",
+        "addTimestampButton": false,
+        "propertyType": "details",
+        "template": "textarea"
+      },
+      {
+        "propertyName": "Or replace",
+        "propertyKeyword": "orReplace",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "ifNotExist",
+              "value": false
+            },
+            {
+              "key": "ifNotExist",
+              "exists": false
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "If not exist",
+        "propertyKeyword": "ifNotExist",
+        "propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified table already exists. Cannot be used together with the OR REPLACE clause.",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "orReplace",
+              "value": false
+            },
+            {
+              "key": "orReplace",
+              "exists": false
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Temporary",
+        "propertyKeyword": "temporary",
+        "propertyType": "checkbox"
+      },
+      {
+        "propertyName": "Like parent table",
+        "propertyKeyword": "like",
+        "propertyTooltip": "To create a table with the same definition as another table, including columns, indexes, and table options. Foreign key definitions, as well as any DATA DIRECTORY or INDEX DIRECTORY table options specified on the original table, will NOT be created.",
+        "propertyType": "selecthashed",
+        "template": "entities",
+        "withEmptyOption": true,
+        "excludeCurrent": true
+      },
+      {
+        "propertyName": "As Select statement",
+        "propertyKeyword": "selectStatement",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false
+      },
+      {
+        "propertyName": "Table options",
+        "propertyKeyword": "tableOptions",
+        "propertyType": "block",
+        "propertyTooltip": "For each individual table you create, you can set some table options. ",
+        "structure": [
+          {
+            "propertyName": "Default storage engine",
+            "propertyKeyword": "defaultStorEng",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Uncheck if you want to specify a different storage engine for this table instead of the default.",
+            "defaultValue": true
+          },
+          {
+            "propertyName": "Storage engine",
+            "propertyKeyword": "ENGINE",
+            "propertyTooltip": "Specifies a storage engine for the table.",
+            "propertyType": "select",
+            "defaultValue": "InnoDB",
+            "dependency": {
+              "key": "defaultStorEng",
+              "value": false
+            },
+            "options": [
+              "",
+              "InnoDB",
+              "CSV",
+              "Memory",
+              "Aria",
+              "MyISAM",
+              "Blackhole",
+              "Federated",
+              "Archive"
+            ]
+          },
+          {
+            "propertyName": "Default character set",
+            "propertyKeyword": "defaultCharSet",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Uncheck if you want to specify a different character set for this table instead of the default.",
+            "defaultValue": true
+          },
+          {
+            "propertyName": "Character set",
+            "propertyKeyword": "characterSet",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": [
+              "",
+              "utf8mb4",
+              "armscii8",
+              "ascii",
+              "big5",
+              "binary",
+              "cp850",
+              "cp852",
+              "cp866",
+              "cp932",
+              "cp1250",
+              "cp1251",
+              "cp1256",
+              "cp1257",
+              "dec8",
+              "eucjpms",
+              "euckr",
+              "gb2312",
+              "gbk",
+              "geostd8",
+              "greek",
+              "hebrew",
+              "hp8",
+              "keybcs2",
+              "koi8r",
+              "koi8u",
+              "latin1",
+              "latin2",
+              "latin5",
+              "latin7",
+              "macce",
+              "macroman",
+              "sjis",
+              "swe7",
+              "tis620",
+              "ucs2",
+              "ujis",
+              "utf8",
+              "utf16",
+              "utf16le",
+              "utf32"
+            ]
+          },
+          {
+            "options": ["", "armscii8_general_ci", "armscii8_bin"],
+            "dependency": { "key": "characterSet", "value": "armscii8" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "ascii_bin", "ascii_general_ci"],
+            "dependency": { "key": "characterSet", "value": "ascii" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "big5_bin", "big5_chinese_ci"],
+            "dependency": { "key": "characterSet", "value": "big5" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "binary"],
+            "dependency": { "key": "characterSet", "value": "binary" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "cp1250_polish_ci",
+              "cp1250_bin",
+              "cp1250_croatian_ci",
+              "cp1250_czech_cs",
+              "cp1250_general_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "cp1250" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "cp1251_bulgarian_ci",
+              "cp1251_general_cs",
+              "cp1251_general_ci",
+              "cp1251_bin",
+              "cp1251_ukrainian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "cp1251" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "cp1256_bin", "cp1256_general_ci"],
+            "dependency": { "key": "characterSet", "value": "cp1256" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "cp1257_general_ci",
+              "cp1257_bin",
+              "cp1257_lithuanian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "cp1257" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "cp850_bin", "cp850_general_ci"],
+            "dependency": { "key": "characterSet", "value": "cp850" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "cp852_general_ci", "cp852_bin"],
+            "dependency": { "key": "characterSet", "value": "cp852" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "cp866_bin", "cp866_general_ci"],
+            "dependency": { "key": "characterSet", "value": "cp866" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "cp932_bin", "cp932_japanese_ci"],
+            "dependency": { "key": "characterSet", "value": "cp932" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "dec8_bin", "dec8_swedish_ci"],
+            "dependency": { "key": "characterSet", "value": "dec8" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "eucjpms_bin", "eucjpms_japanese_ci"],
+            "dependency": { "key": "characterSet", "value": "eucjpms" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "euckr_bin", "euckr_korean_ci"],
+            "dependency": { "key": "characterSet", "value": "euckr" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "gb18030_unicode_520_ci",
+              "gb18030_bin",
+              "gb18030_chinese_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "gb18030" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "gb2312_bin", "gb2312_chinese_ci"],
+            "dependency": { "key": "characterSet", "value": "gb2312" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "gbk_bin", "gbk_chinese_ci"],
+            "dependency": { "key": "characterSet", "value": "gbk" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "geostd8_bin", "geostd8_general_ci"],
+            "dependency": { "key": "characterSet", "value": "geostd8" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "greek_general_ci", "greek_bin"],
+            "dependency": { "key": "characterSet", "value": "greek" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "hebrew_bin", "hebrew_general_ci"],
+            "dependency": { "key": "characterSet", "value": "hebrew" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "hp8_bin", "hp8_english_ci"],
+            "dependency": { "key": "characterSet", "value": "hp8" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "keybcs2_bin", "keybcs2_general_ci"],
+            "dependency": { "key": "characterSet", "value": "keybcs2" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "koi8r_bin", "koi8r_general_ci"],
+            "dependency": { "key": "characterSet", "value": "koi8r" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "koi8u_bin", "koi8u_general_ci"],
+            "dependency": { "key": "characterSet", "value": "koi8u" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "latin1_spanish_ci",
+              "latin1_general_cs",
+              "latin1_general_ci",
+              "latin1_bin",
+              "latin1_german2_ci",
+              "latin1_danish_ci",
+              "latin1_swedish_ci",
+              "latin1_german1_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "latin1" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "latin2_hungarian_ci",
+              "latin2_general_ci",
+              "latin2_czech_cs",
+              "latin2_bin",
+              "latin2_croatian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "latin2" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "latin5_bin", "latin5_turkish_ci"],
+            "dependency": { "key": "characterSet", "value": "latin5" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "latin7_bin",
+              "latin7_general_cs",
+              "latin7_general_ci",
+              "latin7_estonian_cs"
+            ],
+            "dependency": { "key": "characterSet", "value": "latin7" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "macce_bin", "macce_general_ci"],
+            "dependency": { "key": "characterSet", "value": "macce" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "macroman_bin", "macroman_general_ci"],
+            "dependency": { "key": "characterSet", "value": "macroman" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "sjis_bin", "sjis_japanese_ci"],
+            "dependency": { "key": "characterSet", "value": "sjis" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "swe7_bin", "swe7_swedish_ci"],
+            "dependency": { "key": "characterSet", "value": "swe7" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "tis620_bin", "tis620_thai_ci"],
+            "dependency": { "key": "characterSet", "value": "tis620" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "ucs2_icelandic_ci",
+              "ucs2_unicode_520_ci",
+              "ucs2_danish_ci",
+              "ucs2_unicode_ci",
+              "ucs2_croatian_ci",
+              "ucs2_czech_ci",
+              "ucs2_bin",
+              "ucs2_german2_ci",
+              "ucs2_turkish_ci",
+              "ucs2_general_ci",
+              "ucs2_sinhala_ci",
+              "ucs2_swedish_ci",
+              "ucs2_hungarian_ci",
+              "ucs2_spanish_ci",
+              "ucs2_esperanto_ci",
+              "ucs2_estonian_ci",
+              "ucs2_persian_ci",
+              "ucs2_polish_ci",
+              "ucs2_roman_ci",
+              "ucs2_slovenian_ci",
+              "ucs2_spanish2_ci",
+              "ucs2_romanian_ci",
+              "ucs2_general_mysql500_ci",
+              "ucs2_slovak_ci",
+              "ucs2_latvian_ci",
+              "ucs2_vietnamese_ci",
+              "ucs2_lithuanian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "ucs2" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "ujis_bin", "ujis_japanese_ci"],
+            "dependency": { "key": "characterSet", "value": "ujis" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "utf16_spanish2_ci",
+              "utf16_romanian_ci",
+              "utf16_slovak_ci",
+              "utf16_latvian_ci",
+              "utf16_vietnamese_ci",
+              "utf16_lithuanian_ci",
+              "utf16_icelandic_ci",
+              "utf16_unicode_520_ci",
+              "utf16_danish_ci",
+              "utf16_unicode_ci",
+              "utf16_croatian_ci",
+              "utf16_czech_ci",
+              "utf16_bin",
+              "utf16_german2_ci",
+              "utf16_turkish_ci",
+              "utf16_general_ci",
+              "utf16_sinhala_ci",
+              "utf16_swedish_ci",
+              "utf16_hungarian_ci",
+              "utf16_spanish_ci",
+              "utf16_esperanto_ci",
+              "utf16_estonian_ci",
+              "utf16_persian_ci",
+              "utf16_polish_ci",
+              "utf16_roman_ci",
+              "utf16_slovenian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "utf16" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": ["", "utf16le_bin", "utf16le_general_ci"],
+            "dependency": { "key": "characterSet", "value": "utf16le" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "utf32_slovak_ci",
+              "utf32_latvian_ci",
+              "utf32_vietnamese_ci",
+              "utf32_lithuanian_ci",
+              "utf32_icelandic_ci",
+              "utf32_unicode_520_ci",
+              "utf32_danish_ci",
+              "utf32_unicode_ci",
+              "utf32_croatian_ci",
+              "utf32_czech_ci",
+              "utf32_bin",
+              "utf32_german2_ci",
+              "utf32_turkish_ci",
+              "utf32_general_ci",
+              "utf32_sinhala_ci",
+              "utf32_swedish_ci",
+              "utf32_hungarian_ci",
+              "utf32_spanish_ci",
+              "utf32_esperanto_ci",
+              "utf32_estonian_ci",
+              "utf32_persian_ci",
+              "utf32_polish_ci",
+              "utf32_roman_ci",
+              "utf32_slovenian_ci",
+              "utf32_spanish2_ci",
+              "utf32_romanian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "utf32" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "utf8_esperanto_ci",
+              "utf8_estonian_ci",
+              "utf8_persian_ci",
+              "utf8_polish_ci",
+              "utf8_roman_ci",
+              "utf8_slovenian_ci",
+              "utf8_spanish2_ci",
+              "utf8_romanian_ci",
+              "utf8_general_mysql500_ci",
+              "utf8_slovak_ci",
+              "utf8_latvian_ci",
+              "utf8_vietnamese_ci",
+              "utf8_lithuanian_ci",
+              "utf8_icelandic_ci",
+              "utf8_unicode_520_ci",
+              "utf8_danish_ci",
+              "utf8_unicode_ci",
+              "utf8_croatian_ci",
+              "utf8_czech_ci",
+              "utf8_bin",
+              "utf8_german2_ci",
+              "utf8_turkish_ci",
+              "utf8_general_ci",
+              "utf8_sinhala_ci",
+              "utf8_swedish_ci",
+              "utf8_hungarian_ci",
+              "utf8_spanish_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "utf8" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+          {
+            "options": [
+              "",
+              "utf8mb4_slovak_ci",
+              "utf8mb4_latvian_ci",
+              "utf8mb4_vietnamese_ci",
+              "utf8mb4_lithuanian_ci",
+              "utf8mb4_icelandic_ci",
+              "utf8mb4_unicode_520_ci",
+              "utf8mb4_danish_ci",
+              "utf8mb4_unicode_ci",
+              "utf8mb4_croatian_ci",
+              "utf8mb4_czech_ci",
+              "utf8mb4_bin",
+              "utf8mb4_german2_ci",
+              "utf8mb4_turkish_ci",
+              "utf8mb4_general_ci",
+              "utf8mb4_sinhala_ci",
+              "utf8mb4_swedish_ci",
+              "utf8mb4_hungarian_ci",
+              "utf8mb4_spanish_ci",
+              "utf8mb4_esperanto_ci",
+              "utf8mb4_estonian_ci",
+              "utf8mb4_persian_ci",
+              "utf8mb4_polish_ci",
+              "utf8mb4_roman_ci",
+              "utf8mb4_slovenian_ci",
+              "utf8mb4_spanish2_ci",
+              "utf8mb4_romanian_ci"
+            ],
+            "dependency": { "key": "characterSet", "value": "utf8mb4" },
+            "propertyName": "Collation",
+            "propertyType": "select",
+            "propertyKeyword": "collation",
+            "propertyTooltip": "Select from list of options"
+          },
+
+          {
+            "options": ["None", "Zlib", "LZ4"],
+            "dependency": { "key": "ENGINE", "value": "InnoDB" },
+            "propertyName": "Compression",
+            "propertyType": "select",
+            "propertyKeyword": "compression",
+            "propertyTooltip": "The compression algorithm used for page level compression for InnoDB tables."
+          },
+		  {
+            "propertyName": "Auto increment",
+            "propertyKeyword": "AUTO_INCREMENT",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Specifies the initial value for AUTO_INCREMENT primary keys.",
+            "minValue": 0,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Archive"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Auto tablespace size extension",
+            "propertyKeyword": "AUTOEXTEND_SIZE",
+            "propertyType": "numeric",
+            "valueType": "bytes",
+            "propertyTooltip": "Must be a multiple of 4MB and defines the amount by which InnoDB extends the size of the tablespace when it becomes full.",
+            "minValue": 0,
+            "step": 4000000,
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                },
+                { "level": "model", "key": "dbVersion", "value": "8.x" }
+              ]
+            }
+          },
+          {
+            "propertyName": "Avg row length",
+            "propertyKeyword": "AVG_ROW_LENGTH",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Average rows size when have the ROW_FORMAT table option is set to FIXED format.",
+            "minValue": 1,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Checksum",
+            "propertyKeyword": "CHECKSUM",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Can be set to 1 to maintain a live checksum for all table's rows.",
+            "defaultValue": 0,
+            "minValue": 0,
+            "maxValue": 1,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                }
+              ]
+            }
+          },
+          {
+            "dependency": { "key": "ENGINE", "value": "FEDERATED" },
+            "propertyName": "Connection",
+            "propertyType": "text",
+            "propertyKeyword": "connection",
+            "propertyTooltip": "The connection string for a FEDERATED table."
+          },
+          {
+            "propertyName": "Data directory",
+            "propertyKeyword": "DATA_DIRECTORY",
+            "propertyTooltip": "Choose an absolute path to directory at creation time, because it cannot be changed without dropping and re-creating the table. If omitted, the database's directory will be used to store data files.",
+            "propertyType": "text",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Delay key write",
+            "propertyKeyword": "DELAY_KEY_WRITE",
+            "propertyTooltip": "Can be set to 1 to speed up write operations. In that case, when data are modified, the indexes are not updated until the table is closed. Writing the changes to the index file altogether can be much faster. However, note that this option is applied only if the delay_key_write server variable is set to 'ON'.",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "defaultValue": 0,
+            "minValue": 0,
+            "maxValue": 1,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Index directory",
+            "propertyKeyword": "INDEX_DIRECTORY",
+            "propertyTooltip": "Choose an absolute path to directory at creation time, because it cannot be changed without dropping and re-creating the table. If omitted, the database's directory will be used to store index files.",
+            "propertyType": "text",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "Aria"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Encrypted",
+            "propertyKeyword": "ENCRYPTION",
+            "propertyTooltip": "The ENCRYPTION clause enables or disables page-level data encryption for an InnoDB table.",
+            "propertyType": "select",
+            "defaultValue": "No",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            },
+            "options": ["No", "Yes"]
+          },
+          {
+            "propertyName": "Pack keys",
+            "propertyKeyword": "PACK_KEYS",
+            "propertyTooltip": "Set this option to 1 if you want to have smaller indexes. This usually makes updates slower and reads faster.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                }
+              ]
+            },
+            "options": ["Default", "0", "1"]
+          },
+          {
+            "propertyName": "INSERT method",
+            "propertyKeyword": "INSERT_METHOD",
+            "propertyTooltip": "Determines in which underlying table the new rows should be inserted.",
+            "propertyType": "select",
+            "defaultValue": "No",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MERGE"
+                }
+              ]
+            },
+            "options": ["No", "First", "Last"]
+          },
+          {
+            "propertyName": "Union",
+            "propertyKeyword": "UNION",
+            "propertyTooltip": "Contains a comma-separated list of MyISAM tables which are accessed by the new table.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MERGE"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Key block size",
+            "propertyKeyword": "KEY_BLOCK_SIZE",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "this value is just a hint, and the storage engine could modify or ignore it.",
+            "defaultValue": 0,
+            "minValue": 0,
+            "step": 1
+          },
+          {
+            "propertyName": "Min rows",
+            "propertyKeyword": "MIN_ROWS",
+            "propertyTooltip": "Value will not be used as real limits, but they help the storage engine to optimize the table.",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "defaultValue": 0,
+            "minValue": 0,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "Memory"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Max rows",
+            "propertyKeyword": "MAX_ROWS",
+            "propertyTooltip": "Value will not be used as real limits, but they help the storage engine to optimize the table.",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "defaultValue": 0,
+            "minValue": 0,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "Memory"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Pack keys",
+            "propertyKeyword": "PACK_KEYS",
+            "propertyTooltip": "Can be used to determine whether the indexes will be compressed. Set it to 1 to compress all keys. With a value of 0, compression will not be used. With the DEFAULT value, only long strings will be compressed. Uncompressed keys are faster.",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "Default", "0", "1"]
+          },
+          {
+            "propertyName": "Row format",
+            "propertyKeyword": "ROW_FORMAT",
+            "propertyTooltip": "Specifies the row format for the data file. Possible values are engine-dependent.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "options": [
+              "Default",
+              "Dynamic",
+              "Fixed",
+              "Compact",
+              "Compressed",
+              "Redundant"
+            ],
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          },
+		  {
+            "propertyName": "Row format",
+            "propertyKeyword": "ROW_FORMAT",
+            "propertyTooltip": "Specifies the row format for the data file. Possible values are engine-dependent.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "options": [
+              "Default",
+              "Fixed",
+			        "Dynamic",
+              "Compressed",
+            ],
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "MyISAM"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Stats auto recalc",
+            "propertyKeyword": "STATS_AUTO_RECALC",
+            "propertyTooltip": "If set to 1, statistics will be recalculated when more than 10% of the data has changed. When set to 0, stats will be recalculated only when an ANALYZE TABLE is run. If set to DEFAULT, or left out, the value set by the innodb_stats_auto_recalc system variable applies.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "options": ["Default", "0", "1"],
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Stats persistent",
+            "propertyKeyword": "STATS_PERSISTENT",
+            "propertyTooltip": "Indicates whether the InnoDB statistics created by ANALYZE TABLE will remain on disk or not. It can be set to 1 (on disk), 0 (not on disk, the pre-MySQL 10 behavior), or DEFAULT (the same as leaving out the option), in which case the value set by the innodb_stats_persistent system variable will apply.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "options": ["Default", "0", "1"],
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          },
+
+          {
+            "propertyName": "Stats sample pages",
+            "propertyKeyword": "STATS_SAMPLE_PAGES",
+            "propertyTooltip": "Indicates the number of index pages to sample when estimating cardinality and other statistics for an indexed column, such as those calculated by ANALYZE TABLE.",
+            "propertyType": "select",
+            "defaultValue": "Default",
+            "options": ["Default", "0", "1"],
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "InnoDB"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "propertyName": "Partitioning",
+        "propertyKeyword": "partitioning",
+        "propertyType": "block",
+        "propertyTooltip": "Determines how a partitioned table's rows are distributed across partitions",
+        "structure": [
+          {
+            "propertyName": "Partition type",
+            "propertyKeyword": "partitionType",
+            "propertyTooltip": "Choose the desired partition type",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "RANGE", "LIST", "HASH", "KEY"]
+          },
+          {
+            "propertyName": "Linear",
+            "propertyKeyword": "LINEAR",
+            "propertyType": "checkbox",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "partitionType",
+                  "value": "HASH"
+                },
+                {
+                  "key": "partitionType",
+                  "value": "KEY"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Expression",
+            "propertyKeyword": "partitioning_expression",
+            "propertyTooltip": "A SQL expression that returns a value from each row. In the simplest cases, it is a column name. This value is used to determine which partition should contain a row.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "partitionType",
+                  "value": "RANGE"
+                },
+                {
+                  "key": "partitionType",
+                  "value": "LIST"
+                },
+                {
+                  "key": "partitionType",
+                  "value": "HASH"
+                },
+                {
+                  "key": "partitionType",
+                  "value": "KEY"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Number of partitions",
+            "propertyKeyword": "partitions",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "allowNegative": false,
+            "maxValue": 1024,
+            "step": 1
+          },
+          {
+            "propertyName": "Interval",
+            "propertyKeyword": "interval",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "allowNegative": false,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "partitionType",
+                  "value": "SYSTEM_TIME"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Subpartition type",
+            "propertyKeyword": "subpartitionType",
+            "propertyTooltip": "Choose the desired partition type",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "HASH", "KEY"]
+          },
+          {
+            "propertyName": "Linear",
+            "propertyKeyword": "SUBLINEAR",
+            "propertyType": "checkbox",
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "subpartitionType",
+                  "value": "HASH"
+                },
+                {
+                  "key": "subpartitionType",
+                  "value": "KEY"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Number of subpartitions",
+            "propertyKeyword": "subpartitions",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "allowNegative": false,
+            "maxValue": 1024,
+            "step": 1,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "subpartitionType",
+                  "value": "HASH"
+                },
+                {
+                  "key": "subpartitionType",
+                  "value": "KEY"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Subpartition Expression",
+            "propertyKeyword": "subpartitioning_expression",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "subpartitionType",
+                  "value": "HASH"
+                },
+                {
+                  "key": "subpartitionType",
+                  "value": "KEY"
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Partition definitions",
+            "propertyKeyword": "partition_definitions",
+            "propertyTooltip": "Indicate the partition definition",
+            "propertyType": "group",
+            "structure": [
+              {
+                "propertyName": "Partition definition",
+                "propertyKeyword": "partitionDefinition",
+                "propertyType": "details",
+                "template": "textarea",
+                "markdown": false
+              },
+              {
+                "propertyName": "Subpartition definitions",
+                "propertyKeyword": "subpartitionDefinition",
+                "propertyType": "details",
+                "template": "textarea",
+                "markdown": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Remarks",
+        "propertyKeyword": "comments",
+        "propertyTooltip": "remarks",
+        "addTimestampButton": true,
+        "propertyType": "details",
+        "template": "textarea",
+        "valueType": "string"
+      }
+    ],
+    "columnsRatio": [3.7, 5]
+  },
+  {
+    "lowerTab": "Composite keys",
+    "structure": [
+      {
+        "propertyName": "Primary key",
+        "propertyType": "group",
+        "groupItemLimit": 1,
+        "propertyKeyword": "primaryKey",
+        "propertyTooltip": {
+          "disabled": [
+            {
+              "tooltip": "Remove the existing single column primary key definition prior to unlock the possibility to create a composite primary key definition for this table",
+              "dependency": {
+                "type": "and",
+                "values": [
+                  {
+                    "level": "children",
+                    "key": "primaryKey",
+                    "value": true
+                  },
+                  {
+                    "type": "not",
+                    "values": {
+                      "level": "children",
+                      "key": "compositePrimaryKey",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "tooltip": "Remove or update the existing composite primary key definition prior to unlock the possibility to create a new composite primary key definition for this table",
+              "dependency": {
+                "key": "primaryKey",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "disabledOnCondition": [
+          {
+            "level": "children",
+            "value": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "primaryKey",
+                  "value": true
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "compositePrimaryKey",
+                      "value": false
+                    },
+                    {
+                      "key": "compositePrimaryKey",
+                      "exist": false
+                    }
+                  ]
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "compositeUniqueKey",
+                      "value": false
+                    },
+                    {
+                      "key": "compositeUniqueKey",
+                      "exist": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "structure": [
+          {
+            "propertyName": "Constraint name",
+            "propertyKeyword": "constraintName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Key",
+            "propertyKeyword": "compositePrimaryKey",
+            "propertyType": "primaryKeySetter",
+            "abbr": "pk",
+            "attributeList": ["ascending", "descending"]
+          },
+          {
+            "propertyName": "Category",
+            "propertyKeyword": "indexCategory",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "BTREE", "HASH", "RTREE"]
+          },
+          {
+            "propertyName": "Key block size",
+            "propertyKeyword": "indexBlockSize",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "step": 1
+          },
+          {
+            "propertyName": "Ignore index",
+            "propertyKeyword": "indexIgnore",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Indexes can be specified to be ignored by the optimizer"
+          },
+          {
+            "propertyName": "Comment",
+            "propertyKeyword": "indexComment",
+            "propertyTooltip": "comment",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      },
+      {
+        "propertyName": "Unique key",
+        "propertyType": "group",
+        "propertyKeyword": "uniqueKey",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Constraint name",
+            "propertyKeyword": "constraintName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Key",
+            "propertyKeyword": "compositeUniqueKey",
+            "propertyType": "compositeKeySetter",
+            "disabledItemStrategy": "default",
+            "setPrimaryKey": false,
+            "template": "collectiontree",
+            "isCompositeKey": true,
+            "abbr": " ",
+            "attributeList": ["ascending", "descending"]
+          },
+          {
+            "propertyName": "Alternate key",
+            "propertyKeyword": "alternateKey",
+            "propertyTooltip": "",
+            "propertyType": "checkbox",
+            "setFieldPropertyBy": "compositeUniqueKey"
+          },
+          {
+            "propertyName": "Category",
+            "propertyKeyword": "indexCategory",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "BTREE", "HASH", "RTREE"]
+          },
+          {
+            "propertyName": "Key block size",
+            "propertyKeyword": "indexBlockSize",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "step": 1
+          },
+          {
+            "propertyName": "Ignore index",
+            "propertyKeyword": "indexIgnore",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Indexes can be specified to be ignored by the optimizer"
+          },
+          {
+            "propertyName": "Comment",
+            "propertyKeyword": "indexComment",
+            "propertyTooltip": "comment",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lowerTab": "Indexes",
+    "structure": [
+      {
+        "propertyName": "Index",
+        "propertyType": "group",
+        "propertyKeyword": "Indxs",
+        "propertyTooltip": "In general you should only add indexes to match the queries your application uses. Any extra will waste resources.",
+        "structure": [
+          {
+            "propertyName": "Name",
+            "propertyKeyword": "indxName",
+            "propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Activated",
+            "propertyKeyword": "isActivated",
+            "propertyTooltip": "Deactivated item will be not included in FE script",
+            "propertyType": "checkbox",
+            "defaultValue": true
+          },
+          {
+            "propertyName": "If not exist",
+            "propertyKeyword": "ifNotExist",
+            "propertyTooltip": "The index will only be created if an index with the same name does not already exist. If the index already exists, then a warning will be triggered by default.",
+            "defaultValue": true,
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Type",
+            "propertyKeyword": "indexType",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "",
+            "options": ["", "PRIMARY", "KEY", "UNIQUE", "FULLTEXT", "SPATIAL"]
+          },
+          {
+            "propertyName": "Category",
+            "propertyKeyword": "indexCategory",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "BTREE",
+            "options": ["", "BTREE", "HASH", "RTREE"]
+          },
+          {
+            "propertyName": "Keys",
+            "propertyKeyword": "indxKey",
+            "propertyType": "fieldList",
+            "template": "orderedList",
+            "attributeList": ["", "ASC", "DESC"]
+          },
+          {
+            "propertyName": "Wait",
+            "propertyKeyword": "waitNoWait",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "NoWait",
+            "options": ["", "NoWait", "Wait"]
+          },
+          {
+            "propertyName": "Wait",
+            "propertyKeyword": "waitValue",
+            "propertyTooltip": "",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "defaultValue": 1,
+            "minValue": 1,
+            "step": 1,
+            "dependency": {
+              "key": "waitNoWait",
+              "value": "Wait"
+            }
+          },
+          {
+            "propertyName": "Algorithm",
+            "propertyKeyword": "indexAlgorithm",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "DEFAULT",
+            "options": ["", "DEFAULT", "COPY", "INPLACE"]
+          },
+          {
+            "propertyName": "Lock",
+            "propertyKeyword": "indexLock",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "defaultValue": "DEFAULT",
+            "options": ["", "DEFAULT", "NONE", "SHARED", "EXCLUSIVE"]
+          },
+          {
+            "propertyName": "Comment",
+            "propertyKeyword": "indexComment",
+            "propertyTooltip": "comment",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lowerTab": "Check Constraints",
+    "structure": [
+      {
+        "propertyName": "Check Constraint",
+        "propertyType": "group",
+        "propertyKeyword": "chkConstr",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Name",
+            "propertyKeyword": "chkConstrName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Description",
+            "propertyKeyword": "constrDescription",
+            "propertyTooltip": "description",
+            "propertyType": "details",
+            "template": "textarea"
+          },
+          {
+            "propertyName": "Expression",
+            "propertyKeyword": "constrExpression",
+            "propertyTooltip": "Expression",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Comments",
+            "propertyKeyword": "constrComments",
+            "propertyTooltip": "comments",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  }
+]
