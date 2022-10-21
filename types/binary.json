@@ -6,7 +6,6 @@
 	"useSample": false,
 	"hiddenOnEntity": "view",
 	"defaultValues": {
-		"primaryKey": false,
 		"mode": "binary",
 		"length": 10
 	},
@@ -22,7 +21,35 @@
 			"schema": {
 				"mode": "varbinary"
 			},
-			"size": 21844,
+			"size": 2147483649,
+			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "tinyblob"
+			},
+			"size": 255,
+			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "blob"
+			},
+			"size": 65535,
+			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "mediumblob"
+			},
+			"size": 16777215,
+			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "longblob"
+			},
+			"size": 4294967295,
 			"mode": "binary"
 		}
 	]
