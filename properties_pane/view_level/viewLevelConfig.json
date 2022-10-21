@@ -128,21 +128,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Or replace",
 				"propertyKeyword": "orReplace",
 				"defaultValue": false,
-				"propertyType": "checkbox",
-				"disabledOnCondition": {
-					"key": "ifNotExist",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "If not exist",
-				"propertyKeyword": "ifNotExist",
-				"propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified view already exists. Cannot be used together with the OR REPLACE clause.",
-				"propertyType": "checkbox",
-				"disabledOnCondition": {
-					"key": "orReplace",
-					"value": true
-				}
+				"propertyType": "checkbox"
 			},
 			{
 				"propertyName": "Algorithm",
