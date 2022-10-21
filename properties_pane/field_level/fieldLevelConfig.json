@@ -2854,7 +2854,13 @@ making sure that you maintain a proper JSON format.
             }
         ],
         "defaultValue": "object"
-    },
+      },
+			{
+				"propertyName": "JSON Type",
+				"propertyKeyword": "physicalType",
+				"propertyType": "select",
+				"hidden": true
+			},
       {
         "propertyName": "Comments",
         "propertyKeyword": "description",

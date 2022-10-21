@@ -2,7 +2,7 @@
 	"name": "json",
 	"erdAbbreviation": "<json>",
 	"dtdAbbreviation": "{json}",
-	"parentType": "json",
+	"parentType": "jsonObject",
 	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 1,
