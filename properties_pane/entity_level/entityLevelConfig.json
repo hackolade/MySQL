@@ -130,38 +130,20 @@ making sure that you maintain a proper JSON format.
         "propertyName": "Or replace",
         "propertyKeyword": "orReplace",
         "propertyType": "checkbox",
-        "dependency": {
-          "type": "or",
-          "values": [
-            {
-              "key": "ifNotExist",
-              "value": false
-            },
-            {
-              "key": "ifNotExist",
-              "exists": false
-            }
-          ]
-        }
+				"disabledOnCondition": {
+					"key": "ifNotExist",
+					"value": true
+				}
       },
       {
         "propertyName": "If not exist",
         "propertyKeyword": "ifNotExist",
         "propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified table already exists. Cannot be used together with the OR REPLACE clause.",
         "propertyType": "checkbox",
-        "dependency": {
-          "type": "or",
-          "values": [
-            {
-              "key": "orReplace",
-              "value": false
-            },
-            {
-              "key": "orReplace",
-              "exists": false
-            }
-          ]
-        }
+				"disabledOnCondition": {
+					"key": "orReplace",
+					"value": true
+				}
       },
       {
         "propertyName": "Temporary",
