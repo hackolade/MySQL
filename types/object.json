@@ -15,13 +15,8 @@
 				"enum",
 				"geometry",
 				"json",
-				"inet6",
 				"numeric",
-				"rowversion",
 				"set",
-				"sql_variant",
-				"table",
-				"xml",
 				"reference",
 				"multiple"
 			]
