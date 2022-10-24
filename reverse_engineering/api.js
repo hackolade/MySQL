@@ -194,7 +194,7 @@ module.exports = {
 						standardDoc: records[0],
 						ddl: {
 							script: ddl,
-							type: 'mariadb'
+							type: 'mySql'
 						},
 						emptyBucket: false,
 						validation: {

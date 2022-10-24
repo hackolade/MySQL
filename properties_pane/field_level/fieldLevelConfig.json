@@ -1049,6 +1049,40 @@ making sure that you maintain a proper JSON format.
         "propertyType": "checkbox"
       },
       {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
         "propertyName": "Comments",
         "propertyKeyword": "description",
         "propertyTooltip": "comments",
@@ -1620,6 +1654,40 @@ making sure that you maintain a proper JSON format.
         "propertyType": "checkbox"
       },
       {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
         "propertyName": "Comments",
         "propertyKeyword": "description",
         "propertyTooltip": "comments",
@@ -2181,27 +2249,34 @@ making sure that you maintain a proper JSON format.
         }
       },
       {
-        "propertyName": "Always Generated ",
+        "propertyName": "Generated Always",
         "propertyKeyword": "generated",
         "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
         "propertyType": "checkbox",
         "defaultValue": false
       },
       {
-        "propertyName": "Generation expresion",
-        "propertyKeyword": "generated_expr",
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
         "propertyTooltip": "Allows specifying a generated column expression",
-        "propertyType": "textarea",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
         "dependency": {
           "key": "generated",
           "value": true
         }
       },
       {
-        "propertyName": "Virtual",
-        "propertyKeyword": "generated_is_stored",
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
         "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
-        "propertyType": "checkbox",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
         "dependency": {
           "key": "generated",
           "value": true
@@ -2666,6 +2741,41 @@ making sure that you maintain a proper JSON format.
         ],
         "data": "options",
         "valueType": "string"
+      },
+
+      {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
       },
       {
         "propertyName": "Comments",
@@ -3136,6 +3246,40 @@ making sure that you maintain a proper JSON format.
         "valueType": "string"
       },
       {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
         "propertyName": "Comments",
         "propertyKeyword": "description",
         "propertyTooltip": "comments",
@@ -3204,6 +3348,41 @@ making sure that you maintain a proper JSON format.
         "propertyType": "select",
         "hidden": true
       },
+
+      {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
       {
         "propertyName": "Comments",
         "propertyKeyword": "description",
@@ -3239,6 +3418,41 @@ making sure that you maintain a proper JSON format.
       "schemaId",
       "refPath",
       "type",
+      
+      {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
       {
         "propertyName": "Comments",
         "propertyKeyword": "description",
@@ -3295,6 +3509,40 @@ making sure that you maintain a proper JSON format.
       "schemaId",
       "refPath",
       "type",
+      {
+        "propertyName": "Generated Always",
+        "propertyKeyword": "generated",
+        "propertyTooltip": "Allows to specify if column is generated from other columns automatically.",
+        "propertyType": "checkbox",
+        "defaultValue": false
+      },
+      {
+        "propertyName": "Generated Expression",
+        "propertyKeyword": "expression",
+        "propertyTooltip": "Allows specifying a generated column expression",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false,
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Generated Storage",
+        "propertyKeyword": "generated_storage",
+        "propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
+        "propertyType": "select",
+        "options": [
+          "",
+          "VIRTUAL",
+          "STORED"
+        ],
+        "dependency": {
+          "key": "generated",
+          "value": true
+        }
+      },
       {
         "propertyName": "Comments",
         "propertyKeyword": "description",
