@@ -3,7 +3,7 @@
 		"NO_DATABASES": "There is no databases in MySQL instance",
 		"WRONG_CONNECTION": "Can not connect to MySQL instance"
 	},
-	"defaultDdlType": "mysql",
+	"defaultDdlType": "mySql",
 	"excludeDocKind": ["id"],
 	"connectionList": [ "name", "host", "port", "userName" ],
 	"helpUrl": "https://hackolade.com/help/ConnecttoaMySQLinstance.html"

@@ -1061,11 +1061,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -1078,8 +1074,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -1666,11 +1662,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -1683,8 +1675,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -2261,11 +2253,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -2278,8 +2266,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -2756,11 +2744,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -2773,8 +2757,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -3258,11 +3242,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -3275,8 +3255,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -3362,11 +3342,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -3379,8 +3355,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -3432,11 +3408,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -3449,8 +3421,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
@@ -3522,11 +3494,7 @@ making sure that you maintain a proper JSON format.
         "propertyTooltip": "Allows specifying a generated column expression",
         "propertyType": "details",
         "template": "textarea",
-        "markdown": false,
-        "dependency": {
-          "key": "generated",
-          "value": true
-        }
+        "markdown": false
       },
       {
         "propertyName": "Generated Storage",
@@ -3539,8 +3507,8 @@ making sure that you maintain a proper JSON format.
           "STORED"
         ],
         "dependency": {
-          "key": "generated",
-          "value": true
+          "key": "expression",
+          "exist": true
         }
       },
       {
