@@ -117,8 +117,9 @@ module.exports = {
 			const dataBaseNames = data.collectionData.dataBaseNames;
 			const connection = await this.connect(data);
 			const instance = await connectionHelper.createInstance(connection, logger);
+			const dbVersion = await instance.serverVersion();
 
-			log.info('MySQL version: ' + await instance.serverVersion());
+			log.info('MySQL version: ' + dbVersion);
 			log.progress('Start reverse engineering ...');			
 
 			const result = await async.mapSeries(dataBaseNames, async (dbName) => {
@@ -136,16 +137,15 @@ module.exports = {
 				log.progress(`Parsing functions`, dbName);	
 
 				const UDFs = mysqlHelper.parseFunctions(
-					await instance.getFunctions(dbName), logger
+					await instance.getFunctions(dbName), log
 				);
-
 				logger.log('info', 'Parsed functions', JSON.stringify(UDFs, null,2));
 
 				log.info(`Parsing procedures`);
 				log.progress(`Parsing procedures`, dbName);
 
 				const Procedures = mysqlHelper.parseProcedures(
-					await instance.getProcedures(dbName)
+					await instance.getProcedures(dbName), log
 				);
 
 				const result = await async.mapSeries(tables, async (tableName) => {
@@ -224,18 +224,21 @@ module.exports = {
 				});
 
 				if (viewData.length) {
-					return [...result, {
-						dbName: dbName,
-						views: viewData,
-						emptyBucket: false,
-					}];
+					return [
+						...result,
+						{
+							dbName: dbName,
+							views: viewData,
+							emptyBucket: false,
+						},
+					];
 				}
 				
 				return result;
 			});
 
 
-			callback(null, result.flat());
+			callback(null, result.flat(), { version: getVersion(dbVersion) });
 		} catch(error) {
 			log.error(error);
 			callback({ message: error.message, stack: error.stack });
@@ -257,6 +260,7 @@ const createLogger = ({ title, logger, hiddenKeys }) => {
 			logger.log('error', {
 				message: error.message,
 				stack: error.stack,
+				meta: error.meta,
 			}, title);
 		}
 	};
@@ -306,4 +310,12 @@ const getViewName = (name) => name.replace(/\ \(v\)$/i, '');
 
 const containsJson = (columns) => {
 	return columns.some(column => column['Type'] === 'longtext' || column['Type'] === 'json');
+};
+
+const getVersion = (version) => {
+	if (/^8./.test(String(version))) {
+		return 'v8.x';
+	} else {
+		return 'v5.x';
+	}
 };

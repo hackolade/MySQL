@@ -1,18 +1,14 @@
 
 const parseFunctionQuery = (query) => {
-
-	const parseRegexp = /create(?<orReplace>\s+or\s+replace)?(?<definer>\s+definer\s*=[\s\S]+?)?(?<aggregate>\s+aggregate)?\s+function(?<ifNotExists>\s+if not exists)?\s+\`(?<funcName>[\s\S]+?)\`\s*\((?<funcParameters>[\s\S]*?)\)\s+returns\s+(?<returnType>[a-z0-9\(\)]+)(?<characteristics>(\s*language\s+sql)?(\s*(not)?\s+deterministic)?(\s*contains\s+(sql|no\s+sql|reads\s+sql\s+data|modifies\s+sql\s+data))?(\s*sql\s+security\s+(definer|invoker))?(\s*comment\s+\'[\s\S]+?\')?(\s*charset\s+[\S\s]+?)?(\s*COLLATE\s+[\S\s]+?)?)?\s+(?<funcBody>(begin|return)([\s\S]+))/i;
+	const parseRegexp = /create(?:\s+definer\s*=(?<definer>[\s\S]+?))?\s+function(?<ifNotExists>\s+if\s+not\s+exists)?\s+\`(?<funcName>[\s\S]+?)\`\s*\((?<funcParameters>[\s\S]*?)\)\s+returns\s+(?<returnType>[a-z0-9\(\),]+)(?<characteristics>(\s+(\s*language\s+sql)|(\s*(not)?\s+deterministic)|(\s*(contains\s+sql|no\s+sql|reads\s+sql\s+data|modifies\s+sql\s+data))|(\s*sql\s+security\s+(definer|invoker))|(\s*comment\s+\'[\s\S]+?\'))*)\s+(?<funcBody>(begin|return)([\s\S]+))/i;
 
 	if (!parseRegexp.test(query)) {
-		// Should be improved to help debugging, with current approach the fail is silent
-		return {};
+		throw Error('Cannot parse function');
 	}
 
 	const result = String(query).match(parseRegexp);
 	const {
-		orReplace,
 		definer,
-		aggregate,
 		ifNotExists,
 		funcName,
 		funcParameters,
@@ -22,9 +18,7 @@ const parseFunctionQuery = (query) => {
 	} = result.groups;
 
 	return {
-		orReplace: Boolean(orReplace),
 		definer: definer,
-		isAggregate: Boolean(aggregate),
 		ifNotExists: Boolean(ifNotExists),
 		name: funcName,
 		parameters: funcParameters,
@@ -51,11 +45,11 @@ const getDeterministic = (characteristics) => {
 const getContains = (characteristics) => {
 	if (/contains\s+sql/i.test(characteristics)) {
 		return 'SQL';
-	} else if (/contains\s+no\s+sql/i.test(characteristics)) {
+	} else if (/no\s+sql/i.test(characteristics)) {
 		return 'NO SQL';
-	} else if (/contains\s+reads\s+sql\s+data/i.test(characteristics)) {
+	} else if (/reads\s+sql\s+data/i.test(characteristics)) {
 		return 'READS SQL DATA';
-	} else if (/contains\s+modifies\s+sql\s+data/i.test(characteristics)) {
+	} else if (/modifies\s+sql\s+data/i.test(characteristics)) {
 		return 'MODIFIES SQL DATA';
 	} else {
 		return '';

@@ -2,9 +2,9 @@ const functionHelper = require("./parsers/functionHelper");
 const procedureHelper = require("./parsers/procedureHelper");
 
 const parseDatabaseStatement = (statement) => {
-	const characterSetRegExp = /CHARACTER\ SET\ (.+?)\ /i;
-	const collationRegExp = /COLLATE\ (.+?)\ /i;
-	const commentRegExp = /COMMENT\ \'([\s\S]*?)\'/i;
+	const characterSetRegExp = /CHARACTER\s+SET(?:\s*=\s*|\s+)(.+?)\ /i;
+	const collationRegExp = /COLLATE(?:\s*=\s*|\s+)?(.+?)\ /i;
+	const encryptionRegExp = /ENCRYPTION(?:\s*=\s*|\s+)(yes|no)\ /i;
 	const data = {};
 
 	if (characterSetRegExp.test(statement)) {
@@ -15,14 +15,14 @@ const parseDatabaseStatement = (statement) => {
 		data.collation = statement.match(collationRegExp)[1];
 	}
 
-	if (commentRegExp.test(statement)) {
-		data.description = statement.match(commentRegExp)[1];
+	if (encryptionRegExp.test(statement)) {
+		data.ENCRYPTION = String(statement.match(collationRegExp)[1]).toLocaleLowerCase() === 'yes' ? 'Yes' : 'No';
 	}
 
 	return data;
 };
 
-const parseFunctions = (functions) => {
+const parseFunctions = (functions, logger) => {
 	return functions.map(f => {
 
 		const query = f.data[0]['Create Function'];
@@ -30,12 +30,10 @@ const parseFunctions = (functions) => {
 		try {
 			const func = functionHelper.parseFunctionQuery(String(query));
 
-	
 			return {
 				name: f.meta['Name'],
 				functionDelimiter: (func.body || '').includes(';') ? '$$' : '',
-				functionOrReplace: func.orReplace,
-				functionAggregate: func.isAggregate,
+				functionDefiner: func.definer,
 				functionIfNotExist: func.ifNotExists,
 				functionArguments: func.parameters,
 				functionDataType: func.returnType,
@@ -47,40 +45,54 @@ const parseFunctions = (functions) => {
 				functionDescription: f.meta['Comment'],
 			};
 		} catch (error) {
-			throw {
-				message: error.message + '.\nError parsing function: ' + query,
+			logger.error({
+				message: error.message + '.\nError parsing function: ' + query +
+					'.\nMake sure you have access to read function body: show create function `' + f.meta.Db + '`.`' + f.meta.Name + '`',
 				stack: error.stack,
-			};
+				meta: {
+					db: f.meta.Db,
+					name: f.meta.Name,
+					securityType: f.meta.Security_type,
+					definer: f.meta.Definer,
+				},
+			});
 		}
-	});
+	}).filter(Boolean);
 };
 
-const parseProcedures = (procedures) => {
+const parseProcedures = (procedures, logger) => {
 	return procedures.map(procedure => {
 		try {
 			const meta = procedure.meta;
 			const procValue = procedure.data[0]['Create Procedure'];
-			const data = procedureHelper.parseProcedure(String(procValue));
+			const data = procedureHelper.parseProcedure(String(procValue || ''));
 			
 			return {
 				name: meta['Name'],
 				delimiter: (data.body || '').includes(';') ? '$$' : '',
-				orReplace: data.orReplace,
+				definer: data.definer,
 				inputArgs: data.parameters,
 				body: data.body,
 				language: 'SQL',
-				deterministic: data.deterministic,
-				contains: data.contains,
+				deterministic: functionHelper.getDeterministic(data.characteristics),
+				contains: functionHelper.getContains(data.characteristics),
 				securityMode: meta['Security_type'],
 				comments: meta['Comment']
 			};
 		} catch (error) {
-			throw {
-				message: error.message + '.\nError parsing procedure: ' + procedure.data[0]['Create Procedure'],
+			logger.error({
+				message: error.message + '.\nError parsing procedure: ' + procedure.data[0]['Create Procedure'] +
+					'.\nMake sure you have access to read procedure body: show create procedure `' + procedure.meta.Db + '`.`' + procedure.meta.Name + '`',
 				stack: error.stack,
-			};
+				meta: {
+					db: procedure.meta.Db,
+					name: procedure.meta.Name,
+					securityType: procedure.meta.Security_type,
+					definer: procedure.meta.Definer,
+				},
+			});
 		}
-	});
+	}).filter(Boolean);
 };
 
 const isJson = (columnName, constraints) => {
