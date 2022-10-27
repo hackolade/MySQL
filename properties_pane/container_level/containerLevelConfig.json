@@ -990,7 +990,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Returns data type",
-						"propertyKeyword": "functionDataType",
+						"propertyKeyword": "functionReturnType",
 						"propertyTooltip": "Any valid MySQL data type",
 						"propertyType": "text"
 					},
@@ -1080,16 +1080,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Definer",
+						"propertyKeyword": "definer",
+						"shouldValidate": false,
+						"propertyType": "text"
+					},
+					{
 						"propertyName": "Delimiter",
 						"propertyKeyword": "delimiter",
 						"propertyType": "text",
 						"propertyTooltip": "redefine delimiter in order to use semicolons in body statement"
 					},
 					{
-						"propertyName": "Definer",
-						"propertyKeyword": "definer",
-						"shouldValidate": false,
-						"propertyType": "text"
+						"propertyName": "If not exist",
+						"propertyKeyword": "procedureIfNotExist",
+						"propertyTooltip": "The procedure will only be created if a procedure with the same name does not already exist. If the procedure already exists, then a warning will be triggered by default.",
+						"defaultValue": true,
+						"propertyType": "checkbox"
 					},
 					{
 						"propertyName": "Parameters",

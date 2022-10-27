@@ -36,7 +36,7 @@ const parseFunctions = (functions, logger) => {
 				functionDefiner: func.definer,
 				functionIfNotExist: func.ifNotExists,
 				functionArguments: func.parameters,
-				functionDataType: func.returnType,
+				functionReturnType: func.returnType,
 				functionBody: func.body,
 				functionLanguage: 'SQL',
 				functionDeterministic: functionHelper.getDeterministic(func.characteristics),
