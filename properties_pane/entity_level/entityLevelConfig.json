@@ -1040,6 +1040,10 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
+                  "value": "HEAP"
+                },
+                {
+                  "key": "ENGINE",
                   "value": "Archive"
                 }
               ]
@@ -1099,11 +1103,11 @@ making sure that you maintain a proper JSON format.
           {
             "dependency": {
               "key": "ENGINE",
-              "value": "FEDERATED"
+              "value": "Federated"
             },
             "propertyName": "Connection",
             "propertyType": "text",
-            "propertyKeyword": "connection",
+            "propertyKeyword": "CONNECTION",
             "propertyTooltip": "The connection string for a FEDERATED table."
           },
           {
@@ -1243,8 +1247,17 @@ making sure that you maintain a proper JSON format.
             "minValue": 0,
             "step": 1,
             "dependency": {
-              "key": "ENGINE",
-              "value": "Memory"
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "HEAP"
+                }
+              ]
             }
           },
           {
@@ -1257,8 +1270,17 @@ making sure that you maintain a proper JSON format.
             "minValue": 0,
             "step": 1,
             "dependency": {
-              "key": "ENGINE",
-              "value": "Memory"
+              "type": "or",
+              "values": [
+                {
+                  "key": "ENGINE",
+                  "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "HEAP"
+                }
+              ]
             }
           },
           {
@@ -1293,13 +1315,8 @@ making sure that you maintain a proper JSON format.
               "Compressed"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
