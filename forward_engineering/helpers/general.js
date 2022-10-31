@@ -24,7 +24,10 @@ module.exports = (_, wrap) => {
 		STATS_AUTO_RECALC: 'STATS_AUTO_RECALC',
 		STATS_PERSISTENT: 'STATS_PERSISTENT',
 		TRANSACTIONAL: 'TRANSACTIONAL',
-		WITH_SYSTEM_VERSIONING: 'WITH SYSTEM VERSIONING',
+		compression: 'COMPRESSION',
+		STATS_SAMPLE_PAGES: 'STATS_SAMPLE_PAGES',
+		ENCRYPTION: 'ENCRYPTION',
+		AUTOEXTEND_SIZE: 'AUTOEXTEND_SIZE',
 	};
 
 	const OPTIONS_BY_ENGINE = {
@@ -38,42 +41,28 @@ module.exports = (_, wrap) => {
 			'KEY_BLOCK_SIZE',
 			'PACK_KEYS',
 			'ROW_FORMAT',
-			'WITH_SYSTEM_VERSIONING',
 		],
 		InnoDB: [
 			'AUTO_INCREMENT',
 			'DATA_DIRECTORY',
 			'INDEX_DIRECTORY',
-			'ENCRYPTED',
-			'ENCRYPTION_KEY_ID',
-			'KEY_BLOCK_SIZE',
-			'PACK_KEYS',
-			'PAGE_COMPRESSED',
-			'PAGE_COMPRESSION_LEVEL',
+			'ENCRYPTION',
+			'AUTOEXTEND_SIZE',
 			'ROW_FORMAT',
-			'SEQUENCE',
+			'compression',
 			'STATS_AUTO_RECALC',
 			'STATS_PERSISTENT',
-			'WITH_SYSTEM_VERSIONING',
-		],
-		CSV: ['IETF_QUOTES', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		MERGE: ['INSERT_METHOD', 'UNION', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		Aria: [
-			'AUTO_INCREMENT',
-			'AVG_ROW_LENGTH',
-			'CHECKSUM',
-			'DATA_DIRECTORY',
-			'DELAY_KEY_WRITE',
-			'INDEX_DIRECTORY',
-			'PAGE_CHECKSUM',
-			'ROW_FORMAT',
+			'STATS_SAMPLE_PAGES',
 			'KEY_BLOCK_SIZE',
-			'PACK_KEYS',
-			'TRANSACTIONAL',
-			'WITH_SYSTEM_VERSIONING',
 		],
-		Memory: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		Archive: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
+		CSV: ['IETF_QUOTES', 'KEY_BLOCK_SIZE'],
+		MERGE: ['INSERT_METHOD', 'UNION', 'KEY_BLOCK_SIZE'],
+		Memory: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		Archive: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		Federated: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		EXAMPLE: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		HEAP: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		NDB: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
 	};
 
 	const getTableName = (tableName, schemaName) => {
@@ -136,17 +125,9 @@ module.exports = (_, wrap) => {
 			tableOptions.push(`COMMENT = '${encodeStringLiteral(options.description)}'`);
 		}
 
-		const optionKeywords = OPTIONS_BY_ENGINE[engine] || ['KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'];
+		const optionKeywords = OPTIONS_BY_ENGINE[engine] || ['KEY_BLOCK_SIZE'];
 
 		optionKeywords.forEach(keyword => {
-			if (keyword === 'WITH_SYSTEM_VERSIONING') {
-				if (options[keyword]) {
-					return tableOptions.push(OPTION_KEYWORDS[keyword]);
-				} else {
-					return;
-				}
-			}
-
 			const value = getOptionValue(keyword, options[keyword]);
 
 			if (value === undefined) {

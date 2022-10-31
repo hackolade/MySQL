@@ -2,7 +2,7 @@ module.exports = {
 	createDatabase: 'CREATE DATABASE${ifNotExist} `${name}`${dbOptions};\n\n${useDb}',
 
 	createTable:
-		'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} (\n' +
+		'CREATE ${temporary}TABLE ${ifNotExist}${name} (\n' +
 		'\t${column_definitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
 		')${options}${partitions}${selectStatement};\n',
 

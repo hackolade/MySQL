@@ -1002,8 +1002,8 @@ making sure that you maintain a proper JSON format.
           },
           {
             "options": [
-              "None",
-              "Zlib",
+              "NONE",
+              "ZLIB",
               "LZ4"
             ],
             "dependency": {
@@ -1032,10 +1032,6 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
-                  "value": "Aria"
-                },
-                {
-                  "key": "ENGINE",
                   "value": "InnoDB"
                 },
                 {
@@ -1053,7 +1049,7 @@ making sure that you maintain a proper JSON format.
             "propertyName": "Auto tablespace size extension",
             "propertyKeyword": "AUTOEXTEND_SIZE",
             "propertyType": "numeric",
-            "valueType": "bytes",
+            "valueType": "integer",
             "propertyTooltip": "Must be a multiple of 4MB and defines the amount by which InnoDB extends the size of the tablespace when it becomes full.",
             "minValue": 0,
             "step": 4000000,
@@ -1067,7 +1063,7 @@ making sure that you maintain a proper JSON format.
                 {
                   "level": "model",
                   "key": "dbVersion",
-                  "value": "8.x"
+                  "value": "v8.x"
                 }
               ]
             }
@@ -1081,17 +1077,8 @@ making sure that you maintain a proper JSON format.
             "minValue": 1,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
@@ -1105,17 +1092,8 @@ making sure that you maintain a proper JSON format.
             "maxValue": 1,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
@@ -1142,10 +1120,6 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
-                  "value": "Aria"
-                },
-                {
-                  "key": "ENGINE",
                   "value": "InnoDB"
                 }
               ]
@@ -1167,10 +1141,6 @@ making sure that you maintain a proper JSON format.
                 {
                   "key": "ENGINE",
                   "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
                 }
               ]
             }
@@ -1189,10 +1159,6 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
-                  "value": "Aria"
-                },
-                {
-                  "key": "ENGINE",
                   "value": "InnoDB"
                 }
               ]
@@ -1205,13 +1171,8 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "No",
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             },
             "options": [
               "No",
@@ -1225,13 +1186,8 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "Default",
             "dependency": {
-              "type": "and",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             },
             "options": [
               "Default",
@@ -1246,13 +1202,8 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "No",
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MERGE"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MERGE"
             },
             "options": [
               "No",
@@ -1268,13 +1219,8 @@ making sure that you maintain a proper JSON format.
             "template": "textarea",
             "markdown": false,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MERGE"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MERGE"
             }
           },
           {
@@ -1297,13 +1243,8 @@ making sure that you maintain a proper JSON format.
             "minValue": 0,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "Memory"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "Memory"
             }
           },
           {
@@ -1316,27 +1257,9 @@ making sure that you maintain a proper JSON format.
             "minValue": 0,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "Memory"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "Memory"
             }
-          },
-          {
-            "propertyName": "Pack keys",
-            "propertyKeyword": "PACK_KEYS",
-            "propertyTooltip": "Can be used to determine whether the indexes will be compressed. Set it to 1 to compress all keys. With a value of 0, compression will not be used. With the DEFAULT value, only long strings will be compressed. Uncompressed keys are faster.",
-            "propertyType": "select",
-            "defaultValue": "",
-            "options": [
-              "",
-              "Default",
-              "0",
-              "1"
-            ]
           },
           {
             "propertyName": "Row format",
@@ -1353,13 +1276,8 @@ making sure that you maintain a proper JSON format.
               "Redundant"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
           {
@@ -1372,7 +1290,7 @@ making sure that you maintain a proper JSON format.
               "Default",
               "Fixed",
               "Dynamic",
-              "Compressed",
+              "Compressed"
             ],
             "dependency": {
               "type": "or",
@@ -1396,13 +1314,8 @@ making sure that you maintain a proper JSON format.
               "1"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
           {
@@ -1417,13 +1330,8 @@ making sure that you maintain a proper JSON format.
               "1"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
           {
@@ -1438,13 +1346,8 @@ making sure that you maintain a proper JSON format.
               "1"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           }
         ]

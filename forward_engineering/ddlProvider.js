@@ -65,7 +65,6 @@ module.exports = (baseProvider, options, app) => {
 				columns,
 				dbData,
 				temporary,
-				orReplace,
 				ifNotExist,
 				likeTableName,
 				selectStatement,
@@ -78,7 +77,6 @@ module.exports = (baseProvider, options, app) => {
 			isActivated,
 		) {
 			const tableName = getTableName(name, dbData.databaseName);
-			const orReplaceTable = orReplace ? 'OR REPLACE ' : '';
 			const temporaryTable = temporary ? 'TEMPORARY ' : '';
 			const ifNotExistTable = ifNotExist ? 'IF NOT EXISTS ' : '';
 
@@ -86,7 +84,6 @@ module.exports = (baseProvider, options, app) => {
 				return assignTemplates(templates.createLikeTable, {
 					name: tableName,
 					likeTableName: getTableName(likeTableName, dbData.databaseName),
-					orReplace: orReplaceTable,
 					temporary: temporaryTable,
 					ifNotExist: ifNotExistTable,
 				});
@@ -104,8 +101,7 @@ module.exports = (baseProvider, options, app) => {
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
 				column_definitions: columns.join(',\n\t'),
-				selectStatement: selectStatement ? ` ${selectStatement}` : '',
-				orReplace: orReplaceTable,
+				selectStatement: selectStatement ? ` AS ${selectStatement}` : '',
 				temporary: temporaryTable,
 				ifNotExist: ifNotExistTable,
 				options: getTableOptions(options),
@@ -385,7 +381,6 @@ module.exports = (baseProvider, options, app) => {
 				...tableData,
 				keyConstraints: keyHelper.getTableKeyConstraints({ jsonSchema }),
 				temporary: detailsTab.temporary,
-				orReplace: detailsTab.orReplace,
 				ifNotExist: !detailsTab.orReplace && detailsTab.ifNotExist,
 				likeTableName: likeTable?.code || likeTable?.collectionName,
 				selectStatement: _.trim(detailsTab.selectStatement),
