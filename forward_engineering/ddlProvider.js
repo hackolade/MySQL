@@ -34,11 +34,10 @@ module.exports = (baseProvider, options, app) => {
 	return {
 		createDatabase({
 			databaseName,
-			orReplace,
 			ifNotExist,
 			collation,
 			characterSet,
-			comments,
+			encryption,
 			udfs,
 			procedures,
 			useDb = true,
@@ -46,11 +45,10 @@ module.exports = (baseProvider, options, app) => {
 			let dbOptions = '';
 			dbOptions += characterSet ? tab(`\nCHARACTER SET = '${characterSet}'`) : '';
 			dbOptions += collation ? tab(`\nCOLLATE = '${collation}'`) : '';
-			dbOptions += comments ? tab(`\nCOMMENT = '${escapeQuotes(comments)}'`) : '';
+			dbOptions += encryption ? tab(`\nENCRYPTION = 'Y'`) : '';
 
 			const databaseStatement = assignTemplates(templates.createDatabase, {
 				name: databaseName,
-				orReplace: orReplace && !ifNotExist ? ' OR REPLACE' : '',
 				ifNotExist: ifNotExist ? ' IF NOT EXISTS' : '',
 				dbOptions: dbOptions,
 				useDb: useDb ? `USE \`${databaseName}\`;\n` : '',
@@ -370,11 +368,10 @@ module.exports = (baseProvider, options, app) => {
 		hydrateDatabase(containerData, data) {
 			return {
 				databaseName: containerData.name,
-				orReplace: containerData.orReplace,
 				ifNotExist: containerData.ifNotExist,
 				characterSet: containerData.characterSet,
 				collation: containerData.collation,
-				comments: containerData.description,
+				encryption: containerData.ENCRYPTION === 'Yes' ? true : false,
 				udfs: (data?.udfs || []).map(this.hydrateUdf),
 				procedures: (data?.procedures || []).map(this.hydrateProcedure),
 			};
@@ -430,9 +427,8 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				name: udf.name,
 				delimiter: udf.functionDelimiter,
-				orReplace: udf.functionOrReplace,
-				aggregate: udf.functionAggregate,
 				ifNotExist: udf.functionIfNotExist,
+				definer: udf.functionDefiner,
 				parameters: udf.functionArguments,
 				type: udf.functionReturnType,
 				characteristics: {
@@ -448,8 +444,9 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateProcedure(procedure) {
 			return {
-				orReplace: procedure.orReplace,
 				delimiter: procedure.delimiter,
+				definer: procedure.definer,
+				ifNotExist: procedure.procedureIfNotExist,
 				name: procedure.name,
 				parameters: procedure.inputArgs,
 				body: procedure.body,
@@ -472,9 +469,8 @@ module.exports = (baseProvider, options, app) => {
 				startDelimiter +
 				assignTemplates(templates.createFunction, {
 					name: getTableName(udf.name, databaseName),
-					orReplace: udf.orReplace ? 'OR REPLACE ' : '',
+					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
 					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
-					aggregate: udf.aggregate ? 'AGGREGATE ' : '',
 					characteristics: characteristics.join('\n\t'),
 					type: udf.type,
 					parameters: udf.parameters,
@@ -494,7 +490,8 @@ module.exports = (baseProvider, options, app) => {
 				startDelimiter +
 				assignTemplates(templates.createProcedure, {
 					name: getTableName(procedure.name, databaseName),
-					orReplace: procedure.orReplace ? 'OR REPLACE ' : '',
+					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
+					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
 					parameters: procedure.parameters,
 					characteristics: characteristics.join('\n\t'),
 					body: procedure.body,

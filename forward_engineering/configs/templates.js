@@ -1,5 +1,5 @@
 module.exports = {
-	createDatabase: 'CREATE${orReplace} DATABASE${ifNotExist} `${name}`${dbOptions};\n\n${useDb}',
+	createDatabase: 'CREATE DATABASE${ifNotExist} `${name}`${dbOptions};\n\n${useDb}',
 
 	createTable:
 		'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} (\n' +
@@ -31,14 +31,14 @@ module.exports = {
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
 
 	createFunction:
-		'CREATE ${orReplace}FUNCTION ${ifNotExist}${name}\n' +
+		'CREATE ${definer}FUNCTION ${ifNotExist}${name}\n' +
 		'\t(${parameters})\n' +
 		'\tRETURNS ${type}\n' +
 		'\t${characteristics}\n' +
-		'${body}${delimiter}\n',
+		'${body} ${delimiter}\n',
 
 	createProcedure:
-		'CREATE ${orReplace}PROCEDURE ${name} (${parameters})\n' + '\t${characteristics}\n' + '${body}${delimiter}\n',
+		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' + '\t${characteristics}\n' + '${body} ${delimiter}\n',
 
 	alterView: 'ALTER VIEW ${name}${algorithm}${sqlSecurity} AS ${selectStatement}',
 };

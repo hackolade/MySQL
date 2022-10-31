@@ -295,6 +295,10 @@ module.exports = (_, wrap) => {
 			characteristics.push(udfCharacteristics.deterministic);
 		}
 
+		if (udfCharacteristics.contains) {
+			characteristics.push(udfCharacteristics.contains);
+		}
+
 		if (udfCharacteristics.sqlSecurity) {
 			characteristics.push(`SQL SECURITY ${udfCharacteristics.sqlSecurity}`);
 		}
