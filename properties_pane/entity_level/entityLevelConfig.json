@@ -1408,6 +1408,20 @@ making sure that you maintain a proper JSON format.
             }
           },
           {
+            "propertyName": "Algorithm",
+            "propertyKeyword": "ALGORITHM",
+            "propertyType": "select",
+            "dependency": {
+              "key": "partitionType",
+              "value": "KEY"
+            },
+            "options": [
+              "",
+              "0",
+              "1"
+            ]
+          },
+          {
             "propertyName": "Expression",
             "propertyKeyword": "partitioning_expression",
             "propertyTooltip": "A SQL expression that returns a value from each row. In the simplest cases, it is a column name. This value is used to determine which partition should contain a row.",
@@ -1419,19 +1433,81 @@ making sure that you maintain a proper JSON format.
               "values": [
                 {
                   "key": "partitionType",
-                  "value": "RANGE"
-                },
-                {
-                  "key": "partitionType",
-                  "value": "LIST"
-                },
-                {
-                  "key": "partitionType",
                   "value": "HASH"
                 },
                 {
                   "key": "partitionType",
                   "value": "KEY"
+                },
+                {
+                  "type": "and",
+                  "values": [
+                    {
+                      "type": "or",
+                      "values": [
+                        {
+                          "key": "partitionType",
+                          "value": "RANGE"
+                        },
+                        {
+                          "key": "partitionType",
+                          "value": "LIST"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "or",
+                      "values": [
+                        {
+                          "key": "partitioning_columns",
+                          "value": ""
+                        },
+                        {
+                          "key": "partitioning_columns",
+                          "exist": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Columns",
+            "propertyKeyword": "partitioning_columns",
+            "propertyTooltip": "Columns list separated by comma. Cannot be specified within expression.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false,
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "partitionType",
+                      "value": "RANGE"
+                    },
+                    {
+                      "key": "partitionType",
+                      "value": "LIST"
+                    }
+                  ]
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "partitioning_expression",
+                      "value": ""
+                    },
+                    {
+                      "key": "partitioning_expression",
+                      "exist": false
+                    }
+                  ]
                 }
               ]
             }
@@ -1444,23 +1520,6 @@ making sure that you maintain a proper JSON format.
             "allowNegative": false,
             "maxValue": 1024,
             "step": 1
-          },
-          {
-            "propertyName": "Interval",
-            "propertyKeyword": "interval",
-            "propertyType": "numeric",
-            "valueType": "number",
-            "allowNegative": false,
-            "step": 1,
-            "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "partitionType",
-                  "value": "SYSTEM_TIME"
-                }
-              ]
-            }
           },
           {
             "propertyName": "Subpartition type",
@@ -1491,6 +1550,20 @@ making sure that you maintain a proper JSON format.
                 }
               ]
             }
+          },
+          {
+            "propertyName": "Algorithm",
+            "propertyKeyword": "SUBALGORITHM",
+            "propertyType": "select",
+            "dependency": {
+              "key": "subpartitionType",
+              "value": "KEY"
+            },
+            "options": [
+              "",
+              "0",
+              "1"
+            ]
           },
           {
             "propertyName": "Number of subpartitions",

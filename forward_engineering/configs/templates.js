@@ -1,5 +1,5 @@
 module.exports = {
-	createDatabase: 'CREATE DATABASE${ifNotExist} `${name}`${dbOptions};\n\n${useDb}',
+	createDatabase: 'CREATE DATABASE${ifNotExist} `${name}`${dbOptions};\n',
 
 	createTable:
 		'CREATE ${temporary}TABLE ${ifNotExist}${name} (\n' +

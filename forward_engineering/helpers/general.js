@@ -150,28 +150,31 @@ module.exports = (_, wrap) => {
 	const addLinear = linear => (linear ? 'LINEAR ' : '');
 
 	const getPartitionBy = partitioning => {
-		if (partitioning.partitionType === 'SYSTEM_TIME') {
-			let interval =
-				!isNaN(partitioning.interval) && partitioning.interval ? ` INTERVAL ${partitioning.interval}` : '';
+		let expression =` (${_.trim(partitioning.partitioning_expression)})`;
+		let algorithm = '';
 
-			if (interval && partitioning.time_unit) {
-				interval += ` ${partitioning.time_unit}`;
-			}
-
-			return `SYSTEM_TIME${interval}`;
+		if (['RANGE', 'LIST'].includes(partitioning.partitionType) && partitioning.partitioning_columns) {
+			expression = ` COLUMNS(${_.trim(partitioning.partitioning_columns)})`;
 		}
 
-		return `${addLinear(partitioning.LINEAR)}${partitioning.partitionType}(${_.trim(
-			partitioning.partitioning_expression,
-		)})`;
+		if (partitioning.partitionType === 'KEY' && partitioning.ALGORITHM) {
+			algorithm = ` ALGORITHM ${partitioning.ALGORITHM}`;
+		}
+
+		return `${addLinear(partitioning.LINEAR)}${partitioning.partitionType}${algorithm}${expression}`;
 	};
 
 	const getSubPartitionBy = partitioning => {
 		if (!partitioning.subpartitionType) {
 			return '';
 		}
+		let algorithm = '';
 
-		return `SUBPARTITION BY ${addLinear(partitioning.SUBLINEAR)}${partitioning.subpartitionType}(${_.trim(
+		if (partitioning.subpartitionType === 'KEY' && partitioning.SUBALGORITHM) {
+			algorithm = ` ALGORITHM ${partitioning.SUBALGORITHM} `;
+		}
+
+		return `SUBPARTITION BY ${addLinear(partitioning.SUBLINEAR)}${partitioning.subpartitionType}${algorithm}(${_.trim(
 			partitioning.subpartitioning_expression,
 		)})`;
 	};
