@@ -176,8 +176,7 @@ module.exports = {
 					log.info(`Get constraints "${tableName}"`);
 					log.progress(`Get constraints`, dbName, tableName);
 
-					const constraints = await instance.getConstraints(dbName, tableName);
-					const jsonSchema = mysqlHelper.getJsonSchema({ columns, constraints, records, indexes });
+					const jsonSchema = mysqlHelper.getJsonSchema({ columns, records, indexes });
 					const Indxs = mysqlHelper.parseIndexes(indexes);
 
 					log.info(`Data retrieved successfully "${tableName}"`);
@@ -236,7 +235,6 @@ module.exports = {
 				
 				return result;
 			});
-
 
 			callback(null, result.flat(), { version: getVersion(dbVersion) });
 		} catch(error) {

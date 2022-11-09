@@ -109,7 +109,11 @@ const isJson = (columnName, constraints) => {
 
 const findJsonRecord = (fieldName, records) => {
 	return records.find(records => {
-		if (typeof records[fieldName] !== 'string') {
+		if (records[fieldName] && typeof records[fieldName] === 'object') {
+			return records[fieldName];
+		}
+
+		if (typeof records[fieldName] === 'string') {
 			return false;
 		}
 
@@ -122,6 +126,14 @@ const findJsonRecord = (fieldName, records) => {
 };
 
 const getSubtype = (fieldName, record) => {
+	if (Array.isArray(record[fieldName])) {
+		return 'array';
+	}
+
+	if (record[fieldName] && typeof record[fieldName] === 'object') {
+		return 'object';
+	}
+
 	const item = JSON.parse(record[fieldName]);
  
 	if (!item) {
@@ -210,17 +222,25 @@ const getIndexData = (index) => {
 	};
 };
 
-const getJsonSchema = ({ columns, constraints, records, indexes }) => {
+const getJsonSchema = ({ columns, records, indexes }) => {
 	const properties = columns.filter((column) => {
-		return column['Type'] === 'longtext';
+		return column['Type'] === 'longtext' || column['Type'] === 'json';
 	}).reduce((schema, column) => {
 		const fieldName = column['Field'];
 		const record = findJsonRecord(fieldName, records);
-		const isJsonSynonym = isJson(fieldName, constraints);
 		const subtype = record ? getSubtype(fieldName, record) : ' ';
-		const synonym = isJsonSynonym ? 'json' : '';
 
-		if (!synonym && subtype === ' ') {
+		if (column['Type'] === 'json') {
+			return {
+				...schema,
+				[fieldName]: {
+					type: 'json',
+					subtype,
+				}
+			};
+		}
+
+		if (subtype === ' ') {
 			return schema;
 		}
 
@@ -229,7 +249,6 @@ const getJsonSchema = ({ columns, constraints, records, indexes }) => {
 			[fieldName]: {
 				type: 'char',
 				mode: 'longtext',
-				synonym,
 				subtype,
 			}
 		};
@@ -278,20 +297,44 @@ const getIndexCategory = (index) => {
 	}
 };
 
+const parseIndexExpression = (expression) => {
+	const jsonColumnRegExp = /json_extract\(`(?<columnName>[\s\S]+?)`,[\s\S]+\'\$(?<jsonPath>[\w\d\.]+)/i;
+	const parseData = expression.match(jsonColumnRegExp);
+
+	if (!parseData) {
+		return;
+	}
+
+	return parseData.groups.columnName + parseData.groups.jsonPath;
+};
+
 const parseIndexes = (indexes) => {
 	const indexesByConstraint = indexes.filter(index => !['PRIMARY', 'UNIQUE'].includes(getIndexType(index))).reduce((result, index) => {
 		const constraintName = index['Key_name'];
+		let columnName = index['Column_name'];
+		if (!columnName && index['Expression']) {
+			columnName = parseIndexExpression(index['Expression']);
+		}
 
 		if (result[constraintName]) {
+			const indexData = {
+				...result[constraintName],
+				indxKey: result[constraintName].indxKey.concat({
+					name: columnName,
+					type: getIndexOrder(index['Collation']),
+				}),
+			};
+
+			if (indexData.indxExpression && indexData.indxExpression.length) {
+				indexData.indxExpression = [
+					...indexData.indxExpression,
+					{ value: index['Expression'] || columnName },
+				];
+			}
+
 			return {
 				...result,
-				[constraintName]: {
-					...result[constraintName],
-					indxKey: result[constraintName].indxKey.concat({
-						name: index['Column_name'],
-						type: getIndexOrder(index['Collation']),
-					}),
-				},
+				[constraintName]: indexData,
 			};
 		}
 
@@ -301,10 +344,14 @@ const parseIndexes = (indexes) => {
 			indexCategory: getIndexCategory(index),
 			indexComment: index['Index_comment'],
 			indxKey: [{
-				name: index['Column_name'],
+				name: columnName,
 				type: getIndexOrder(index['Collation']),
 			}],
 		};
+
+		if (index['Expression']) {
+			indexData.indxExpression = [{ value: index['Expression'] }];
+		}
 
 		return {
 			...result,

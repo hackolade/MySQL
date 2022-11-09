@@ -22,7 +22,7 @@ module.exports = {
 		'ALTER TABLE ${foreignTable} ADD CONSTRAINT `${name}` FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey});',
 
 	index:
-		'CREATE ${indexType}INDEX ${ifNotExist}${name}${indexCategory}\n' +
+		'CREATE ${indexType}INDEX ${name}${indexCategory}\n' +
 		'\tON ${table} ( ${keys} )${indexOptions};\n',
 
 	createView:

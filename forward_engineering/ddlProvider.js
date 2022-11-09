@@ -30,6 +30,7 @@ module.exports = (baseProvider, options, app) => {
 			escapeQuotes,
 		});
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
+	const { processIndexKeyName } = require('./helpers/indexHelper')(wrap);
 
 	return {
 		createDatabase({
@@ -161,7 +162,7 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		createIndex(tableName, index, dbData, isParentActivated = true) {
+		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
 			if (_.isEmpty(index.indxKey) || !index.indxName) {
 				return '';
 			}
@@ -169,7 +170,6 @@ module.exports = (baseProvider, options, app) => {
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
 			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
-			const ifNotExist = index.ifNotExist ? 'IF NOT EXISTS ' : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
@@ -177,7 +177,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const dividedKeys = divideIntoActivatedAndDeactivated(
 				index.indxKey || [],
-				key => `\`${key.name}\`${key.type === 'DESC' ? ' DESC' : ''}`,
+				key => processIndexKeyName({ name: key.name, type: key.type, jsonSchema }),
 			);
 			const commentedKeys = dividedKeys.deactivatedItems.length
 				? commentIfDeactivated(dividedKeys.deactivatedItems.join(', '), {
@@ -185,17 +185,22 @@ module.exports = (baseProvider, options, app) => {
 						isPartOfLine: true,
 				  })
 				: '';
+			const expressionKeys = (index.indxExpression || []).map(item => item.value?.replace(/\\/g, '\\\\')).filter(Boolean);
 
-			if (_.toLower(index.waitNoWait) === 'wait' && index.waitValue) {
-				indexOptions.push(`WAIT ${index.waitValue}`);
+			if (index.indxKeyBlockSize) {
+				indexOptions.push(`KEY_BLOCK_SIZE = ${index.indxKeyBlockSize}`);
 			}
 
-			if (_.toLower(index.waitNoWait) === 'nowait') {
-				indexOptions.push(`NOWAIT`);
+			if (index.indexType === 'FULLTEXT' && index.indxParser) {
+				indexOptions.push(`WITH PARSER ${index.indxParser}`);
 			}
 
 			if (index.indexComment) {
 				indexOptions.push(`COMMENT '${escapeQuotes(index.indexComment)}'`);
+			}
+
+			if (index.indxVisibility) {
+				indexOptions.push(index.indxVisibility);
 			}
 
 			if (index.indexLock) {
@@ -205,7 +210,7 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const indexStatement = assignTemplates(templates.index, {
-				keys:
+				keys: expressionKeys.length ? expressionKeys.join(', ') :
 					dividedKeys.activatedItems.join(', ') +
 					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
 						? ', ' + commentedKeys
@@ -214,7 +219,6 @@ module.exports = (baseProvider, options, app) => {
 				name,
 				table,
 				indexType,
-				ifNotExist,
 				indexCategory,
 			});
 
