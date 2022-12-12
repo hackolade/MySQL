@@ -163,7 +163,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
-			if (_.isEmpty(index.indxKey) || !index.indxName) {
+			if ((_.isEmpty(index.indxKey) && _.isEmpty(index.indxExpression)) || !index.indxName) {
 				return '';
 			}
 
@@ -210,7 +210,7 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const indexStatement = assignTemplates(templates.index, {
-				keys: expressionKeys.length ? expressionKeys.join(', ') :
+				keys: expressionKeys.length ? `(${expressionKeys.join(', ')})` :
 					dividedKeys.activatedItems.join(', ') +
 					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
 						? ', ' + commentedKeys
@@ -233,6 +233,7 @@ module.exports = (baseProvider, options, app) => {
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `${wrap(checkConstraint.name, '`', '`')} ` : '',
 				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
+				enforcement: checkConstraint.enforcement ? ` ${checkConstraint.enforcement}` : '',
 			});
 		},
 
@@ -362,6 +363,7 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				name: checkConstraint.chkConstrName,
 				expression: checkConstraint.constrExpression,
+				enforcement: checkConstraint.constrEnforcement,
 			};
 		},
 

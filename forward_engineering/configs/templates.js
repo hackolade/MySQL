@@ -11,7 +11,7 @@ module.exports = {
 	columnDefinition:
 		'`${name}` ${national}${type}${signed}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
 
-	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})',
+	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})${enforcement}',
 
 	createForeignKeyConstraint:
 		'CONSTRAINT `${name}` FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})',

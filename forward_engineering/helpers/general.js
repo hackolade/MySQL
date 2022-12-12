@@ -88,7 +88,10 @@ module.exports = (_, wrap) => {
 		}
 
 		if (['YES', 'NO', 'DEFAULT'].includes(_.toUpper(value))) {
-			return _.toUpper(value);
+			return ({
+				YES: '\'Y\'',
+				NO: '\'N\'',
+			})[_.toUpper(value)] || _.toUpper(value);
 		}
 		if (typeof value === 'number') {
 			return value;
@@ -97,7 +100,7 @@ module.exports = (_, wrap) => {
 		} else if (typeof value === 'string' && value) {
 			return wrap(value);
 		} else if (typeof value === 'boolean') {
-			return value ? 'YES' : 'NO';
+			return value ? '\'Y\'' : '\'N\'';
 		}
 	};
 

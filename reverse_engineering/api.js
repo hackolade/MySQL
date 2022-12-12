@@ -166,15 +166,12 @@ module.exports = {
 					log.info(`Get create table statement "${tableName}"`);
 					log.progress(`Get create table statement`, dbName, tableName);
 
-					const ddl = await instance.showCreateTable(dbName, tableName);
+					const ddl = prepareDdl(await instance.showCreateTable(dbName, tableName));
 
 					log.info(`Get indexes "${tableName}"`);
 					log.progress(`Get indexes`, dbName, tableName);
 
 					const indexes = await instance.getIndexes(dbName, tableName);
-
-					log.info(`Get constraints "${tableName}"`);
-					log.progress(`Get constraints`, dbName, tableName);
 
 					const jsonSchema = mysqlHelper.getJsonSchema({ columns, records, indexes });
 					const Indxs = mysqlHelper.parseIndexes(indexes);
@@ -217,7 +214,7 @@ module.exports = {
 						name: viewName,
 						ddl: {
 							script: ddl,
-							type: 'mariadb'
+							type: 'mySql'
 						}
 					};
 				});
@@ -316,4 +313,9 @@ const getVersion = (version) => {
 	} else {
 		return 'v5.x';
 	}
+};
+
+const prepareDdl = (ddl) => {
+	return ddl
+		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1');
 };

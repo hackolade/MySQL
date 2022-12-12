@@ -2025,6 +2025,17 @@ making sure that you maintain a proper JSON format.
             "markdown": false
           },
           {
+            "propertyName": "Enforcement",
+            "propertyKeyword": "constrEnforcement",
+            "propertyTooltip": "Enforcement",
+            "propertyType": "select",
+            "options": [
+              "",
+              "ENFORCED",
+              "NOT ENFORCED"
+            ]
+          },
+          {
             "propertyName": "Comments",
             "propertyKeyword": "constrComments",
             "propertyTooltip": "comments",
