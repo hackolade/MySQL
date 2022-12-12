@@ -14,7 +14,7 @@ module.exports = (baseProvider, options, app) => {
 		clean,
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
-	const { decorateDefault, decorateType, canBeNational, getSign } = require('./helpers/columnDefinitionHelper')(
+	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn } = require('./helpers/columnDefinitionHelper')(
 		_,
 		wrap,
 	);
@@ -130,7 +130,8 @@ module.exports = (baseProvider, options, app) => {
 				type !== 'JSON' && columnDefinition.charset && columnDefinition.collation
 					? ` COLLATE ${columnDefinition.collation}`
 					: '';
-			const defaultValue = !_.isUndefined(columnDefinition.default)
+			const generatedDefaultValue = createGeneratedColumn(columnDefinition.generatedDefaultValue);
+			const defaultValue = (!_.isUndefined(columnDefinition.default) && !generatedDefaultValue)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
 				: '';
 			const compressed = columnDefinition.compressionMethod
@@ -146,6 +147,7 @@ module.exports = (baseProvider, options, app) => {
 					primary_key: primaryKey,
 					unique_key: unique,
 					default: defaultValue,
+					generatedDefaultValue,
 					autoIncrement,
 					compressed,
 					signed,
@@ -348,6 +350,7 @@ module.exports = (baseProvider, options, app) => {
 				microSecPrecision: jsonSchema.microSecPrecision,
 				charset: jsonSchema.characterSet,
 				collation: jsonSchema.collation,
+				generatedDefaultValue: jsonSchema.generatedDefaultValue,
 			};
 		},
 

@@ -9,7 +9,7 @@ module.exports = {
 	createLikeTable: 'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} LIKE ${likeTableName};\n',
 
 	columnDefinition:
-		'`${name}` ${national}${type}${signed}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
+		'`${name}` ${national}${type}${signed}${generatedDefaultValue}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
 
 	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})${enforcement}',
 

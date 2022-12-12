@@ -328,7 +328,7 @@ const parseIndexes = (indexes) => {
 			if (indexData.indxExpression && indexData.indxExpression.length) {
 				indexData.indxExpression = [
 					...indexData.indxExpression,
-					{ value: index['Expression'] || columnName },
+					{ value: prepareIndexExpression(index['Expression']) || columnName },
 				];
 			}
 
@@ -350,7 +350,7 @@ const parseIndexes = (indexes) => {
 		};
 
 		if (index['Expression']) {
-			indexData.indxExpression = [{ value: index['Expression'] }];
+			indexData.indxExpression = [{ value: prepareIndexExpression(index['Expression']) }];
 		}
 
 		return {
@@ -360,6 +360,14 @@ const parseIndexes = (indexes) => {
 	}, {});
 
 	return Object.values(indexesByConstraint);
+};
+
+const prepareIndexExpression = (indexExpression) => {
+	if (typeof indexExpression !== 'string') {
+		return '';
+	}
+
+	return indexExpression.replace(/\\'/g, '\'');
 };
 
 module.exports = {
