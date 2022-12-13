@@ -84,12 +84,12 @@ module.exports = (baseProvider, options, app) => {
 			const ifNotExistTable = ifNotExist ? 'IF NOT EXISTS ' : '';
 
 			if (likeTableName) {
-				return assignTemplates(templates.createLikeTable, {
+				return commentIfDeactivated(assignTemplates(templates.createLikeTable, {
 					name: tableName,
 					likeTableName: getTableName(likeTableName, dbData.databaseName),
 					temporary: temporaryTable,
 					ifNotExist: ifNotExistTable,
-				});
+				}), { isActivated });
 			}
 
 			const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
@@ -116,7 +116,7 @@ module.exports = (baseProvider, options, app) => {
 				ignoreReplace,
 			});
 
-			return tableStatement;
+			return commentIfDeactivated(tableStatement, { isActivated });
 		},
 
 		convertColumnDefinition(columnDefinition) {
