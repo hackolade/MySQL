@@ -1632,6 +1632,40 @@ making sure that you maintain a proper JSON format.
         ]
       },
       {
+        "propertyName": "Ignore",
+        "propertyKeyword": "selectIgnore",
+        "propertyType": "checkbox",
+        "propertyTooltip": "The IGNORE and REPLACE options indicate how to handle rows that duplicate unique key values when copying a table using a SELECT statement.",
+        "disabledOnCondition": {
+          "key": "selectReplace",
+          "value": true
+        },
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "selectStatement",
+            "length": 0
+          }
+        }
+      },
+      {
+        "propertyName": "Replace",
+        "propertyKeyword": "selectReplace",
+        "propertyType": "checkbox",
+        "propertyTooltip": "The IGNORE and REPLACE options indicate how to handle rows that duplicate unique key values when copying a table using a SELECT statement.",
+        "disabledOnCondition": {
+          "key": "selectIgnore",
+          "value": true
+        },
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "selectStatement",
+            "length": 0
+          }
+        }
+      },
+      {
         "propertyName": "Remarks",
         "propertyKeyword": "comments",
         "propertyTooltip": "remarks",

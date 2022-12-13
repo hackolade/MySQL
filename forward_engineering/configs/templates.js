@@ -4,7 +4,7 @@ module.exports = {
 	createTable:
 		'CREATE ${temporary}TABLE ${ifNotExist}${name} (\n' +
 		'\t${column_definitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
-		')${options}${partitions}${selectStatement};\n',
+		')${options}${partitions}${ignoreReplace}${selectStatement};\n',
 
 	createLikeTable: 'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} LIKE ${likeTableName};\n',
 

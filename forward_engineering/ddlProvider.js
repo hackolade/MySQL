@@ -74,6 +74,8 @@ module.exports = (baseProvider, options, app) => {
 				checkConstraints,
 				foreignKeyConstraints,
 				keyConstraints,
+				selectIgnore,
+				selectReplace,
 			},
 			isActivated,
 		) {
@@ -98,6 +100,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
 			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
+			const ignoreReplace = selectStatement ? selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '' : '';
 
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
@@ -110,6 +113,7 @@ module.exports = (baseProvider, options, app) => {
 				checkConstraints: checkConstraints.length ? ',\n\t' + checkConstraints.join(',\n\t') : '',
 				foreignKeyConstraints: foreignKeyConstraintsString,
 				keyConstraints: keyConstraintsString,
+				ignoreReplace,
 			});
 
 			return tableStatement;
@@ -395,6 +399,8 @@ module.exports = (baseProvider, options, app) => {
 				selectStatement: _.trim(detailsTab.selectStatement),
 				options: { ...detailsTab.tableOptions, description: detailsTab.description },
 				partitioning: detailsTab.partitioning,
+				selectIgnore: detailsTab.selectIgnore,
+				selectReplace: detailsTab.selectReplace,
 			};
 		},
 
