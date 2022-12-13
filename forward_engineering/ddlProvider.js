@@ -216,7 +216,7 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const indexStatement = assignTemplates(templates.index, {
-				keys: expressionKeys.length ? `(${expressionKeys.join(', ')})` :
+				keys: expressionKeys.length ? `${expressionKeys.join(', ')}` :
 					dividedKeys.activatedItems.join(', ') +
 					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
 						? ', ' + commentedKeys

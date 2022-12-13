@@ -330,6 +330,11 @@ const parseIndexes = (indexes) => {
 					...indexData.indxExpression,
 					{ value: prepareIndexExpression(index['Expression']) || columnName },
 				];
+			} else if (index['Sub_part'] && indexData.indexType !== 'SPATIAL') {
+				indexData.indxExpression = [
+					...(indexData.indxExpression || []),
+					{ value: `${columnName}(${index.Sub_part})` },
+				];
 			}
 
 			return {
@@ -351,6 +356,8 @@ const parseIndexes = (indexes) => {
 
 		if (index['Expression']) {
 			indexData.indxExpression = [{ value: prepareIndexExpression(index['Expression']) }];
+		} else if (index['Sub_part'] && indexData.indexType !== 'SPATIAL') {
+			indexData.indxExpression = [{ value: `${columnName}(${index['Sub_part']})` }];
 		}
 
 		return {
@@ -367,7 +374,7 @@ const prepareIndexExpression = (indexExpression) => {
 		return '';
 	}
 
-	return indexExpression.replace(/\\'/g, '\'');
+	return '(' + indexExpression.replace(/\\'/g, '\'') + ')';
 };
 
 module.exports = {

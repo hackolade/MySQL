@@ -1836,6 +1836,7 @@ making sure that you maintain a proper JSON format.
             "isCompositeKey": true,
             "abbr": " ",
             "attributeList": [
+              "",
               "ascending",
               "descending"
             ]
