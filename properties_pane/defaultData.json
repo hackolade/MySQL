@@ -1,57 +1,25 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "v5.7.x",
+		"dbVersion": "v5.x",
 		"dbVendor": "MySQL"
 	},
 	"container": {
-		"name": "New database",
-		"indexes": []
+		"name": "New database"
 	},
 	"collection": {
-		"collectionName": "New table",
-		"memory_optimized": false,
-		"collectionUsers": [],
-		"collation": {},
-		"chkConstr": {
-			"constrCheck": true,
-			"constrEnforceUpserts": true,
-			"constrEnforceReplication": true
-		},
-		"Indxs": {
-			"indxType": "Index",
-			"ALLOW_ROW_LOCKS": true,
-			"ALLOW_PAGE_LOCKS": true
-		}
+		"collectionName": "New table"
 	},
 	"field": {
 		"name": "New column",
 		"signed": true,
 		"primaryKey": false,
-		"unique": false,
-		"hasMaxLength": {
-			"valueDependencies": [
-				{
-					"value": true,
-					"dependency": {
-						"type": "or",
-						"values": [{
-							"key": "subtype",
-							"value": "object"
-						}, {
-							"key": "subtype",
-							"value": "array"
-						}]
-					}
-				}
-			]
-		}
+		"unique": false
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"
 	},
 	"multipleField": {
-		"primaryKey": true
 	},
 	"subschema": {},
 	"arrayItem": {},
@@ -60,7 +28,6 @@
 		"parentCardinality": "1",
 		"childCardinality": "0..n"
 	},
-	"user": {},
 	"view": {
 		"viewOn": "",
 		"pipeline": ""
@@ -71,13 +38,5 @@
 		"udfDescription": "",
 		"udfFunction": "",
 		"udfComments": ""
-	},
-	"SecIdxs": {
-		"name": "New Secondary Index",
-		"SecIndxKey": "",
-		"SecIndxID": "",
-		"SecIndxDescription": "",
-		"SecIndxFunction": "",
-		"SecIndxComments": ""
 	}
 }

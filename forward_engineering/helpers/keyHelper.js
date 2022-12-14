@@ -93,7 +93,10 @@ module.exports = (_, clean) => {
 		return keys.map(key => {
 			return {
 				name: findName(key.keyId, jsonSchema.properties),
-				order: key.type === 'descending' ? 'DESC' : 'ASC',
+				order: {
+					'descending': 'DESC',
+					'ascending': 'ASC',
+				}[key.type] || '',
 				isActivated: checkIfActivated(key.keyId, jsonSchema.properties),
 			};
 		});

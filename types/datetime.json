@@ -30,42 +30,53 @@
 	}, {
 		"schema": {
 			"mode": "time",
-			"fractSecPrecision": 3
+			"microSecPrecision": 3
 		},
 		"format": "hh:mm:ss.nnn"
 	}, {
 		"schema": {
 			"mode": "time",
-			"fractSecPrecision": 6
+			"microSecPrecision": 6
 		},
 		"format": "hh:mm:ss.nnnnnn"
 	}, {
 		"schema": {
-			"mode": "datetime2"
+			"mode": "time",
+			"microSecPrecision": 9
+		},
+		"format": "hh:mm:ss.nnnnnnnnn"
+	}, {
+		"schema": {
+			"mode": "datetime"
 		},
 		"format": "YYYY-MM-DD hh:mm:ss"
 	}, {
 		"schema": {
-			"mode": "datetime2",
-			"fractSecPrecision": 3
+			"mode": "datetime",
+			"microSecPrecision": 3
 		},
 		"format": "YYYY-MM-DD hh:mm:ss.nnn"
 	}, {
 		"schema": {
-			"mode": "datetime2",
-			"fractSecPrecision": 6
+			"mode": "datetime",
+			"microSecPrecision": 6
 		},
 		"format": "YYYY-MM-DD hh:mm:ss.nnnnnn"
 	}, {
 		"schema": {
-			"mode": "datetimeoffset",
-			"fractSecPrecision": 3
+			"mode": "datetime",
+			"microSecPrecision": 9
+		},
+		"format": "YYYY-MM-DD hh:mm:ss.nnnnnnnnn"
+	}, {
+		"schema": {
+			"mode": "timestamp"
 		},
 		"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
 	}, {
 		"schema": {
-			"mode": "datetimeoffset",
-			"fractSecPrecision": 6
+			"mode": "timestamp",
+			"microSecPrecision": 6
 		},
 		"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
 	}]

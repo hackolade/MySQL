@@ -1,87 +1,27 @@
-
-const isCreateOrReplace = (query) => {
-	return /^create\s+or\s+replace/i.test((String(query || '')).trim());
-};
-
-const getBodyAndParameters = (query) => {
-	const regExp = /procedure\s+\`[\s\S]+?\`\s*\((?<parameters>[\S\s]*)\)\s+(?<body>begin[\S\s]+)/i;
-
-	if (!regExp.test(query)) {
-		return {
-			body: '',
-			parameters: '',
-		};
-	}
-
-	const result = query.match(regExp);
-	
-	return {
-		parameters: (result.groups['parameters'] || '').trim(),
-		body: (result.groups['body'] || '').trim(),
-	};
-};
-
-const findAndReplaceCharacteristics = (query) => {
-	const characteristics = {
-		language: /language\s+sql/i,
-		deterministic: /(not\s+)?deterministic/i,
-		contains: /contains\s+(sql|no\s+sql|reads\s+sql\s+data|modifies\s+sql\s+data)/i,
-		security: /sql\s+security\s+(definer|invoker)/i,
-		comment: /comment\s+\'[\s\S]+?\'/i
-	};
-
-	return Object.keys(characteristics).reduce(([query, result], characteristic) => {
-		const regExp = characteristics[characteristic];
-
-		if (!regExp.test(query)) {
-			return [query, result];
-		}
-
-		return [
-			query.replace(regExp, ''),
-			{
-				...result,
-				[characteristic]: query.match(regExp).shift(),
-			},
-		];
-	}, [
-		query,
-		{}
-	]);
-};
-
-const getDeterministic = (characteristic) => {
-	if (!characteristic) {
-		return '';
-	}
-
-	if ( /not\s+deterministic/i.test(characteristic)) {
-		return 'NOT DETERMINISTIC';
-	} else {
-		return 'DETERMINISTIC';
-	}
-};
-
-const getContains = (characteristic) => {
-	if (!characteristic) {
-		return '';
-	}
-
-	const data = characteristic.replace(/\s+/g, ' ').replace(/contains\s+/, '');
-	
-	return data.toUpperCase();
-};
-
 const parseProcedure = (query) => {
-	const [noCharacteristicsQuery, characteristics] = findAndReplaceCharacteristics(String(query));
-	const { body, parameters } = getBodyAndParameters(String(noCharacteristicsQuery));
+	const parseRegexp = /create(\s+definer\s*=(?<definer>[\s\S]+?))?\s+procedure(?<ifNotExists>\s+if\s+not\s+exists)?\s+\`(?<name>[\s\S]+?)\`\s*\((?<parameters>[\s\S]*?)\)(?<characteristics>(\s+(\s*language\s+sql)|(\s*(not)?\s+deterministic)|(\s*(contains\s+sql|no\s+sql|reads\s+sql\s+data|modifies\s+sql\s+data))|(\s*sql\s+security\s+(definer|invoker))|(\s*comment\s+\'[\s\S]+?\'))*)\s+(?<body>([a-z_\-0-9]+\:\s*)?(begin|return)([\s\S]+))/i;
+
+	if (!parseRegexp.test(query)) {
+		throw new Error('Cannot parse procedure');
+	}
+
+	const result = String(query).match(parseRegexp);
+	const {
+		definer,
+		ifNotExists,
+		name,
+		parameters,
+		characteristics,
+		body,
+	} = result.groups;
 
 	return {
-		body,
-		parameters,
-		contains: getContains(characteristics.contains),
-		deterministic: getDeterministic(characteristics.deterministic),
-		orReplace: isCreateOrReplace(query),
+		definer: definer,
+		ifNotExists: Boolean(ifNotExists),
+		name: name,
+		parameters: parameters,
+		characteristics: characteristics || '',
+		body: body || '',
 	};
 };
 

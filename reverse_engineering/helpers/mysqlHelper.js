@@ -2,9 +2,9 @@ const functionHelper = require("./parsers/functionHelper");
 const procedureHelper = require("./parsers/procedureHelper");
 
 const parseDatabaseStatement = (statement) => {
-	const characterSetRegExp = /CHARACTER\ SET\ (.+?)\ /i;
-	const collationRegExp = /COLLATE\ (.+?)\ /i;
-	const commentRegExp = /COMMENT\ \'([\s\S]*?)\'/i;
+	const characterSetRegExp = /CHARACTER\s+SET(?:\s*=\s*|\s+)(.+?)\ /i;
+	const collationRegExp = /COLLATE(?:\s*=\s*|\s+)?(.+?)\ /i;
+	const encryptionRegExp = /ENCRYPTION(?:\s*=\s*|\s+)(yes|no)\ /i;
 	const data = {};
 
 	if (characterSetRegExp.test(statement)) {
@@ -15,14 +15,14 @@ const parseDatabaseStatement = (statement) => {
 		data.collation = statement.match(collationRegExp)[1];
 	}
 
-	if (commentRegExp.test(statement)) {
-		data.description = statement.match(commentRegExp)[1];
+	if (encryptionRegExp.test(statement)) {
+		data.ENCRYPTION = String(statement.match(collationRegExp)[1]).toLocaleLowerCase() === 'yes' ? 'Yes' : 'No';
 	}
 
 	return data;
 };
 
-const parseFunctions = (functions) => {
+const parseFunctions = (functions, logger) => {
 	return functions.map(f => {
 
 		const query = f.data[0]['Create Function'];
@@ -30,15 +30,13 @@ const parseFunctions = (functions) => {
 		try {
 			const func = functionHelper.parseFunctionQuery(String(query));
 
-	
 			return {
 				name: f.meta['Name'],
 				functionDelimiter: (func.body || '').includes(';') ? '$$' : '',
-				functionOrReplace: func.orReplace,
-				functionAggregate: func.isAggregate,
+				functionDefiner: func.definer,
 				functionIfNotExist: func.ifNotExists,
 				functionArguments: func.parameters,
-				functionDataType: func.returnType,
+				functionReturnType: func.returnType,
 				functionBody: func.body,
 				functionLanguage: 'SQL',
 				functionDeterministic: functionHelper.getDeterministic(func.characteristics),
@@ -47,40 +45,54 @@ const parseFunctions = (functions) => {
 				functionDescription: f.meta['Comment'],
 			};
 		} catch (error) {
-			throw {
-				message: error.message + '.\nError parsing function: ' + query,
+			logger.error({
+				message: error.message + '.\nError parsing function: ' + query +
+					'.\nMake sure you have access to read function body: show create function `' + f.meta.Db + '`.`' + f.meta.Name + '`',
 				stack: error.stack,
-			};
+				meta: {
+					db: f.meta.Db,
+					name: f.meta.Name,
+					securityType: f.meta.Security_type,
+					definer: f.meta.Definer,
+				},
+			});
 		}
-	});
+	}).filter(Boolean);
 };
 
-const parseProcedures = (procedures) => {
+const parseProcedures = (procedures, logger) => {
 	return procedures.map(procedure => {
 		try {
 			const meta = procedure.meta;
 			const procValue = procedure.data[0]['Create Procedure'];
-			const data = procedureHelper.parseProcedure(String(procValue));
+			const data = procedureHelper.parseProcedure(String(procValue || ''));
 			
 			return {
 				name: meta['Name'],
 				delimiter: (data.body || '').includes(';') ? '$$' : '',
-				orReplace: data.orReplace,
+				definer: data.definer,
 				inputArgs: data.parameters,
 				body: data.body,
 				language: 'SQL',
-				deterministic: data.deterministic,
-				contains: data.contains,
+				deterministic: functionHelper.getDeterministic(data.characteristics),
+				contains: functionHelper.getContains(data.characteristics),
 				securityMode: meta['Security_type'],
 				comments: meta['Comment']
 			};
 		} catch (error) {
-			throw {
-				message: error.message + '.\nError parsing procedure: ' + procedure.data[0]['Create Procedure'],
+			logger.error({
+				message: error.message + '.\nError parsing procedure: ' + procedure.data[0]['Create Procedure'] +
+					'.\nMake sure you have access to read procedure body: show create procedure `' + procedure.meta.Db + '`.`' + procedure.meta.Name + '`',
 				stack: error.stack,
-			};
+				meta: {
+					db: procedure.meta.Db,
+					name: procedure.meta.Name,
+					securityType: procedure.meta.Security_type,
+					definer: procedure.meta.Definer,
+				},
+			});
 		}
-	});
+	}).filter(Boolean);
 };
 
 const isJson = (columnName, constraints) => {
@@ -97,7 +109,11 @@ const isJson = (columnName, constraints) => {
 
 const findJsonRecord = (fieldName, records) => {
 	return records.find(records => {
-		if (typeof records[fieldName] !== 'string') {
+		if (records[fieldName] && typeof records[fieldName] === 'object') {
+			return records[fieldName];
+		}
+
+		if (typeof records[fieldName] === 'string') {
 			return false;
 		}
 
@@ -110,6 +126,14 @@ const findJsonRecord = (fieldName, records) => {
 };
 
 const getSubtype = (fieldName, record) => {
+	if (Array.isArray(record[fieldName])) {
+		return 'array';
+	}
+
+	if (record[fieldName] && typeof record[fieldName] === 'object') {
+		return 'object';
+	}
+
 	const item = JSON.parse(record[fieldName]);
  
 	if (!item) {
@@ -198,17 +222,25 @@ const getIndexData = (index) => {
 	};
 };
 
-const getJsonSchema = ({ columns, constraints, records, indexes }) => {
+const getJsonSchema = ({ columns, records, indexes }) => {
 	const properties = columns.filter((column) => {
-		return column['Type'] === 'longtext';
+		return column['Type'] === 'longtext' || column['Type'] === 'json';
 	}).reduce((schema, column) => {
 		const fieldName = column['Field'];
 		const record = findJsonRecord(fieldName, records);
-		const isJsonSynonym = isJson(fieldName, constraints);
 		const subtype = record ? getSubtype(fieldName, record) : ' ';
-		const synonym = isJsonSynonym ? 'json' : '';
 
-		if (!synonym && subtype === ' ') {
+		if (column['Type'] === 'json') {
+			return {
+				...schema,
+				[fieldName]: {
+					type: 'json',
+					subtype,
+				}
+			};
+		}
+
+		if (subtype === ' ') {
 			return schema;
 		}
 
@@ -217,7 +249,6 @@ const getJsonSchema = ({ columns, constraints, records, indexes }) => {
 			[fieldName]: {
 				type: 'char',
 				mode: 'longtext',
-				synonym,
 				subtype,
 			}
 		};
@@ -266,20 +297,49 @@ const getIndexCategory = (index) => {
 	}
 };
 
+const parseIndexExpression = (expression) => {
+	const jsonColumnRegExp = /json_extract\(`(?<columnName>[\s\S]+?)`,[\s\S]+\'\$(?<jsonPath>[\w\d\.]+)/i;
+	const parseData = expression.match(jsonColumnRegExp);
+
+	if (!parseData) {
+		return;
+	}
+
+	return parseData.groups.columnName + parseData.groups.jsonPath;
+};
+
 const parseIndexes = (indexes) => {
 	const indexesByConstraint = indexes.filter(index => !['PRIMARY', 'UNIQUE'].includes(getIndexType(index))).reduce((result, index) => {
 		const constraintName = index['Key_name'];
+		let columnName = index['Column_name'];
+		if (!columnName && index['Expression']) {
+			columnName = parseIndexExpression(index['Expression']);
+		}
 
 		if (result[constraintName]) {
+			const indexData = {
+				...result[constraintName],
+				indxKey: result[constraintName].indxKey.concat({
+					name: columnName,
+					type: getIndexOrder(index['Collation']),
+				}),
+			};
+
+			if (indexData.indxExpression && indexData.indxExpression.length) {
+				indexData.indxExpression = [
+					...indexData.indxExpression,
+					{ value: prepareIndexExpression(index['Expression']) || columnName },
+				];
+			} else if (index['Sub_part'] && indexData.indexType !== 'SPATIAL') {
+				indexData.indxExpression = [
+					...(indexData.indxExpression || []),
+					{ value: `${columnName}(${index.Sub_part})` },
+				];
+			}
+
 			return {
 				...result,
-				[constraintName]: {
-					...result[constraintName],
-					indxKey: result[constraintName].indxKey.concat({
-						name: index['Column_name'],
-						type: getIndexOrder(index['Collation']),
-					}),
-				},
+				[constraintName]: indexData,
 			};
 		}
 
@@ -289,10 +349,16 @@ const parseIndexes = (indexes) => {
 			indexCategory: getIndexCategory(index),
 			indexComment: index['Index_comment'],
 			indxKey: [{
-				name: index['Column_name'],
+				name: columnName,
 				type: getIndexOrder(index['Collation']),
 			}],
 		};
+
+		if (index['Expression']) {
+			indexData.indxExpression = [{ value: prepareIndexExpression(index['Expression']) }];
+		} else if (index['Sub_part'] && indexData.indexType !== 'SPATIAL') {
+			indexData.indxExpression = [{ value: `${columnName}(${index['Sub_part']})` }];
+		}
 
 		return {
 			...result,
@@ -301,6 +367,14 @@ const parseIndexes = (indexes) => {
 	}, {});
 
 	return Object.values(indexesByConstraint);
+};
+
+const prepareIndexExpression = (indexExpression) => {
+	if (typeof indexExpression !== 'string') {
+		return '';
+	}
+
+	return '(' + indexExpression.replace(/\\'/g, '\'') + ')';
 };
 
 module.exports = {

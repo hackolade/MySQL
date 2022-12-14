@@ -26,8 +26,8 @@
 		"maxLength": "",
 		"pattern": "",
 		"enum": [],
-		"sample":"",
-		"comments":"",
+		"sample": "",
+		"comments": "",
 		"mode": "varchar",
 		"length": 10,
 		"subtype": "string"
@@ -58,5 +58,47 @@
 		"string": {
 			"parentType": "string"
 		}
-	}
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "char"
+			},
+			"size": 1
+		},
+		{
+			"schema": {
+				"mode": "varchar"
+			},
+			"mode": "varying"
+		},
+		{
+			"schema": {
+				"mode": "tinytext"
+			},
+			"size": 255,
+			"mode": "text"
+		},
+		{
+			"schema": {
+				"mode": "text"
+			},
+			"size": 65535,
+			"mode": "text"
+		},
+		{
+			"schema": {
+				"mode": "mediumtext"
+			},
+			"size": 16777215,
+			"mode": "text"
+		},
+		{
+			"schema": {
+				"mode": "longtext"
+			},
+			"size": 4294967295,
+			"mode": "text"
+		}
+	]
 }

@@ -117,8 +117,9 @@ module.exports = {
 			const dataBaseNames = data.collectionData.dataBaseNames;
 			const connection = await this.connect(data);
 			const instance = await connectionHelper.createInstance(connection, logger);
+			const dbVersion = await instance.serverVersion();
 
-			log.info('MySQL version: ' + await instance.serverVersion());
+			log.info('MySQL version: ' + dbVersion);
 			log.progress('Start reverse engineering ...');			
 
 			const result = await async.mapSeries(dataBaseNames, async (dbName) => {
@@ -136,16 +137,15 @@ module.exports = {
 				log.progress(`Parsing functions`, dbName);	
 
 				const UDFs = mysqlHelper.parseFunctions(
-					await instance.getFunctions(dbName), logger
+					await instance.getFunctions(dbName), log
 				);
-
 				logger.log('info', 'Parsed functions', JSON.stringify(UDFs, null,2));
 
 				log.info(`Parsing procedures`);
 				log.progress(`Parsing procedures`, dbName);
 
 				const Procedures = mysqlHelper.parseProcedures(
-					await instance.getProcedures(dbName)
+					await instance.getProcedures(dbName), log
 				);
 
 				const result = await async.mapSeries(tables, async (tableName) => {
@@ -166,18 +166,14 @@ module.exports = {
 					log.info(`Get create table statement "${tableName}"`);
 					log.progress(`Get create table statement`, dbName, tableName);
 
-					const ddl = await instance.showCreateTable(dbName, tableName);
+					const ddl = prepareDdl(await instance.showCreateTable(dbName, tableName));
 
 					log.info(`Get indexes "${tableName}"`);
 					log.progress(`Get indexes`, dbName, tableName);
 
 					const indexes = await instance.getIndexes(dbName, tableName);
 
-					log.info(`Get constraints "${tableName}"`);
-					log.progress(`Get constraints`, dbName, tableName);
-
-					const constraints = await instance.getConstraints(dbName, tableName);
-					const jsonSchema = mysqlHelper.getJsonSchema({ columns, constraints, records, indexes });
+					const jsonSchema = mysqlHelper.getJsonSchema({ columns, records, indexes });
 					const Indxs = mysqlHelper.parseIndexes(indexes);
 
 					log.info(`Data retrieved successfully "${tableName}"`);
@@ -194,7 +190,7 @@ module.exports = {
 						standardDoc: records[0],
 						ddl: {
 							script: ddl,
-							type: 'mariadb'
+							type: 'mySql'
 						},
 						emptyBucket: false,
 						validation: {
@@ -218,24 +214,26 @@ module.exports = {
 						name: viewName,
 						ddl: {
 							script: ddl,
-							type: 'mariadb'
+							type: 'mySql'
 						}
 					};
 				});
 
 				if (viewData.length) {
-					return [...result, {
-						dbName: dbName,
-						views: viewData,
-						emptyBucket: false,
-					}];
+					return [
+						...result,
+						{
+							dbName: dbName,
+							views: viewData,
+							emptyBucket: false,
+						},
+					];
 				}
 				
 				return result;
 			});
 
-
-			callback(null, result.flat());
+			callback(null, result.flat(), { version: getVersion(dbVersion) });
 		} catch(error) {
 			log.error(error);
 			callback({ message: error.message, stack: error.stack });
@@ -257,6 +255,7 @@ const createLogger = ({ title, logger, hiddenKeys }) => {
 			logger.log('error', {
 				message: error.message,
 				stack: error.stack,
+				meta: error.meta,
 			}, title);
 		}
 	};
@@ -306,4 +305,17 @@ const getViewName = (name) => name.replace(/\ \(v\)$/i, '');
 
 const containsJson = (columns) => {
 	return columns.some(column => column['Type'] === 'longtext' || column['Type'] === 'json');
+};
+
+const getVersion = (version) => {
+	if (/^8./.test(String(version))) {
+		return 'v8.x';
+	} else {
+		return 'v5.x';
+	}
+};
+
+const prepareDdl = (ddl) => {
+	return ddl
+		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1');
 };

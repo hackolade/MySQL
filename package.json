@@ -43,13 +43,5 @@
     },
     "description": "Hackolade plugin for MySQL",
     "icon_url": "logo.jpg",
-    "disabled": false,
-    "scripts": {
-        "start-test-instances": "pushd ./test > /dev/null; bash startInstance.sh; popd > /dev/null",
-        "stop-test-instances": "pushd ./test > /dev/null; bash stopInstance.sh; popd > /dev/null",
-        "sync": "echo $PWD; rsync -ar ./ $HOME/.hackolade/plugins/MySQL",
-        "hck": "DEBUG=mysql* Hackolade",
-        "get-mysql5-health":"docker inspect test-mysql5-1 --format='{{json (index .State.Health.Log 4)}}'",
-        "get-mysql8-health":"docker inspect test-mysql8-1 --format='{{json (index .State.Health.Log 4)}}'"
-    }
+    "disabled": false
 }

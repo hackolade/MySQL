@@ -14,7 +14,7 @@ module.exports = (baseProvider, options, app) => {
 		clean,
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
-	const { decorateDefault, decorateType, canBeNational, getSign } = require('./helpers/columnDefinitionHelper')(
+	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn } = require('./helpers/columnDefinitionHelper')(
 		_,
 		wrap,
 	);
@@ -30,15 +30,15 @@ module.exports = (baseProvider, options, app) => {
 			escapeQuotes,
 		});
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
+	const { processIndexKeyName } = require('./helpers/indexHelper')(wrap);
 
 	return {
 		createDatabase({
 			databaseName,
-			orReplace,
 			ifNotExist,
 			collation,
 			characterSet,
-			comments,
+			encryption,
 			udfs,
 			procedures,
 			useDb = true,
@@ -46,11 +46,10 @@ module.exports = (baseProvider, options, app) => {
 			let dbOptions = '';
 			dbOptions += characterSet ? tab(`\nCHARACTER SET = '${characterSet}'`) : '';
 			dbOptions += collation ? tab(`\nCOLLATE = '${collation}'`) : '';
-			dbOptions += comments ? tab(`\nCOMMENT = '${escapeQuotes(comments)}'`) : '';
+			dbOptions += encryption ? tab(`\nENCRYPTION = 'Y'`) : '';
 
 			const databaseStatement = assignTemplates(templates.createDatabase, {
 				name: databaseName,
-				orReplace: orReplace && !ifNotExist ? ' OR REPLACE' : '',
 				ifNotExist: ifNotExist ? ' IF NOT EXISTS' : '',
 				dbOptions: dbOptions,
 				useDb: useDb ? `USE \`${databaseName}\`;\n` : '',
@@ -67,7 +66,6 @@ module.exports = (baseProvider, options, app) => {
 				columns,
 				dbData,
 				temporary,
-				orReplace,
 				ifNotExist,
 				likeTableName,
 				selectStatement,
@@ -76,22 +74,22 @@ module.exports = (baseProvider, options, app) => {
 				checkConstraints,
 				foreignKeyConstraints,
 				keyConstraints,
+				selectIgnore,
+				selectReplace,
 			},
 			isActivated,
 		) {
 			const tableName = getTableName(name, dbData.databaseName);
-			const orReplaceTable = orReplace ? 'OR REPLACE ' : '';
 			const temporaryTable = temporary ? 'TEMPORARY ' : '';
 			const ifNotExistTable = ifNotExist ? 'IF NOT EXISTS ' : '';
 
 			if (likeTableName) {
-				return assignTemplates(templates.createLikeTable, {
+				return commentIfDeactivated(assignTemplates(templates.createLikeTable, {
 					name: tableName,
 					likeTableName: getTableName(likeTableName, dbData.databaseName),
-					orReplace: orReplaceTable,
 					temporary: temporaryTable,
 					ifNotExist: ifNotExistTable,
-				});
+				}), { isActivated });
 			}
 
 			const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
@@ -102,12 +100,12 @@ module.exports = (baseProvider, options, app) => {
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
 			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
+			const ignoreReplace = selectStatement ? selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '' : '';
 
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
 				column_definitions: columns.join(',\n\t'),
-				selectStatement: selectStatement ? ` ${selectStatement}` : '',
-				orReplace: orReplaceTable,
+				selectStatement: selectStatement ? ` AS ${selectStatement}` : '',
 				temporary: temporaryTable,
 				ifNotExist: ifNotExistTable,
 				options: getTableOptions(options),
@@ -115,9 +113,10 @@ module.exports = (baseProvider, options, app) => {
 				checkConstraints: checkConstraints.length ? ',\n\t' + checkConstraints.join(',\n\t') : '',
 				foreignKeyConstraints: foreignKeyConstraintsString,
 				keyConstraints: keyConstraintsString,
+				ignoreReplace,
 			});
 
-			return tableStatement;
+			return commentIfDeactivated(tableStatement, { isActivated });
 		},
 
 		convertColumnDefinition(columnDefinition) {
@@ -135,7 +134,8 @@ module.exports = (baseProvider, options, app) => {
 				type !== 'JSON' && columnDefinition.charset && columnDefinition.collation
 					? ` COLLATE ${columnDefinition.collation}`
 					: '';
-			const defaultValue = !_.isUndefined(columnDefinition.default)
+			const generatedDefaultValue = createGeneratedColumn(columnDefinition.generatedDefaultValue);
+			const defaultValue = (!_.isUndefined(columnDefinition.default) && !generatedDefaultValue)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
 				: '';
 			const compressed = columnDefinition.compressionMethod
@@ -151,6 +151,7 @@ module.exports = (baseProvider, options, app) => {
 					primary_key: primaryKey,
 					unique_key: unique,
 					default: defaultValue,
+					generatedDefaultValue,
 					autoIncrement,
 					compressed,
 					signed,
@@ -167,15 +168,14 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		createIndex(tableName, index, dbData, isParentActivated = true) {
-			if (_.isEmpty(index.indxKey) || !index.indxName) {
+		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
+			if ((_.isEmpty(index.indxKey) && _.isEmpty(index.indxExpression)) || !index.indxName) {
 				return '';
 			}
 
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
 			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
-			const ifNotExist = index.ifNotExist ? 'IF NOT EXISTS ' : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
@@ -183,7 +183,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const dividedKeys = divideIntoActivatedAndDeactivated(
 				index.indxKey || [],
-				key => `\`${key.name}\`${key.type === 'DESC' ? ' DESC' : ''}`,
+				key => processIndexKeyName({ name: key.name, type: key.type, jsonSchema }),
 			);
 			const commentedKeys = dividedKeys.deactivatedItems.length
 				? commentIfDeactivated(dividedKeys.deactivatedItems.join(', '), {
@@ -191,17 +191,22 @@ module.exports = (baseProvider, options, app) => {
 						isPartOfLine: true,
 				  })
 				: '';
+			const expressionKeys = (index.indxExpression || []).map(item => item.value?.replace(/\\/g, '\\\\')).filter(Boolean);
 
-			if (_.toLower(index.waitNoWait) === 'wait' && index.waitValue) {
-				indexOptions.push(`WAIT ${index.waitValue}`);
+			if (index.indxKeyBlockSize) {
+				indexOptions.push(`KEY_BLOCK_SIZE = ${index.indxKeyBlockSize}`);
 			}
 
-			if (_.toLower(index.waitNoWait) === 'nowait') {
-				indexOptions.push(`NOWAIT`);
+			if (index.indexType === 'FULLTEXT' && index.indxParser) {
+				indexOptions.push(`WITH PARSER ${index.indxParser}`);
 			}
 
 			if (index.indexComment) {
 				indexOptions.push(`COMMENT '${escapeQuotes(index.indexComment)}'`);
+			}
+
+			if (index.indxVisibility) {
+				indexOptions.push(index.indxVisibility);
 			}
 
 			if (index.indexLock) {
@@ -211,7 +216,7 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const indexStatement = assignTemplates(templates.index, {
-				keys:
+				keys: expressionKeys.length ? `${expressionKeys.join(', ')}` :
 					dividedKeys.activatedItems.join(', ') +
 					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
 						? ', ' + commentedKeys
@@ -220,7 +225,6 @@ module.exports = (baseProvider, options, app) => {
 				name,
 				table,
 				indexType,
-				ifNotExist,
 				indexCategory,
 			});
 
@@ -235,6 +239,7 @@ module.exports = (baseProvider, options, app) => {
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `${wrap(checkConstraint.name, '`', '`')} ` : '',
 				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
+				enforcement: checkConstraint.enforcement ? ` ${checkConstraint.enforcement}` : '',
 			});
 		},
 
@@ -349,6 +354,7 @@ module.exports = (baseProvider, options, app) => {
 				microSecPrecision: jsonSchema.microSecPrecision,
 				charset: jsonSchema.characterSet,
 				collation: jsonSchema.collation,
+				generatedDefaultValue: jsonSchema.generatedDefaultValue,
 			};
 		},
 
@@ -364,17 +370,17 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				name: checkConstraint.chkConstrName,
 				expression: checkConstraint.constrExpression,
+				enforcement: checkConstraint.constrEnforcement,
 			};
 		},
 
 		hydrateDatabase(containerData, data) {
 			return {
 				databaseName: containerData.name,
-				orReplace: containerData.orReplace,
 				ifNotExist: containerData.ifNotExist,
 				characterSet: containerData.characterSet,
 				collation: containerData.collation,
-				comments: containerData.description,
+				encryption: containerData.ENCRYPTION === 'Yes' ? true : false,
 				udfs: (data?.udfs || []).map(this.hydrateUdf),
 				procedures: (data?.procedures || []).map(this.hydrateProcedure),
 			};
@@ -388,12 +394,13 @@ module.exports = (baseProvider, options, app) => {
 				...tableData,
 				keyConstraints: keyHelper.getTableKeyConstraints({ jsonSchema }),
 				temporary: detailsTab.temporary,
-				orReplace: detailsTab.orReplace,
 				ifNotExist: !detailsTab.orReplace && detailsTab.ifNotExist,
 				likeTableName: likeTable?.code || likeTable?.collectionName,
 				selectStatement: _.trim(detailsTab.selectStatement),
 				options: { ...detailsTab.tableOptions, description: detailsTab.description },
 				partitioning: detailsTab.partitioning,
+				selectIgnore: detailsTab.selectIgnore,
+				selectReplace: detailsTab.selectReplace,
 			};
 		},
 
@@ -430,9 +437,8 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				name: udf.name,
 				delimiter: udf.functionDelimiter,
-				orReplace: udf.functionOrReplace,
-				aggregate: udf.functionAggregate,
 				ifNotExist: udf.functionIfNotExist,
+				definer: udf.functionDefiner,
 				parameters: udf.functionArguments,
 				type: udf.functionReturnType,
 				characteristics: {
@@ -448,8 +454,9 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateProcedure(procedure) {
 			return {
-				orReplace: procedure.orReplace,
 				delimiter: procedure.delimiter,
+				definer: procedure.definer,
+				ifNotExist: procedure.procedureIfNotExist,
 				name: procedure.name,
 				parameters: procedure.inputArgs,
 				body: procedure.body,
@@ -472,9 +479,8 @@ module.exports = (baseProvider, options, app) => {
 				startDelimiter +
 				assignTemplates(templates.createFunction, {
 					name: getTableName(udf.name, databaseName),
-					orReplace: udf.orReplace ? 'OR REPLACE ' : '',
+					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
 					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
-					aggregate: udf.aggregate ? 'AGGREGATE ' : '',
 					characteristics: characteristics.join('\n\t'),
 					type: udf.type,
 					parameters: udf.parameters,
@@ -494,7 +500,8 @@ module.exports = (baseProvider, options, app) => {
 				startDelimiter +
 				assignTemplates(templates.createProcedure, {
 					name: getTableName(procedure.name, databaseName),
-					orReplace: procedure.orReplace ? 'OR REPLACE ' : '',
+					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
+					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
 					parameters: procedure.parameters,
 					characteristics: characteristics.join('\n\t'),
 					body: procedure.body,

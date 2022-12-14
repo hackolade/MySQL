@@ -24,7 +24,11 @@ module.exports = (_, wrap) => {
 		STATS_AUTO_RECALC: 'STATS_AUTO_RECALC',
 		STATS_PERSISTENT: 'STATS_PERSISTENT',
 		TRANSACTIONAL: 'TRANSACTIONAL',
-		WITH_SYSTEM_VERSIONING: 'WITH SYSTEM VERSIONING',
+		compression: 'COMPRESSION',
+		STATS_SAMPLE_PAGES: 'STATS_SAMPLE_PAGES',
+		ENCRYPTION: 'ENCRYPTION',
+		AUTOEXTEND_SIZE: 'AUTOEXTEND_SIZE',
+		CONNECTION: 'CONNECTION',
 	};
 
 	const OPTIONS_BY_ENGINE = {
@@ -38,42 +42,28 @@ module.exports = (_, wrap) => {
 			'KEY_BLOCK_SIZE',
 			'PACK_KEYS',
 			'ROW_FORMAT',
-			'WITH_SYSTEM_VERSIONING',
 		],
 		InnoDB: [
 			'AUTO_INCREMENT',
 			'DATA_DIRECTORY',
 			'INDEX_DIRECTORY',
-			'ENCRYPTED',
-			'ENCRYPTION_KEY_ID',
-			'KEY_BLOCK_SIZE',
-			'PACK_KEYS',
-			'PAGE_COMPRESSED',
-			'PAGE_COMPRESSION_LEVEL',
+			'ENCRYPTION',
+			'AUTOEXTEND_SIZE',
 			'ROW_FORMAT',
-			'SEQUENCE',
+			'compression',
 			'STATS_AUTO_RECALC',
 			'STATS_PERSISTENT',
-			'WITH_SYSTEM_VERSIONING',
-		],
-		CSV: ['IETF_QUOTES', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		MERGE: ['INSERT_METHOD', 'UNION', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		Aria: [
-			'AUTO_INCREMENT',
-			'AVG_ROW_LENGTH',
-			'CHECKSUM',
-			'DATA_DIRECTORY',
-			'DELAY_KEY_WRITE',
-			'INDEX_DIRECTORY',
-			'PAGE_CHECKSUM',
-			'ROW_FORMAT',
+			'STATS_SAMPLE_PAGES',
 			'KEY_BLOCK_SIZE',
-			'PACK_KEYS',
-			'TRANSACTIONAL',
-			'WITH_SYSTEM_VERSIONING',
 		],
-		Memory: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
-		Archive: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'],
+		CSV: ['KEY_BLOCK_SIZE'],
+		MERGE: ['INSERT_METHOD', 'UNION', 'KEY_BLOCK_SIZE'],
+		Memory: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'MIN_ROWS', 'MAX_ROWS'],
+		Archive: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
+		Federated: ['CONNECTION', 'KEY_BLOCK_SIZE'],
+		EXAMPLE: [],
+		HEAP: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'MIN_ROWS', 'MAX_ROWS'],
+		NDB: ['KEY_BLOCK_SIZE'],
 	};
 
 	const getTableName = (tableName, schemaName) => {
@@ -98,7 +88,10 @@ module.exports = (_, wrap) => {
 		}
 
 		if (['YES', 'NO', 'DEFAULT'].includes(_.toUpper(value))) {
-			return _.toUpper(value);
+			return ({
+				YES: '\'Y\'',
+				NO: '\'N\'',
+			})[_.toUpper(value)] || _.toUpper(value);
 		}
 		if (typeof value === 'number') {
 			return value;
@@ -107,7 +100,7 @@ module.exports = (_, wrap) => {
 		} else if (typeof value === 'string' && value) {
 			return wrap(value);
 		} else if (typeof value === 'boolean') {
-			return value ? 'YES' : 'NO';
+			return value ? '\'Y\'' : '\'N\'';
 		}
 	};
 
@@ -136,17 +129,9 @@ module.exports = (_, wrap) => {
 			tableOptions.push(`COMMENT = '${encodeStringLiteral(options.description)}'`);
 		}
 
-		const optionKeywords = OPTIONS_BY_ENGINE[engine] || ['KEY_BLOCK_SIZE', 'PACK_KEYS', 'WITH_SYSTEM_VERSIONING'];
+		const optionKeywords = OPTIONS_BY_ENGINE[engine] || ['KEY_BLOCK_SIZE'];
 
 		optionKeywords.forEach(keyword => {
-			if (keyword === 'WITH_SYSTEM_VERSIONING') {
-				if (options[keyword]) {
-					return tableOptions.push(OPTION_KEYWORDS[keyword]);
-				} else {
-					return;
-				}
-			}
-
 			const value = getOptionValue(keyword, options[keyword]);
 
 			if (value === undefined) {
@@ -168,28 +153,31 @@ module.exports = (_, wrap) => {
 	const addLinear = linear => (linear ? 'LINEAR ' : '');
 
 	const getPartitionBy = partitioning => {
-		if (partitioning.partitionType === 'SYSTEM_TIME') {
-			let interval =
-				!isNaN(partitioning.interval) && partitioning.interval ? ` INTERVAL ${partitioning.interval}` : '';
+		let expression =` (${_.trim(partitioning.partitioning_expression)})`;
+		let algorithm = '';
 
-			if (interval && partitioning.time_unit) {
-				interval += ` ${partitioning.time_unit}`;
-			}
-
-			return `SYSTEM_TIME${interval}`;
+		if (['RANGE', 'LIST'].includes(partitioning.partitionType) && partitioning.partitioning_columns) {
+			expression = ` COLUMNS(${_.trim(partitioning.partitioning_columns)})`;
 		}
 
-		return `${addLinear(partitioning.LINEAR)}${partitioning.partitionType}(${_.trim(
-			partitioning.partitioning_expression,
-		)})`;
+		if (partitioning.partitionType === 'KEY' && partitioning.ALGORITHM) {
+			algorithm = ` ALGORITHM ${partitioning.ALGORITHM}`;
+		}
+
+		return `${addLinear(partitioning.LINEAR)}${partitioning.partitionType}${algorithm}${expression}`;
 	};
 
 	const getSubPartitionBy = partitioning => {
 		if (!partitioning.subpartitionType) {
 			return '';
 		}
+		let algorithm = '';
 
-		return `SUBPARTITION BY ${addLinear(partitioning.SUBLINEAR)}${partitioning.subpartitionType}(${_.trim(
+		if (partitioning.subpartitionType === 'KEY' && partitioning.SUBALGORITHM) {
+			algorithm = ` ALGORITHM ${partitioning.SUBALGORITHM} `;
+		}
+
+		return `SUBPARTITION BY ${addLinear(partitioning.SUBLINEAR)}${partitioning.subpartitionType}${algorithm}(${_.trim(
 			partitioning.subpartitioning_expression,
 		)})`;
 	};
@@ -293,6 +281,10 @@ module.exports = (_, wrap) => {
 
 		if (udfCharacteristics.deterministic) {
 			characteristics.push(udfCharacteristics.deterministic);
+		}
+
+		if (udfCharacteristics.contains) {
+			characteristics.push(udfCharacteristics.contains);
 		}
 
 		if (udfCharacteristics.sqlSecurity) {

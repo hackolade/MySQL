@@ -14,13 +14,9 @@
 				"datetime",
 				"enum",
 				"geometry",
-				"inet6",
+				"json",
 				"numeric",
-				"rowversion",
 				"set",
-				"sql_variant",
-				"table",
-				"xml",
 				"reference",
 				"multiple"
 			]

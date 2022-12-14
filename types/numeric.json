@@ -40,6 +40,12 @@
 		},
 		{
 			"schema": {
+				"mode": "mediumint"
+			},
+			"capacity": 3
+		},
+		{
+			"schema": {
 				"mode": "int"
 			},
 			"capacity": 4
@@ -52,38 +58,23 @@
 		},
 		{
 			"schema": {
-				"mode": "real"
+				"mode": "bit"
 			},
-			"capacity": 4,
-			"mode": "floating"
+			"mode": "boolean"
 		},
 		{
 			"schema": {
 				"mode": "float"
 			},
-			"capacity": 8,
+			"capacity": 4,
 			"mode": "floating"
 		},
 		{
 			"schema": {
-				"mode": "smallmoney"
-			},
-			"capacity": 4,
-			"mode": "decimal"
-		},
-		{
-			"schema": {
-				"mode": "money"
+				"mode": "double"
 			},
 			"capacity": 8,
-			"mode": "decimal"
-		},
-		{
-			"schema": {
-				"mode": "numeric"
-			},
-			"capacity": 12,
-			"mode": "decimal"
+			"mode": "floating"
 		},
 		{
 			"schema": {

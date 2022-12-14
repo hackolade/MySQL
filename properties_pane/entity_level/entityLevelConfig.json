@@ -112,7 +112,6 @@ making sure that you maintain a proper JSON format.
 			}
 
 */
-
 [
   {
     "lowerTab": "Details",
@@ -127,41 +126,10 @@ making sure that you maintain a proper JSON format.
         "template": "textarea"
       },
       {
-        "propertyName": "Or replace",
-        "propertyKeyword": "orReplace",
-        "propertyType": "checkbox",
-        "dependency": {
-          "type": "or",
-          "values": [
-            {
-              "key": "ifNotExist",
-              "value": false
-            },
-            {
-              "key": "ifNotExist",
-              "exists": false
-            }
-          ]
-        }
-      },
-      {
         "propertyName": "If not exist",
         "propertyKeyword": "ifNotExist",
-        "propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified table already exists. Cannot be used together with the OR REPLACE clause.",
-        "propertyType": "checkbox",
-        "dependency": {
-          "type": "or",
-          "values": [
-            {
-              "key": "orReplace",
-              "value": false
-            },
-            {
-              "key": "orReplace",
-              "exists": false
-            }
-          ]
-        }
+        "propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified table already exists.",
+        "propertyType": "checkbox"
       },
       {
         "propertyName": "Temporary",
@@ -212,11 +180,13 @@ making sure that you maintain a proper JSON format.
               "InnoDB",
               "CSV",
               "Memory",
-              "Aria",
               "MyISAM",
-              "Blackhole",
               "Federated",
-              "Archive"
+              "Archive",
+              "EXAMPLE",
+              "HEAP",
+              "MERGE",
+              "NDB"
             ]
           },
           {
@@ -276,32 +246,59 @@ making sure that you maintain a proper JSON format.
             ]
           },
           {
-            "options": ["", "armscii8_general_ci", "armscii8_bin"],
-            "dependency": { "key": "characterSet", "value": "armscii8" },
+            "options": [
+              "",
+              "armscii8_general_ci",
+              "armscii8_bin"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "armscii8"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "ascii_bin", "ascii_general_ci"],
-            "dependency": { "key": "characterSet", "value": "ascii" },
+            "options": [
+              "",
+              "ascii_bin",
+              "ascii_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "ascii"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "big5_bin", "big5_chinese_ci"],
-            "dependency": { "key": "characterSet", "value": "big5" },
+            "options": [
+              "",
+              "big5_bin",
+              "big5_chinese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "big5"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "binary"],
-            "dependency": { "key": "characterSet", "value": "binary" },
+            "options": [
+              "",
+              "binary"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "binary"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -316,7 +313,10 @@ making sure that you maintain a proper JSON format.
               "cp1250_czech_cs",
               "cp1250_general_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "cp1250" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp1250"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -331,15 +331,25 @@ making sure that you maintain a proper JSON format.
               "cp1251_bin",
               "cp1251_ukrainian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "cp1251" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp1251"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "cp1256_bin", "cp1256_general_ci"],
-            "dependency": { "key": "characterSet", "value": "cp1256" },
+            "options": [
+              "",
+              "cp1256_bin",
+              "cp1256_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp1256"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -352,63 +362,115 @@ making sure that you maintain a proper JSON format.
               "cp1257_bin",
               "cp1257_lithuanian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "cp1257" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp1257"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "cp850_bin", "cp850_general_ci"],
-            "dependency": { "key": "characterSet", "value": "cp850" },
+            "options": [
+              "",
+              "cp850_bin",
+              "cp850_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp850"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "cp852_general_ci", "cp852_bin"],
-            "dependency": { "key": "characterSet", "value": "cp852" },
+            "options": [
+              "",
+              "cp852_general_ci",
+              "cp852_bin"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp852"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "cp866_bin", "cp866_general_ci"],
-            "dependency": { "key": "characterSet", "value": "cp866" },
+            "options": [
+              "",
+              "cp866_bin",
+              "cp866_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp866"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "cp932_bin", "cp932_japanese_ci"],
-            "dependency": { "key": "characterSet", "value": "cp932" },
+            "options": [
+              "",
+              "cp932_bin",
+              "cp932_japanese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "cp932"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "dec8_bin", "dec8_swedish_ci"],
-            "dependency": { "key": "characterSet", "value": "dec8" },
+            "options": [
+              "",
+              "dec8_bin",
+              "dec8_swedish_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "dec8"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "eucjpms_bin", "eucjpms_japanese_ci"],
-            "dependency": { "key": "characterSet", "value": "eucjpms" },
+            "options": [
+              "",
+              "eucjpms_bin",
+              "eucjpms_japanese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "eucjpms"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "euckr_bin", "euckr_korean_ci"],
-            "dependency": { "key": "characterSet", "value": "euckr" },
+            "options": [
+              "",
+              "euckr_bin",
+              "euckr_korean_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "euckr"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -421,79 +483,145 @@ making sure that you maintain a proper JSON format.
               "gb18030_bin",
               "gb18030_chinese_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "gb18030" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "gb18030"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "gb2312_bin", "gb2312_chinese_ci"],
-            "dependency": { "key": "characterSet", "value": "gb2312" },
+            "options": [
+              "",
+              "gb2312_bin",
+              "gb2312_chinese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "gb2312"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "gbk_bin", "gbk_chinese_ci"],
-            "dependency": { "key": "characterSet", "value": "gbk" },
+            "options": [
+              "",
+              "gbk_bin",
+              "gbk_chinese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "gbk"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "geostd8_bin", "geostd8_general_ci"],
-            "dependency": { "key": "characterSet", "value": "geostd8" },
+            "options": [
+              "",
+              "geostd8_bin",
+              "geostd8_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "geostd8"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "greek_general_ci", "greek_bin"],
-            "dependency": { "key": "characterSet", "value": "greek" },
+            "options": [
+              "",
+              "greek_general_ci",
+              "greek_bin"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "greek"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "hebrew_bin", "hebrew_general_ci"],
-            "dependency": { "key": "characterSet", "value": "hebrew" },
+            "options": [
+              "",
+              "hebrew_bin",
+              "hebrew_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "hebrew"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "hp8_bin", "hp8_english_ci"],
-            "dependency": { "key": "characterSet", "value": "hp8" },
+            "options": [
+              "",
+              "hp8_bin",
+              "hp8_english_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "hp8"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "keybcs2_bin", "keybcs2_general_ci"],
-            "dependency": { "key": "characterSet", "value": "keybcs2" },
+            "options": [
+              "",
+              "keybcs2_bin",
+              "keybcs2_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "keybcs2"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "koi8r_bin", "koi8r_general_ci"],
-            "dependency": { "key": "characterSet", "value": "koi8r" },
+            "options": [
+              "",
+              "koi8r_bin",
+              "koi8r_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "koi8r"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "koi8u_bin", "koi8u_general_ci"],
-            "dependency": { "key": "characterSet", "value": "koi8u" },
+            "options": [
+              "",
+              "koi8u_bin",
+              "koi8u_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "koi8u"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -511,7 +639,10 @@ making sure that you maintain a proper JSON format.
               "latin1_swedish_ci",
               "latin1_german1_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "latin1" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "latin1"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -526,15 +657,25 @@ making sure that you maintain a proper JSON format.
               "latin2_bin",
               "latin2_croatian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "latin2" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "latin2"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "latin5_bin", "latin5_turkish_ci"],
-            "dependency": { "key": "characterSet", "value": "latin5" },
+            "options": [
+              "",
+              "latin5_bin",
+              "latin5_turkish_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "latin5"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -548,47 +689,85 @@ making sure that you maintain a proper JSON format.
               "latin7_general_ci",
               "latin7_estonian_cs"
             ],
-            "dependency": { "key": "characterSet", "value": "latin7" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "latin7"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "macce_bin", "macce_general_ci"],
-            "dependency": { "key": "characterSet", "value": "macce" },
+            "options": [
+              "",
+              "macce_bin",
+              "macce_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "macce"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "macroman_bin", "macroman_general_ci"],
-            "dependency": { "key": "characterSet", "value": "macroman" },
+            "options": [
+              "",
+              "macroman_bin",
+              "macroman_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "macroman"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "sjis_bin", "sjis_japanese_ci"],
-            "dependency": { "key": "characterSet", "value": "sjis" },
+            "options": [
+              "",
+              "sjis_bin",
+              "sjis_japanese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "sjis"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "swe7_bin", "swe7_swedish_ci"],
-            "dependency": { "key": "characterSet", "value": "swe7" },
+            "options": [
+              "",
+              "swe7_bin",
+              "swe7_swedish_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "swe7"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "tis620_bin", "tis620_thai_ci"],
-            "dependency": { "key": "characterSet", "value": "tis620" },
+            "options": [
+              "",
+              "tis620_bin",
+              "tis620_thai_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "tis620"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -625,15 +804,25 @@ making sure that you maintain a proper JSON format.
               "ucs2_vietnamese_ci",
               "ucs2_lithuanian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "ucs2" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "ucs2"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "ujis_bin", "ujis_japanese_ci"],
-            "dependency": { "key": "characterSet", "value": "ujis" },
+            "options": [
+              "",
+              "ujis_bin",
+              "ujis_japanese_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "ujis"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -669,15 +858,25 @@ making sure that you maintain a proper JSON format.
               "utf16_roman_ci",
               "utf16_slovenian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "utf16" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "utf16"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
           {
-            "options": ["", "utf16le_bin", "utf16le_general_ci"],
-            "dependency": { "key": "characterSet", "value": "utf16le" },
+            "options": [
+              "",
+              "utf16le_bin",
+              "utf16le_general_ci"
+            ],
+            "dependency": {
+              "key": "characterSet",
+              "value": "utf16le"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -713,7 +912,10 @@ making sure that you maintain a proper JSON format.
               "utf32_spanish2_ci",
               "utf32_romanian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "utf32" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "utf32"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -750,7 +952,10 @@ making sure that you maintain a proper JSON format.
               "utf8_hungarian_ci",
               "utf8_spanish_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "utf8" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "utf8"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
@@ -786,22 +991,31 @@ making sure that you maintain a proper JSON format.
               "utf8mb4_spanish2_ci",
               "utf8mb4_romanian_ci"
             ],
-            "dependency": { "key": "characterSet", "value": "utf8mb4" },
+            "dependency": {
+              "key": "characterSet",
+              "value": "utf8mb4"
+            },
             "propertyName": "Collation",
             "propertyType": "select",
             "propertyKeyword": "collation",
             "propertyTooltip": "Select from list of options"
           },
-
           {
-            "options": ["None", "Zlib", "LZ4"],
-            "dependency": { "key": "ENGINE", "value": "InnoDB" },
+            "options": [
+              "NONE",
+              "ZLIB",
+              "LZ4"
+            ],
+            "dependency": {
+              "key": "ENGINE",
+              "value": "InnoDB"
+            },
             "propertyName": "Compression",
             "propertyType": "select",
             "propertyKeyword": "compression",
             "propertyTooltip": "The compression algorithm used for page level compression for InnoDB tables."
           },
-		  {
+          {
             "propertyName": "Auto increment",
             "propertyKeyword": "AUTO_INCREMENT",
             "propertyType": "numeric",
@@ -818,15 +1032,15 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
-                  "value": "Aria"
-                },
-                {
-                  "key": "ENGINE",
                   "value": "InnoDB"
                 },
                 {
                   "key": "ENGINE",
                   "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "HEAP"
                 },
                 {
                   "key": "ENGINE",
@@ -839,7 +1053,7 @@ making sure that you maintain a proper JSON format.
             "propertyName": "Auto tablespace size extension",
             "propertyKeyword": "AUTOEXTEND_SIZE",
             "propertyType": "numeric",
-            "valueType": "bytes",
+            "valueType": "integer",
             "propertyTooltip": "Must be a multiple of 4MB and defines the amount by which InnoDB extends the size of the tablespace when it becomes full.",
             "minValue": 0,
             "step": 4000000,
@@ -850,7 +1064,11 @@ making sure that you maintain a proper JSON format.
                   "key": "ENGINE",
                   "value": "InnoDB"
                 },
-                { "level": "model", "key": "dbVersion", "value": "8.x" }
+                {
+                  "level": "model",
+                  "key": "dbVersion",
+                  "value": "v8.x"
+                }
               ]
             }
           },
@@ -863,17 +1081,8 @@ making sure that you maintain a proper JSON format.
             "minValue": 1,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
@@ -887,24 +1096,18 @@ making sure that you maintain a proper JSON format.
             "maxValue": 1,
             "step": 1,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
-            "dependency": { "key": "ENGINE", "value": "FEDERATED" },
+            "dependency": {
+              "key": "ENGINE",
+              "value": "Federated"
+            },
             "propertyName": "Connection",
             "propertyType": "text",
-            "propertyKeyword": "connection",
+            "propertyKeyword": "CONNECTION",
             "propertyTooltip": "The connection string for a FEDERATED table."
           },
           {
@@ -918,10 +1121,6 @@ making sure that you maintain a proper JSON format.
                 {
                   "key": "ENGINE",
                   "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
                 },
                 {
                   "key": "ENGINE",
@@ -946,10 +1145,6 @@ making sure that you maintain a proper JSON format.
                 {
                   "key": "ENGINE",
                   "value": "MyISAM"
-                },
-                {
-                  "key": "ENGINE",
-                  "value": "Aria"
                 }
               ]
             }
@@ -968,10 +1163,6 @@ making sure that you maintain a proper JSON format.
                 },
                 {
                   "key": "ENGINE",
-                  "value": "Aria"
-                },
-                {
-                  "key": "ENGINE",
                   "value": "InnoDB"
                 }
               ]
@@ -984,15 +1175,13 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "No",
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             },
-            "options": ["No", "Yes"]
+            "options": [
+              "No",
+              "Yes"
+            ]
           },
           {
             "propertyName": "Pack keys",
@@ -1001,15 +1190,14 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "Default",
             "dependency": {
-              "type": "and",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             },
-            "options": ["Default", "0", "1"]
+            "options": [
+              "Default",
+              "0",
+              "1"
+            ]
           },
           {
             "propertyName": "INSERT method",
@@ -1018,15 +1206,14 @@ making sure that you maintain a proper JSON format.
             "propertyType": "select",
             "defaultValue": "No",
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MERGE"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MERGE"
             },
-            "options": ["No", "First", "Last"]
+            "options": [
+              "No",
+              "First",
+              "Last"
+            ]
           },
           {
             "propertyName": "Union",
@@ -1036,13 +1223,8 @@ making sure that you maintain a proper JSON format.
             "template": "textarea",
             "markdown": false,
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MERGE"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MERGE"
             }
           },
           {
@@ -1070,6 +1252,10 @@ making sure that you maintain a proper JSON format.
                 {
                   "key": "ENGINE",
                   "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "HEAP"
                 }
               ]
             }
@@ -1089,17 +1275,13 @@ making sure that you maintain a proper JSON format.
                 {
                   "key": "ENGINE",
                   "value": "Memory"
+                },
+                {
+                  "key": "ENGINE",
+                  "value": "HEAP"
                 }
               ]
             }
-          },
-          {
-            "propertyName": "Pack keys",
-            "propertyKeyword": "PACK_KEYS",
-            "propertyTooltip": "Can be used to determine whether the indexes will be compressed. Set it to 1 to compress all keys. With a value of 0, compression will not be used. With the DEFAULT value, only long strings will be compressed. Uncompressed keys are faster.",
-            "propertyType": "select",
-            "defaultValue": "",
-            "options": ["", "Default", "0", "1"]
           },
           {
             "propertyName": "Row format",
@@ -1116,16 +1298,11 @@ making sure that you maintain a proper JSON format.
               "Redundant"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
-		  {
+          {
             "propertyName": "Row format",
             "propertyKeyword": "ROW_FORMAT",
             "propertyTooltip": "Specifies the row format for the data file. Possible values are engine-dependent.",
@@ -1134,17 +1311,12 @@ making sure that you maintain a proper JSON format.
             "options": [
               "Default",
               "Fixed",
-			        "Dynamic",
-              "Compressed",
+              "Dynamic",
+              "Compressed"
             ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "MyISAM"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "MyISAM"
             }
           },
           {
@@ -1153,15 +1325,14 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "If set to 1, statistics will be recalculated when more than 10% of the data has changed. When set to 0, stats will be recalculated only when an ANALYZE TABLE is run. If set to DEFAULT, or left out, the value set by the innodb_stats_auto_recalc system variable applies.",
             "propertyType": "select",
             "defaultValue": "Default",
-            "options": ["Default", "0", "1"],
+            "options": [
+              "Default",
+              "0",
+              "1"
+            ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
           {
@@ -1170,33 +1341,30 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "Indicates whether the InnoDB statistics created by ANALYZE TABLE will remain on disk or not. It can be set to 1 (on disk), 0 (not on disk, the pre-MySQL 10 behavior), or DEFAULT (the same as leaving out the option), in which case the value set by the innodb_stats_persistent system variable will apply.",
             "propertyType": "select",
             "defaultValue": "Default",
-            "options": ["Default", "0", "1"],
+            "options": [
+              "Default",
+              "0",
+              "1"
+            ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           },
-
           {
             "propertyName": "Stats sample pages",
             "propertyKeyword": "STATS_SAMPLE_PAGES",
             "propertyTooltip": "Indicates the number of index pages to sample when estimating cardinality and other statistics for an indexed column, such as those calculated by ANALYZE TABLE.",
             "propertyType": "select",
             "defaultValue": "Default",
-            "options": ["Default", "0", "1"],
+            "options": [
+              "Default",
+              "0",
+              "1"
+            ],
             "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "ENGINE",
-                  "value": "InnoDB"
-                }
-              ]
+              "key": "ENGINE",
+              "value": "InnoDB"
             }
           }
         ]
@@ -1213,7 +1381,13 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "Choose the desired partition type",
             "propertyType": "select",
             "defaultValue": "",
-            "options": ["", "RANGE", "LIST", "HASH", "KEY"]
+            "options": [
+              "",
+              "RANGE",
+              "LIST",
+              "HASH",
+              "KEY"
+            ]
           },
           {
             "propertyName": "Linear",
@@ -1234,6 +1408,20 @@ making sure that you maintain a proper JSON format.
             }
           },
           {
+            "propertyName": "Algorithm",
+            "propertyKeyword": "ALGORITHM",
+            "propertyType": "select",
+            "dependency": {
+              "key": "partitionType",
+              "value": "KEY"
+            },
+            "options": [
+              "",
+              "0",
+              "1"
+            ]
+          },
+          {
             "propertyName": "Expression",
             "propertyKeyword": "partitioning_expression",
             "propertyTooltip": "A SQL expression that returns a value from each row. In the simplest cases, it is a column name. This value is used to determine which partition should contain a row.",
@@ -1245,19 +1433,81 @@ making sure that you maintain a proper JSON format.
               "values": [
                 {
                   "key": "partitionType",
-                  "value": "RANGE"
-                },
-                {
-                  "key": "partitionType",
-                  "value": "LIST"
-                },
-                {
-                  "key": "partitionType",
                   "value": "HASH"
                 },
                 {
                   "key": "partitionType",
                   "value": "KEY"
+                },
+                {
+                  "type": "and",
+                  "values": [
+                    {
+                      "type": "or",
+                      "values": [
+                        {
+                          "key": "partitionType",
+                          "value": "RANGE"
+                        },
+                        {
+                          "key": "partitionType",
+                          "value": "LIST"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "or",
+                      "values": [
+                        {
+                          "key": "partitioning_columns",
+                          "value": ""
+                        },
+                        {
+                          "key": "partitioning_columns",
+                          "exist": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Columns",
+            "propertyKeyword": "partitioning_columns",
+            "propertyTooltip": "Columns list separated by comma. Cannot be specified within expression.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false,
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "partitionType",
+                      "value": "RANGE"
+                    },
+                    {
+                      "key": "partitionType",
+                      "value": "LIST"
+                    }
+                  ]
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "partitioning_expression",
+                      "value": ""
+                    },
+                    {
+                      "key": "partitioning_expression",
+                      "exist": false
+                    }
+                  ]
                 }
               ]
             }
@@ -1272,29 +1522,16 @@ making sure that you maintain a proper JSON format.
             "step": 1
           },
           {
-            "propertyName": "Interval",
-            "propertyKeyword": "interval",
-            "propertyType": "numeric",
-            "valueType": "number",
-            "allowNegative": false,
-            "step": 1,
-            "dependency": {
-              "type": "or",
-              "values": [
-                {
-                  "key": "partitionType",
-                  "value": "SYSTEM_TIME"
-                }
-              ]
-            }
-          },
-          {
             "propertyName": "Subpartition type",
             "propertyKeyword": "subpartitionType",
             "propertyTooltip": "Choose the desired partition type",
             "propertyType": "select",
             "defaultValue": "",
-            "options": ["", "HASH", "KEY"]
+            "options": [
+              "",
+              "HASH",
+              "KEY"
+            ]
           },
           {
             "propertyName": "Linear",
@@ -1313,6 +1550,20 @@ making sure that you maintain a proper JSON format.
                 }
               ]
             }
+          },
+          {
+            "propertyName": "Algorithm",
+            "propertyKeyword": "SUBALGORITHM",
+            "propertyType": "select",
+            "dependency": {
+              "key": "subpartitionType",
+              "value": "KEY"
+            },
+            "options": [
+              "",
+              "0",
+              "1"
+            ]
           },
           {
             "propertyName": "Number of subpartitions",
@@ -1381,6 +1632,40 @@ making sure that you maintain a proper JSON format.
         ]
       },
       {
+        "propertyName": "Ignore",
+        "propertyKeyword": "selectIgnore",
+        "propertyType": "checkbox",
+        "propertyTooltip": "The IGNORE and REPLACE options indicate how to handle rows that duplicate unique key values when copying a table using a SELECT statement.",
+        "disabledOnCondition": {
+          "key": "selectReplace",
+          "value": true
+        },
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "selectStatement",
+            "length": 0
+          }
+        }
+      },
+      {
+        "propertyName": "Replace",
+        "propertyKeyword": "selectReplace",
+        "propertyType": "checkbox",
+        "propertyTooltip": "The IGNORE and REPLACE options indicate how to handle rows that duplicate unique key values when copying a table using a SELECT statement.",
+        "disabledOnCondition": {
+          "key": "selectIgnore",
+          "value": true
+        },
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "selectStatement",
+            "length": 0
+          }
+        }
+      },
+      {
         "propertyName": "Remarks",
         "propertyKeyword": "comments",
         "propertyTooltip": "remarks",
@@ -1390,7 +1675,10 @@ making sure that you maintain a proper JSON format.
         "valueType": "string"
       }
     ],
-    "columnsRatio": [3.7, 5]
+    "columnsRatio": [
+      3.7,
+      5
+    ]
   },
   {
     "lowerTab": "Composite keys",
@@ -1484,7 +1772,10 @@ making sure that you maintain a proper JSON format.
             "propertyKeyword": "compositePrimaryKey",
             "propertyType": "primaryKeySetter",
             "abbr": "pk",
-            "attributeList": ["ascending", "descending"]
+            "attributeList": [
+              "ascending",
+              "descending"
+            ]
           },
           {
             "propertyName": "Category",
@@ -1492,7 +1783,12 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "",
-            "options": ["", "BTREE", "HASH", "RTREE"]
+            "options": [
+              "",
+              "BTREE",
+              "HASH",
+              "RTREE"
+            ]
           },
           {
             "propertyName": "Key block size",
@@ -1539,7 +1835,11 @@ making sure that you maintain a proper JSON format.
             "template": "collectiontree",
             "isCompositeKey": true,
             "abbr": " ",
-            "attributeList": ["ascending", "descending"]
+            "attributeList": [
+              "",
+              "ascending",
+              "descending"
+            ]
           },
           {
             "propertyName": "Alternate key",
@@ -1554,7 +1854,12 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "",
-            "options": ["", "BTREE", "HASH", "RTREE"]
+            "options": [
+              "",
+              "BTREE",
+              "HASH",
+              "RTREE"
+            ]
           },
           {
             "propertyName": "Key block size",
@@ -1594,7 +1899,7 @@ making sure that you maintain a proper JSON format.
           {
             "propertyName": "Name",
             "propertyKeyword": "indxName",
-            "propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
+            "propertyTooltip": "Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
             "propertyType": "text"
           },
           {
@@ -1605,19 +1910,19 @@ making sure that you maintain a proper JSON format.
             "defaultValue": true
           },
           {
-            "propertyName": "If not exist",
-            "propertyKeyword": "ifNotExist",
-            "propertyTooltip": "The index will only be created if an index with the same name does not already exist. If the index already exists, then a warning will be triggered by default.",
-            "defaultValue": true,
-            "propertyType": "checkbox"
-          },
-          {
             "propertyName": "Type",
             "propertyKeyword": "indexType",
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "",
-            "options": ["", "PRIMARY", "KEY", "UNIQUE", "FULLTEXT", "SPATIAL"]
+            "options": [
+              "",
+              "PRIMARY",
+              "KEY",
+              "UNIQUE",
+              "FULLTEXT",
+              "SPATIAL"
+            ]
           },
           {
             "propertyName": "Category",
@@ -1625,36 +1930,65 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "BTREE",
-            "options": ["", "BTREE", "HASH", "RTREE"]
+            "options": [
+              "",
+              "BTREE",
+              "HASH"
+            ]
           },
           {
             "propertyName": "Keys",
             "propertyKeyword": "indxKey",
             "propertyType": "fieldList",
             "template": "orderedList",
-            "attributeList": ["", "ASC", "DESC"]
+            "attributeList": [
+              "",
+              "ASC",
+              "DESC"
+            ]
           },
           {
-            "propertyName": "Wait",
-            "propertyKeyword": "waitNoWait",
-            "propertyTooltip": "",
-            "propertyType": "select",
-            "defaultValue": "NoWait",
-            "options": ["", "NoWait", "Wait"]
+            "propertyName": "Expressions",
+            "propertyKeyword": "indxExpression",
+            "propertyType": "group",
+            "propertyTooltip": "Specify more detailed expression for index",
+            "structure": [
+              {
+                "propertyName": "value",
+                "propertyKeyword": "value",
+                "propertyType": "text"
+              }
+            ]
           },
           {
-            "propertyName": "Wait",
-            "propertyKeyword": "waitValue",
-            "propertyTooltip": "",
+            "propertyName": "Key block size",
+            "propertyKeyword": "indxKeyBlockSize",
             "propertyType": "numeric",
             "valueType": "number",
-            "defaultValue": 1,
-            "minValue": 1,
-            "step": 1,
+            "propertyTooltip": "this value is just a hint, and the storage engine could modify or ignore it.",
+            "minValue": 0,
+            "step": 1
+          },
+          {
+            "propertyName": "Parser",
+            "propertyKeyword": "indxParser",
+            "propertyTooltip": "It associates a parser plugin with the index if full-text indexing and searching operations need special handling.",
+            "propertyType": "text",
             "dependency": {
-              "key": "waitNoWait",
-              "value": "Wait"
+              "key": "indexType",
+              "value": "FULLTEXT"
             }
+          },
+          {
+            "propertyName": "Visibility",
+            "propertyKeyword": "indxVisibility",
+            "propertyTooltip": " An invisible index is not used by the optimizer. Specification of index visibility applies to indexes other than primary keys (either explicit or implicit).",
+            "propertyType": "select",
+            "options": [
+              "",
+              "VISIBLE",
+              "INVISIBLE"
+            ]
           },
           {
             "propertyName": "Algorithm",
@@ -1662,7 +1996,12 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "DEFAULT",
-            "options": ["", "DEFAULT", "COPY", "INPLACE"]
+            "options": [
+              "",
+              "DEFAULT",
+              "COPY",
+              "INPLACE"
+            ]
           },
           {
             "propertyName": "Lock",
@@ -1670,7 +2009,13 @@ making sure that you maintain a proper JSON format.
             "propertyTooltip": "",
             "propertyType": "select",
             "defaultValue": "DEFAULT",
-            "options": ["", "DEFAULT", "NONE", "SHARED", "EXCLUSIVE"]
+            "options": [
+              "",
+              "DEFAULT",
+              "NONE",
+              "SHARED",
+              "EXCLUSIVE"
+            ]
           },
           {
             "propertyName": "Comment",
@@ -1713,6 +2058,17 @@ making sure that you maintain a proper JSON format.
             "propertyType": "details",
             "template": "textarea",
             "markdown": false
+          },
+          {
+            "propertyName": "Enforcement",
+            "propertyKeyword": "constrEnforcement",
+            "propertyTooltip": "Enforcement",
+            "propertyType": "select",
+            "options": [
+              "",
+              "ENFORCED",
+              "NOT ENFORCED"
+            ]
           },
           {
             "propertyName": "Comments",

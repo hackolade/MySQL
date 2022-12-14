@@ -94,6 +94,25 @@ module.exports = (_, wrap) => {
 	
 		return '';
 	};
+
+	const createGeneratedColumn = (generatedDefaultValue) => {
+		if (!generatedDefaultValue) {
+			return '';
+		}
+
+		if (!generatedDefaultValue.expression) {
+			return '';
+		}
+
+		const storage = _.toUpper(generatedDefaultValue.generated_storage || '');
+		const generatedType = generatedDefaultValue.generatedType === 'always' ? 'GENERATED ALWAYS' : '';
+
+		return ' ' + [
+			generatedType,
+			`AS (${generatedDefaultValue.expression})`,
+			storage,
+		].filter(Boolean).join(' ');
+	};
 	
 	return {
 		decorateType,
@@ -101,5 +120,6 @@ module.exports = (_, wrap) => {
 		canBeNational,
 		isNumeric,
 		getSign,
+		createGeneratedColumn,
 	};
 };

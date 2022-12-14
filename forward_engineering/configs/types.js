@@ -138,9 +138,6 @@ module.exports = {
 	YEAR: {
 		format: 'YYYY',
 	},
-	INET6: {
-		mode: 'ip',
-	},
 	ENUM: {
 		mode: 'enum',
 	},

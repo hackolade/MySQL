@@ -1,17 +1,17 @@
 module.exports = {
-	createDatabase: 'CREATE${orReplace} DATABASE${ifNotExist} `${name}`${dbOptions};\n\n${useDb}',
+	createDatabase: 'CREATE DATABASE${ifNotExist} `${name}`${dbOptions};\n',
 
 	createTable:
-		'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} (\n' +
+		'CREATE ${temporary}TABLE ${ifNotExist}${name} (\n' +
 		'\t${column_definitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
-		')${options}${partitions}${selectStatement};\n',
+		')${options}${partitions}${ignoreReplace}${selectStatement};\n',
 
 	createLikeTable: 'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} LIKE ${likeTableName};\n',
 
 	columnDefinition:
-		'`${name}` ${national}${type}${signed}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
+		'`${name}` ${national}${type}${signed}${generatedDefaultValue}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
 
-	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})',
+	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})${enforcement}',
 
 	createForeignKeyConstraint:
 		'CONSTRAINT `${name}` FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})',
@@ -22,7 +22,7 @@ module.exports = {
 		'ALTER TABLE ${foreignTable} ADD CONSTRAINT `${name}` FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey});',
 
 	index:
-		'CREATE ${indexType}INDEX ${ifNotExist}${name}${indexCategory}\n' +
+		'CREATE ${indexType}INDEX ${name}${indexCategory}\n' +
 		'\tON ${table} ( ${keys} )${indexOptions};\n',
 
 	createView:
@@ -31,14 +31,14 @@ module.exports = {
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
 
 	createFunction:
-		'CREATE ${orReplace}FUNCTION ${ifNotExist}${name}\n' +
+		'CREATE ${definer}FUNCTION ${ifNotExist}${name}\n' +
 		'\t(${parameters})\n' +
 		'\tRETURNS ${type}\n' +
 		'\t${characteristics}\n' +
-		'${body}${delimiter}\n',
+		'${body} ${delimiter}\n',
 
 	createProcedure:
-		'CREATE ${orReplace}PROCEDURE ${name} (${parameters})\n' + '\t${characteristics}\n' + '${body}${delimiter}\n',
+		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' + '\t${characteristics}\n' + '${body} ${delimiter}\n',
 
 	alterView: 'ALTER VIEW ${name}${algorithm}${sqlSecurity} AS ${selectStatement}',
 };

@@ -74,7 +74,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "DB version",
 				"propertyType": "select",
 				"options": [
-					"v5.7.x",
+					"v5.x",
 					"v8.x"
 				],
 				"disabledOption": false

@@ -131,19 +131,6 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox"
 			},
 			{
-				"propertyName": "If not exist",
-				"propertyKeyword": "ifNotExist",
-				"propertyTooltip": "When the IF NOT EXISTS clause is used, MySQL will return a warning instead of an error if the specified view already exists. Cannot be used together with the OR REPLACE clause.",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "or",
-					"values": [{
-						"key": "orReplace",
-						"value": false
-					}]
-				}
-			},
-			{
 				"propertyName": "Algorithm",
 				"propertyKeyword": "algorithm",
 				"propertyTooltip": "Affects how MySQL will process the view. MERGE is usually more efficient, and a view can only be updated with this algorithm. TEMPTABLE can be useful in certain situations, as locks on the underlying tables can be released before the statement is finished processing.",
