@@ -13,7 +13,7 @@ module.exports = (baseProvider, options, app) => {
 		wrap,
 		clean,
 	} = app.require('@hackolade/ddl-fe-utils').general;
-	const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
+	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn } = require('./helpers/columnDefinitionHelper')(
 		_,
 		wrap,
@@ -543,6 +543,118 @@ module.exports = (baseProvider, options, app) => {
 				  });
 
 			return { deactivatedWholeStatement, selectStatement };
+		},
+
+		dropDatabase(dropDbData) {
+			return assignTemplates(templates.dropDatabase, dropDbData);
+		},
+
+		alterDatabase(alterDbData) {
+			const alterStatements = [];
+			const databaseName = alterDbData.name;
+
+			if (alterDbData.collation || alterDbData.characterSet) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseCharset, {
+						name: databaseName,
+						characterSet: alterDbData.characterSet,
+						collation: alterDbData.collation,
+					}),
+				);
+			}
+
+			if (alterDbData.encryption) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseEncryption, {
+						name: databaseName,
+						encryption: alterDbData.encryption,
+					}),
+				);
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.deleted)) {
+				alterDbData.udfs?.deleted.forEach((udf) => {
+					alterStatements.push(this.dropUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.added)) {
+				alterDbData.udfs.added.forEach((udf) => {
+					alterStatements.push(this.createUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.modified)) {
+				alterDbData.udfs.modified.forEach((udf) => {
+					alterStatements.push(
+						this.dropUdf(databaseName, udf) + '\n' +
+						this.createUdf(databaseName, udf),
+					);
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.deleted)) {
+				alterDbData.procedures?.deleted.forEach((procedure) => {
+					alterStatements.push(this.dropProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.added)) {
+				alterDbData.procedures.added.forEach((procedure) => {
+					alterStatements.push(this.createProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.modified)) {
+				alterDbData.procedures.modified.forEach((procedure) => {
+					alterStatements.push(
+						this.dropProcedure(databaseName, procedure) + '\n' +
+						this.createProcedure(databaseName, procedure),
+					);
+				});
+			}
+
+			return alterStatements.join('\n\n');
+		},
+
+		dropUdf(databaseName, udf) {
+			return assignTemplates(templates.dropUdf, { name: getTableName(databaseName, udf.name) });
+		},
+
+		dropProcedure(databaseName, procedure) {
+			return assignTemplates(templates.dropProcedure, { name: getTableName(databaseName, procedure.name) });
+		},
+
+		hydrateDropDatabase(containerData) {
+			return {
+				name: containerData[0]?.name || '', 
+			};
+		},
+
+		hydrateAlterDatabase({ containerData, compModeData }) {
+			const data = containerData[0] || {};
+			const isCharacterSetModified = compModeData.characterSet?.new !== compModeData.characterSet?.old;
+			const isCollationModified = compModeData.collation?.new !== compModeData.collation?.old;
+			const encryption = compModeData.ENCRYPTION?.new !== compModeData.ENCRYPTION?.old;
+			const procedures = compareGroupItems(
+				(compModeData.Procedures?.old || []).map(this.hydrateProcedure),
+				(compModeData.Procedures?.new || []).map(this.hydrateProcedure),
+			);
+			const udfs = compareGroupItems(
+				(compModeData.UDFs?.old || []).map(this.hydrateUdf),
+				(compModeData.UDFs?.new || []).map(this.hydrateUdf),
+			);
+	
+			return {
+				name: data.name || '',
+				...((isCharacterSetModified || isCollationModified) ? {
+					characterSet: data.characterSet,
+					collation: data.collation,
+				} : {}),
+				...(encryption ? { encryption: data.ENCRYPTION === 'Yes' ? 'Y' : 'N' } : {}),
+				procedures,
+				udfs,
+			};
 		},
 	};
 };

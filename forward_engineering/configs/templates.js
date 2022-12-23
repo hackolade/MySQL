@@ -41,4 +41,14 @@ module.exports = {
 		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' + '\t${characteristics}\n' + '${body} ${delimiter}\n',
 
 	alterView: 'ALTER VIEW ${name}${algorithm}${sqlSecurity} AS ${selectStatement}',
+
+	dropDatabase: 'DROP DATABASE IF EXISTS \`${name}\`;',
+
+	alterDatabaseCharset: 'ALTER DATABASE \`${name}\` CHARACTER SET=\'${characterSet}\' COLLATE=\'${collation}\';',
+
+	alterDatabaseEncryption: 'ALTER DATABASE \`${name}\` ENCRYPTION=\'${encryption}\';',
+
+	dropUdf: 'DROP FUNCTION IF EXISTS ${name};',
+
+	dropProcedure: 'DROP PROCEDURE IF EXISTS ${name};',
 };
