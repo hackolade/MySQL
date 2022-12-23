@@ -618,11 +618,11 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		dropUdf(databaseName, udf) {
-			return assignTemplates(templates.dropUdf, { name: getTableName(databaseName, udf.name) });
+			return assignTemplates(templates.dropUdf, { name: getTableName(udf.name, databaseName) });
 		},
 
 		dropProcedure(databaseName, procedure) {
-			return assignTemplates(templates.dropProcedure, { name: getTableName(databaseName, procedure.name) });
+			return assignTemplates(templates.dropProcedure, { name: getTableName(procedure.name, databaseName) });
 		},
 
 		hydrateDropDatabase(containerData) {
