@@ -192,6 +192,42 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
+		addColumn(tableName, columnDefinition, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: 'ADD COLUMN ' + this.convertColumnDefinition(columnDefinition),
+			});
+		},
+
+		dropColumn(tableName, columnData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: 'DROP COLUMN ' + wrap(columnData.name, '`', '`'),
+			});
+		},
+
+		alterColumn(tableName, columnData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+			let alterStatement = '';
+
+			if (columnData.oldName && !columnData.newOptions) {
+				alterStatement = `RENAME COLUMN ${wrap(columnData.oldName, '`', '`')} TO ${wrap(columnData.name, '`', '`')}`;
+			} else if (columnData.oldName && columnData.newOptions) {
+				alterStatement = `CHANGE ${wrap(columnData.oldName, '`', '`')} ${this.convertColumnDefinition(columnData)}`;
+			} else {
+				alterStatement = `MODIFY ${this.convertColumnDefinition(columnData)}`;
+			}
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement,
+			});
+		},
+
 		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
 			if ((_.isEmpty(index.indxKey) && _.isEmpty(index.indxExpression)) || !index.indxName) {
 				return '';
@@ -289,7 +325,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.alterTable, {
 				table,
-				alterStatement: this.createCheckConstraint(checkConstraint),
+				alterStatement: 'ADD ' + this.createCheckConstraint(checkConstraint),
 			});
 		},
 
@@ -424,6 +460,51 @@ module.exports = (baseProvider, options, app) => {
 				collation: jsonSchema.collation,
 				generatedDefaultValue: jsonSchema.generatedDefaultValue,
 			};
+		},
+
+		hydrateDropColumn({ name }) {
+			return {
+				name,
+			};
+		},
+
+		hydrateAlterColumn({
+			newColumn,
+			oldColumn,
+			newColumnSchema,
+			oldColumnSchema,
+			oldCompData,
+			newCompData,
+		}) {
+			const diff = Object.keys(newColumn).reduce((result, propertyName) => {
+				if (!['name', 'type'].includes(propertyName)) {
+					return result;
+				}
+
+				if (_.isEqual(newColumn[propertyName], oldColumn[propertyName])) {
+					return result;
+				}
+
+				return {
+					...result, [propertyName]: newColumn[propertyName],
+				};
+			}, {});
+
+			const result = {...newColumn};
+
+			if (oldCompData.name !== newCompData.name) {
+				result.oldName = oldCompData.name;
+			}
+
+			if (oldCompData.type !== newCompData.type) {
+				result.oldType = oldCompData.type;
+			}
+
+			if (!_.isEmpty(diff)) {
+				result.newOptions = diff;
+			}
+
+			return result;
 		},
 
 		hydrateIndex(indexData, tableData) {
