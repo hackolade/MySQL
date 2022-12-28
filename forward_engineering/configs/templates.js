@@ -51,4 +51,14 @@ module.exports = {
 	dropUdf: 'DROP FUNCTION IF EXISTS ${name};',
 
 	dropProcedure: 'DROP PROCEDURE IF EXISTS ${name};',
+
+	dropTable: 'DROP TABLE IF EXISTS ${name};',
+
+	alterTable: 'ALTER TABLE ${table} ${alterStatement};',
+
+	dropIndex: 'DROP INDEX IF EXISTS ${indexName}',
+
+	dropCheckConstraint: 'DROP CHECK ${name}',
+
+	alterCharset: '${default}CHARACTER SET=\'${charset}\'${collation}',
 };

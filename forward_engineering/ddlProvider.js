@@ -119,6 +119,30 @@ module.exports = (baseProvider, options, app) => {
 			return commentIfDeactivated(tableStatement, { isActivated });
 		},
 
+		dropTable({ name, dbName }) {
+			return assignTemplates(templates.dropTable, { name: getTableName(name, dbName) });
+		},
+
+		alterTable({ name, collationOptions }, dbData) {
+			const table = getTableName(name, dbData.databaseName);
+
+			if (!collationOptions) {
+				return '';
+			}
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(
+					templates.alterCharset,
+					{
+						charset: collationOptions.characterSet,
+						default: collationOptions.defaultCharSet ? 'DEFAULT ' : '',
+						collation: collationOptions.collation ? ` COLLATE='${collationOptions.collation}'` : '',
+					},
+				),
+			});
+		},
+
 		convertColumnDefinition(columnDefinition) {
 			const type = _.toUpper(columnDefinition.type);
 			const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
@@ -235,12 +259,56 @@ module.exports = (baseProvider, options, app) => {
 			}
 		},
 
+		dropIndex(tableName, indexData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+			const indexName = wrap(indexData.indxName, '`', '`');
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.dropIndex, { indexName }),
+			});
+		},
+
+		alterIndex(tableName, { new: newIndexData, old: oldIndexData }, dbData) {
+			return [
+				this.dropIndex(tableName, oldIndexData, dbData),
+				this.createIndex(tableName, newIndexData, dbData),
+			].join('\n');
+		},
+
 		createCheckConstraint(checkConstraint) {
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `${wrap(checkConstraint.name, '`', '`')} ` : '',
 				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
 				enforcement: checkConstraint.enforcement ? ` ${checkConstraint.enforcement}` : '',
 			});
+		},
+
+		createCheckConstraintStatement(tableName, checkConstraint, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: this.createCheckConstraint(checkConstraint),
+			});
+		},
+
+		dropCheckConstraint(tableName, checkConstraint, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.dropCheckConstraint, {
+					name: wrap(checkConstraint.name, '`', '`'),
+				}),
+			});
+		},
+
+		alterCheckConstraint(tableName, { new: newCheck, old: oldCheck }, dbData) {
+			return [
+				this.dropCheckConstraint(tableName, oldCheck, dbData),
+				this.createCheckConstraintStatement(tableName, newCheck, dbData),
+			].join('\n');
 		},
 
 		createForeignKeyConstraint(
@@ -359,7 +427,20 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateIndex(indexData, tableData) {
-			return indexData;
+			return {
+				indxName: indexData?.indxName,
+				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type })),
+				indxExpression: indexData?.indxExpression?.map(key => ({ value: key.value })),
+				isActivated: indexData?.isActivated,
+				indexType: indexData?.indexType,
+				indexCategory: indexData?.indexCategory,
+				indxKeyBlockSize: indexData?.indxKeyBlockSize,
+				indxParser: indexData?.indxParser,
+				indexComment: indexData?.indexComment,
+				indxVisibility: indexData?.indxVisibility,
+				indexLock: indexData?.indexLock,
+				indexAlgorithm: indexData?.indexAlgorithm,
+			};
 		},
 
 		hydrateViewIndex(indexData) {
@@ -401,6 +482,13 @@ module.exports = (baseProvider, options, app) => {
 				partitioning: detailsTab.partitioning,
 				selectIgnore: detailsTab.selectIgnore,
 				selectReplace: detailsTab.selectReplace,
+			};
+		},
+
+		hydrateDropTable({ tableData }) {
+			return {
+				name: tableData.name,
+				dbName: tableData.dbData.databaseName,
 			};
 		},
 
@@ -511,13 +599,6 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		dropIndex(tableName, dbData, index) {
-			const table = getTableName(tableName, dbData.databaseName);
-			const indexName = index.name;
-
-			return `ALTER TABLE ${table} DROP INDEX IF EXISTS \`${indexName}\`;`;
-		},
-
 		viewSelectStatement(viewData, isActivated = true) {
 			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
 			const deactivatedWholeStatement = allDeactivated || !isActivated;
@@ -587,8 +668,8 @@ module.exports = (baseProvider, options, app) => {
 			if (!_.isEmpty(alterDbData.udfs?.modified)) {
 				alterDbData.udfs.modified.forEach((udf) => {
 					alterStatements.push(
-						this.dropUdf(databaseName, udf) + '\n' +
-						this.createUdf(databaseName, udf),
+						this.dropUdf(databaseName, udf.old) + '\n' +
+						this.createUdf(databaseName, udf.new),
 					);
 				});
 			}
@@ -608,8 +689,8 @@ module.exports = (baseProvider, options, app) => {
 			if (!_.isEmpty(alterDbData.procedures?.modified)) {
 				alterDbData.procedures.modified.forEach((procedure) => {
 					alterStatements.push(
-						this.dropProcedure(databaseName, procedure) + '\n' +
-						this.createProcedure(databaseName, procedure),
+						this.dropProcedure(databaseName, procedure.old) + '\n' +
+						this.createProcedure(databaseName, procedure.new),
 					);
 				});
 			}
@@ -654,6 +735,27 @@ module.exports = (baseProvider, options, app) => {
 				...(encryption ? { encryption: data.ENCRYPTION === 'Yes' ? 'Y' : 'N' } : {}),
 				procedures,
 				udfs,
+			};
+		},
+
+		hydrateAlterTable({ name, newEntityData, oldEntityData, jsonSchema }) {
+			const newDetailsTab = newEntityData[0];
+			const oldDetailsTab = oldEntityData[0];
+			const collationOptionsChanged = [
+				'defaultCharSet',
+				'characterSet',
+				'collation',
+			].some(
+				optionName => oldDetailsTab.tableOptions?.[optionName] !== newDetailsTab.tableOptions?.[optionName],
+			);
+
+			return {
+				name,
+				collationOptions: collationOptionsChanged ? {
+					defaultCharSet: newDetailsTab.tableOptions?.defaultCharSet,
+					characterSet: newDetailsTab.tableOptions?.characterSet,
+					collation: newDetailsTab.tableOptions?.collation,
+				} : null,
 			};
 		},
 	};
