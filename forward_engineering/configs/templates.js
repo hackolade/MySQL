@@ -40,7 +40,7 @@ module.exports = {
 	createProcedure:
 		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' + '\t${characteristics}\n' + '${body} ${delimiter}\n',
 
-	alterView: 'ALTER VIEW ${name}${algorithm}${sqlSecurity} AS ${selectStatement}',
+	alterView: 'ALTER${algorithm}${sqlSecurity} VIEW ${name}\nAS ${selectStatement}${checkOption};',
 
 	dropDatabase: 'DROP DATABASE IF EXISTS \`${name}\`;',
 
@@ -52,7 +52,7 @@ module.exports = {
 
 	dropProcedure: 'DROP PROCEDURE IF EXISTS ${name};',
 
-	dropTable: 'DROP TABLE IF EXISTS ${name};',
+	dropTable: 'DROP${temporary} TABLE IF EXISTS ${name};',
 
 	alterTable: 'ALTER TABLE ${table} ${alterStatement};',
 
@@ -61,4 +61,6 @@ module.exports = {
 	dropCheckConstraint: 'DROP CHECK ${name}',
 
 	alterCharset: '${default}CHARACTER SET=\'${charset}\'${collation}',
+
+	dropView: 'DROP VIEW IF EXISTS ${viewName};',
 };

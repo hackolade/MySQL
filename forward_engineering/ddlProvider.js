@@ -12,6 +12,7 @@ module.exports = (baseProvider, options, app) => {
 		hasType,
 		wrap,
 		clean,
+		getDifferentProperties,
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn } = require('./helpers/columnDefinitionHelper')(
@@ -119,8 +120,11 @@ module.exports = (baseProvider, options, app) => {
 			return commentIfDeactivated(tableStatement, { isActivated });
 		},
 
-		dropTable({ name, dbName }) {
-			return assignTemplates(templates.dropTable, { name: getTableName(name, dbName) });
+		dropTable({ name, dbName, temporary }) {
+			return assignTemplates(templates.dropTable, {
+				name: getTableName(name, dbName),
+				temporary: temporary ? ' TEMPORARY' : '',
+			});
 		},
 
 		alterTable({ name, collationOptions }, dbData) {
@@ -413,6 +417,32 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
+		dropView({ name, dbData }) {
+			const viewName = getTableName(name, dbData.databaseName);
+
+			return assignTemplates(templates.dropView, {
+				viewName,
+			});
+		},
+
+		alterView(alterData, dbData) {
+			if (_.isEmpty(alterData.options)) {
+				return '';
+			}
+
+			const viewName = getTableName(alterData.name, dbData.databaseName);
+			const { selectStatement } = this.viewSelectStatement(alterData);
+			const options = alterData.options || {};
+
+			return assignTemplates(templates.alterView, {
+				name: viewName,
+				selectStatement,
+				algorithm: options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM ${options.algorithm}` : '',
+				sqlSecurity: options.sqlSecurity ? ` SQL SECURITY ${options.sqlSecurity}` : '',
+				checkOption: options.checkOption ? `\nWITH ${options.checkOption} CHECK OPTION` : '',
+			});
+		},
+
 		createViewIndex(viewName, index, dbData, isParentActivated) {
 			return '';
 		},
@@ -476,19 +506,7 @@ module.exports = (baseProvider, options, app) => {
 			oldCompData,
 			newCompData,
 		}) {
-			const diff = Object.keys(newColumn).reduce((result, propertyName) => {
-				if (!['name', 'type'].includes(propertyName)) {
-					return result;
-				}
-
-				if (_.isEqual(newColumn[propertyName], oldColumn[propertyName])) {
-					return result;
-				}
-
-				return {
-					...result, [propertyName]: newColumn[propertyName],
-				};
-			}, {});
+			const diff = getDifferentProperties(newColumn, oldColumn, ['name', 'type']);
 
 			const result = {...newColumn};
 
@@ -566,10 +584,13 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateDropTable({ tableData }) {
+		hydrateDropTable({ tableData, entityData }) {
+			const detailsTab = entityData[0];
+
 			return {
 				name: tableData.name,
 				dbName: tableData.dbData.databaseName,
+				temporary: detailsTab?.temporary,
 			};
 		},
 
@@ -587,7 +608,6 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				name: viewData.name,
-				tableName: viewData.tableName,
 				keys: viewData.keys,
 				orReplace: detailsTab.orReplace,
 				ifNotExist: detailsTab.ifNotExist,
@@ -595,6 +615,32 @@ module.exports = (baseProvider, options, app) => {
 				sqlSecurity: detailsTab.SQL_SECURITY,
 				algorithm: detailsTab.algorithm,
 				checkOption: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
+			};
+		},
+
+		hydrateDropView({ tableData }) {
+			return {
+				name: tableData.name,
+				dbData: tableData.dbData,
+			};
+		},
+
+		hydrateAlterView({ name, newEntityData, oldEntityData, viewData, jsonSchema }) {
+			const newData = this.hydrateView({
+				viewData: {},
+				entityData: newEntityData,
+			});
+			const oldData = this.hydrateView({
+				viewData: {},
+				entityData: oldEntityData,
+			});
+			const options = getDifferentProperties(newData, oldData);
+
+			return {
+				name,
+				keys: viewData.keys,
+				selectStatement: options.selectStatement || newEntityData[0]?.selectStatement,
+				options,
 			};
 		},
 
