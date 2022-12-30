@@ -61,6 +61,127 @@ module.exports = (baseProvider, options, app) => {
 			return [databaseStatement, ...udfStatements, ...procStatements].join('\n');
 		},
 
+		dropDatabase(dropDbData) {
+			return assignTemplates(templates.dropDatabase, dropDbData);
+		},
+
+		alterDatabase(alterDbData) {
+			const alterStatements = [];
+			const databaseName = alterDbData.name;
+
+			if (alterDbData.collation || alterDbData.characterSet) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseCharset, {
+						name: databaseName,
+						characterSet: alterDbData.characterSet,
+						collation: alterDbData.collation,
+					}),
+				);
+			}
+
+			if (alterDbData.encryption) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseEncryption, {
+						name: databaseName,
+						encryption: alterDbData.encryption,
+					}),
+				);
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.deleted)) {
+				alterDbData.udfs?.deleted.forEach((udf) => {
+					alterStatements.push(this.dropUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.added)) {
+				alterDbData.udfs.added.forEach((udf) => {
+					alterStatements.push(this.createUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.modified)) {
+				alterDbData.udfs.modified.forEach((udf) => {
+					alterStatements.push(
+						this.dropUdf(databaseName, udf.old) + '\n' +
+						this.createUdf(databaseName, udf.new),
+					);
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.deleted)) {
+				alterDbData.procedures?.deleted.forEach((procedure) => {
+					alterStatements.push(this.dropProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.added)) {
+				alterDbData.procedures.added.forEach((procedure) => {
+					alterStatements.push(this.createProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.modified)) {
+				alterDbData.procedures.modified.forEach((procedure) => {
+					alterStatements.push(
+						this.dropProcedure(databaseName, procedure.old) + '\n' +
+						this.createProcedure(databaseName, procedure.new),
+					);
+				});
+			}
+
+			return alterStatements.join('\n\n');
+		},
+
+		createUdf(databaseName, udf) {
+			const characteristics = getCharacteristics(udf.characteristics);
+			let startDelimiter = udf.delimiter ? `DELIMITER ${udf.delimiter}\n` : '';
+			let endDelimiter = udf.delimiter ? `DELIMITER ;\n` : '';
+
+			return (
+				startDelimiter +
+				assignTemplates(templates.createFunction, {
+					name: getTableName(udf.name, databaseName),
+					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
+					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
+					characteristics: characteristics.join('\n\t'),
+					type: udf.type,
+					parameters: udf.parameters,
+					body: udf.body,
+					delimiter: udf.delimiter || ';',
+				}) +
+				endDelimiter
+			);
+		},
+
+		createProcedure(databaseName, procedure) {
+			const characteristics = getCharacteristics(procedure.characteristics);
+			let startDelimiter = procedure.delimiter ? `DELIMITER ${procedure.delimiter}\n` : '';
+			let endDelimiter = procedure.delimiter ? `DELIMITER ;\n` : '';
+
+			return (
+				startDelimiter +
+				assignTemplates(templates.createProcedure, {
+					name: getTableName(procedure.name, databaseName),
+					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
+					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
+					parameters: procedure.parameters,
+					characteristics: characteristics.join('\n\t'),
+					body: procedure.body,
+					delimiter: procedure.delimiter || ';',
+				}) +
+				endDelimiter
+			);
+		},
+
+		dropUdf(databaseName, udf) {
+			return assignTemplates(templates.dropUdf, { name: getTableName(udf.name, databaseName) });
+		},
+
+		dropProcedure(databaseName, procedure) {
+			return assignTemplates(templates.dropProcedure, { name: getTableName(procedure.name, databaseName) });
+		},
+
 		createTable(
 			{
 				name,
@@ -201,7 +322,9 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.alterTable, {
 				table,
-				alterStatement: 'ADD COLUMN ' + this.convertColumnDefinition(columnDefinition),
+				alterStatement: assignTemplates(templates.addColumn, {
+					columnDefinition: this.convertColumnDefinition(columnDefinition),
+				}),
 			});
 		},
 
@@ -210,7 +333,9 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.alterTable, {
 				table,
-				alterStatement: 'DROP COLUMN ' + wrap(columnData.name, '`', '`'),
+				alterStatement: assignTemplates(templates.dropColumn, {
+					name: wrap(columnData.name, '`', '`'),
+				}),
 			});
 		},
 
@@ -219,11 +344,19 @@ module.exports = (baseProvider, options, app) => {
 			let alterStatement = '';
 
 			if (columnData.oldName && !columnData.newOptions) {
-				alterStatement = `RENAME COLUMN ${wrap(columnData.oldName, '`', '`')} TO ${wrap(columnData.name, '`', '`')}`;
+				alterStatement = assignTemplates(templates.renameColumn, {
+					oldName: wrap(columnData.oldName, '`', '`'),
+					newName: wrap(columnData.name, '`', '`'),
+				});
 			} else if (columnData.oldName && columnData.newOptions) {
-				alterStatement = `CHANGE ${wrap(columnData.oldName, '`', '`')} ${this.convertColumnDefinition(columnData)}`;
+				alterStatement = assignTemplates(templates.changeColumn, {
+					oldName: wrap(columnData.oldName, '`', '`'),
+					columnDefinition: this.convertColumnDefinition(columnData),
+				});
 			} else {
-				alterStatement = `MODIFY ${this.convertColumnDefinition(columnData)}`;
+				alterStatement = assignTemplates(templates.modifyColumn, {
+					columnDefinition: this.convertColumnDefinition(columnData),
+				});
 			}
 
 			return assignTemplates(templates.alterTable, {
@@ -329,7 +462,9 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.alterTable, {
 				table,
-				alterStatement: 'ADD ' + this.createCheckConstraint(checkConstraint),
+				alterStatement: assignTemplates(templates.addCheckConstraint, {
+					checkConstraint: this.createCheckConstraint(checkConstraint),
+				}),
 			});
 		},
 
@@ -415,6 +550,33 @@ module.exports = (baseProvider, options, app) => {
 				}),
 				{ isActivated: !deactivatedWholeStatement },
 			);
+		},
+
+		viewSelectStatement(viewData, isActivated = true) {
+			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
+			const deactivatedWholeStatement = allDeactivated || !isActivated;
+			const { columns, tables } = getViewData(viewData.keys);
+			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
+
+			if (!deactivatedWholeStatement) {
+				const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
+				const deactivatedColumnsString = dividedColumns.deactivatedItems.length
+					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
+							isActivated: false,
+							isPartOfLine: true,
+					  })
+					: '';
+				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
+			}
+
+			const selectStatement = _.trim(viewData.selectStatement)
+				? _.trim(tab(viewData.selectStatement))
+				: assignTemplates(templates.viewSelectStatement, {
+						tableName: tables.join(', '),
+						keys: columnsAsString,
+				  });
+
+			return { deactivatedWholeStatement, selectStatement };
 		},
 
 		dropView({ name, dbData }) {
@@ -683,154 +845,6 @@ module.exports = (baseProvider, options, app) => {
 					sqlSecurity: procedure.securityMode,
 				},
 			};
-		},
-
-		createUdf(databaseName, udf) {
-			const characteristics = getCharacteristics(udf.characteristics);
-			let startDelimiter = udf.delimiter ? `DELIMITER ${udf.delimiter}\n` : '';
-			let endDelimiter = udf.delimiter ? `DELIMITER ;\n` : '';
-
-			return (
-				startDelimiter +
-				assignTemplates(templates.createFunction, {
-					name: getTableName(udf.name, databaseName),
-					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
-					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
-					characteristics: characteristics.join('\n\t'),
-					type: udf.type,
-					parameters: udf.parameters,
-					body: udf.body,
-					delimiter: udf.delimiter || ';',
-				}) +
-				endDelimiter
-			);
-		},
-
-		createProcedure(databaseName, procedure) {
-			const characteristics = getCharacteristics(procedure.characteristics);
-			let startDelimiter = procedure.delimiter ? `DELIMITER ${procedure.delimiter}\n` : '';
-			let endDelimiter = procedure.delimiter ? `DELIMITER ;\n` : '';
-
-			return (
-				startDelimiter +
-				assignTemplates(templates.createProcedure, {
-					name: getTableName(procedure.name, databaseName),
-					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
-					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
-					parameters: procedure.parameters,
-					characteristics: characteristics.join('\n\t'),
-					body: procedure.body,
-					delimiter: procedure.delimiter || ';',
-				}) +
-				endDelimiter
-			);
-		},
-
-		viewSelectStatement(viewData, isActivated = true) {
-			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
-			const deactivatedWholeStatement = allDeactivated || !isActivated;
-			const { columns, tables } = getViewData(viewData.keys);
-			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
-
-			if (!deactivatedWholeStatement) {
-				const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
-				const deactivatedColumnsString = dividedColumns.deactivatedItems.length
-					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
-							isActivated: false,
-							isPartOfLine: true,
-					  })
-					: '';
-				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
-			}
-
-			const selectStatement = _.trim(viewData.selectStatement)
-				? _.trim(tab(viewData.selectStatement))
-				: assignTemplates(templates.viewSelectStatement, {
-						tableName: tables.join(', '),
-						keys: columnsAsString,
-				  });
-
-			return { deactivatedWholeStatement, selectStatement };
-		},
-
-		dropDatabase(dropDbData) {
-			return assignTemplates(templates.dropDatabase, dropDbData);
-		},
-
-		alterDatabase(alterDbData) {
-			const alterStatements = [];
-			const databaseName = alterDbData.name;
-
-			if (alterDbData.collation || alterDbData.characterSet) {
-				alterStatements.push(
-					assignTemplates(templates.alterDatabaseCharset, {
-						name: databaseName,
-						characterSet: alterDbData.characterSet,
-						collation: alterDbData.collation,
-					}),
-				);
-			}
-
-			if (alterDbData.encryption) {
-				alterStatements.push(
-					assignTemplates(templates.alterDatabaseEncryption, {
-						name: databaseName,
-						encryption: alterDbData.encryption,
-					}),
-				);
-			}
-
-			if (!_.isEmpty(alterDbData.udfs?.deleted)) {
-				alterDbData.udfs?.deleted.forEach((udf) => {
-					alterStatements.push(this.dropUdf(databaseName, udf));
-				});
-			}
-
-			if (!_.isEmpty(alterDbData.udfs?.added)) {
-				alterDbData.udfs.added.forEach((udf) => {
-					alterStatements.push(this.createUdf(databaseName, udf));
-				});
-			}
-
-			if (!_.isEmpty(alterDbData.udfs?.modified)) {
-				alterDbData.udfs.modified.forEach((udf) => {
-					alterStatements.push(
-						this.dropUdf(databaseName, udf.old) + '\n' +
-						this.createUdf(databaseName, udf.new),
-					);
-				});
-			}
-
-			if (!_.isEmpty(alterDbData.procedures?.deleted)) {
-				alterDbData.procedures?.deleted.forEach((procedure) => {
-					alterStatements.push(this.dropProcedure(databaseName, procedure));
-				});
-			}
-
-			if (!_.isEmpty(alterDbData.procedures?.added)) {
-				alterDbData.procedures.added.forEach((procedure) => {
-					alterStatements.push(this.createProcedure(databaseName, procedure));
-				});
-			}
-
-			if (!_.isEmpty(alterDbData.procedures?.modified)) {
-				alterDbData.procedures.modified.forEach((procedure) => {
-					alterStatements.push(
-						this.dropProcedure(databaseName, procedure.old) + '\n' +
-						this.createProcedure(databaseName, procedure.new),
-					);
-				});
-			}
-
-			return alterStatements.join('\n\n');
-		},
-
-		dropUdf(databaseName, udf) {
-			return assignTemplates(templates.dropUdf, { name: getTableName(udf.name, databaseName) });
-		},
-
-		dropProcedure(databaseName, procedure) {
-			return assignTemplates(templates.dropProcedure, { name: getTableName(procedure.name, databaseName) });
 		},
 
 		hydrateDropDatabase(containerData) {

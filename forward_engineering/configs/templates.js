@@ -60,7 +60,19 @@ module.exports = {
 
 	dropCheckConstraint: 'DROP CHECK ${name}',
 
+	addCheckConstraint: 'ADD ${checkConstraint}',
+
 	alterCharset: '${default}CHARACTER SET=\'${charset}\'${collation}',
 
 	dropView: 'DROP VIEW IF EXISTS ${viewName};',
+
+	addColumn: 'ADD COLUMN ${columnDefinition}',
+
+	dropColumn: 'DROP COLUMN ${name}',
+
+	renameColumn: 'RENAME COLUMN ${oldName} TO ${newName}',
+
+	changeColumn: 'CHANGE ${oldName} ${columnDefinition}',
+
+	modifyColumn: 'MODIFY ${columnDefinition}',
 };
