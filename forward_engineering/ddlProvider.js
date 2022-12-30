@@ -358,18 +358,18 @@ module.exports = (baseProvider, options, app) => {
 			} else if (columnData.oldName && columnData.newOptions) {
 				alterStatement = assignTemplates(templates.changeColumn, {
 					oldName: wrap(columnData.oldName, '`', '`'),
-					columnDefinition: this.convertColumnDefinition(columnData),
+					columnDefinition: this.convertColumnDefinition({ ...columnData, isActivated: true }),
 				});
 			} else {
 				alterStatement = assignTemplates(templates.modifyColumn, {
-					columnDefinition: this.convertColumnDefinition(columnData),
+					columnDefinition: this.convertColumnDefinition({ ...columnData, isActivated: true }),
 				});
 			}
 
-			return assignTemplates(templates.alterTable, {
+			return commentIfDeactivated(assignTemplates(templates.alterTable, {
 				table,
 				alterStatement,
-			});
+			}), { isActivated: columnData.isActivated });
 		},
 
 		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
@@ -452,7 +452,10 @@ module.exports = (baseProvider, options, app) => {
 		alterIndex(tableName, { new: newIndexData, old: oldIndexData }, dbData) {
 			return [
 				this.dropIndex(tableName, oldIndexData, dbData),
-				this.createIndex(tableName, newIndexData, dbData),
+				this.createIndex(tableName, {
+					...newIndexData,
+					indxKey: newIndexData.indxKey.filter(key => !(key.isActivated === false))
+				}, dbData),
 			].join('\n');
 		},
 
@@ -697,7 +700,7 @@ module.exports = (baseProvider, options, app) => {
 		hydrateIndex(indexData, tableData) {
 			return {
 				indxName: indexData?.indxName,
-				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type })),
+				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type, isActivated: key.isActivated })),
 				indxExpression: indexData?.indxExpression?.map(key => ({ value: key.value })),
 				isActivated: indexData?.isActivated,
 				indexType: indexData?.indexType,
