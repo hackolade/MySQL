@@ -1,6 +1,8 @@
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
+const getAdditionalOptions = require('./helpers/getAdditionalOptions');
+const dropStatementProxy = require('./helpers/dropStatementProxy');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -32,8 +34,9 @@ module.exports = (baseProvider, options, app) => {
 		});
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
 	const { processIndexKeyName } = require('./helpers/indexHelper')(wrap);
+	const additionalOptions = getAdditionalOptions(options.additionalOptions);
 
-	return {
+	return dropStatementProxy({ commentIfDeactivated })(additionalOptions.applyDropStatements, {
 		createDatabase({
 			databaseName,
 			ifNotExist,
@@ -68,6 +71,10 @@ module.exports = (baseProvider, options, app) => {
 		alterDatabase(alterDbData) {
 			const alterStatements = [];
 			const databaseName = alterDbData.name;
+
+			if (additionalOptions.excludeContainerAlterStatements) {
+				return '';
+			}
 
 			if (alterDbData.collation || alterDbData.characterSet) {
 				alterStatements.push(
@@ -899,5 +906,5 @@ module.exports = (baseProvider, options, app) => {
 				} : null,
 			};
 		},
-	};
+	});
 };
