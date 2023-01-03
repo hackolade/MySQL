@@ -284,7 +284,7 @@ module.exports = (baseProvider, options, app) => {
 			const autoIncrement = columnDefinition.autoIncrement ? ' AUTO_INCREMENT' : '';
 			const invisible = columnDefinition.invisible ? ' INVISIBLE' : '';
 			const national = columnDefinition.national && canBeNational(type) ? 'NATIONAL ' : '';
-			const comment = columnDefinition.comment ? ` COMMENT='${escapeQuotes(columnDefinition.comment)}'` : '';
+			const comment = columnDefinition.comment ? ` COMMENT '${escapeQuotes(columnDefinition.comment)}'` : '';
 			const charset = type !== 'JSON' && columnDefinition.charset ? ` CHARSET ${columnDefinition.charset}` : '';
 			const collate =
 				type !== 'JSON' && columnDefinition.charset && columnDefinition.collation
@@ -379,7 +379,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
-			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
+			const indexType = index.indexType && _.toUpper(index.indexType) !== 'KEY' ? `${_.toUpper(index.indexType)} ` : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
@@ -543,10 +543,10 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createView(viewData, dbData, isActivated) {
-			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(viewData, isActivated);
+			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(viewData, isActivated, dbData);
 
 			const algorithm =
-				viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM ${viewData.algorithm} ` : '';
+				viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM=${viewData.algorithm} ` : '';
 
 			return commentIfDeactivated(
 				assignTemplates(templates.createView, {
@@ -562,10 +562,10 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		viewSelectStatement(viewData, isActivated = true) {
+		viewSelectStatement(viewData, isActivated = true, dbData) {
 			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
 			const deactivatedWholeStatement = allDeactivated || !isActivated;
-			const { columns, tables } = getViewData(viewData.keys);
+			const { columns, tables } = getViewData(viewData.keys, dbData.databaseName);
 			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
 
 			if (!deactivatedWholeStatement) {
@@ -603,13 +603,13 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const viewName = getTableName(alterData.name, dbData.databaseName);
-			const { selectStatement } = this.viewSelectStatement(alterData);
+			const { selectStatement } = this.viewSelectStatement(alterData, true, dbData);
 			const options = alterData.options || {};
 
 			return assignTemplates(templates.alterView, {
 				name: viewName,
 				selectStatement,
-				algorithm: options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM ${options.algorithm}` : '',
+				algorithm: options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM=${options.algorithm}` : '',
 				sqlSecurity: options.sqlSecurity ? ` SQL SECURITY ${options.sqlSecurity}` : '',
 				checkOption: options.checkOption ? `\nWITH ${options.checkOption} CHECK OPTION` : '',
 			});

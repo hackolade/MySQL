@@ -9,7 +9,7 @@ module.exports = {
 	createLikeTable: 'CREATE ${orReplace}${temporary}TABLE ${ifNotExist}${name} LIKE ${likeTableName};\n',
 
 	columnDefinition:
-		'`${name}` ${national}${type}${signed}${generatedDefaultValue}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${charset}${collate}${comment}',
+		'`${name}` ${national}${type}${signed}${charset}${collate}${generatedDefaultValue}${primary_key}${unique_key}${default}${autoIncrement}${zeroFill}${not_null}${invisible}${compressed}${comment}',
 
 	checkConstraint: 'CONSTRAINT ${name}CHECK (${expression})${enforcement}',
 
@@ -56,7 +56,7 @@ module.exports = {
 
 	alterTable: 'ALTER TABLE ${table} ${alterStatement};',
 
-	dropIndex: 'DROP INDEX IF EXISTS ${indexName}',
+	dropIndex: 'DROP INDEX ${indexName}',
 
 	dropCheckConstraint: 'DROP CHECK ${name}',
 

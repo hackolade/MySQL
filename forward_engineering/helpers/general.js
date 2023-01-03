@@ -239,7 +239,7 @@ module.exports = (_, wrap) => {
 		}
 	};
 
-	const getViewData = keys => {
+	const getViewData = (keys, dbName = '') => {
 		if (!Array.isArray(keys)) {
 			return { tables: [], columns: [] };
 		}
@@ -252,7 +252,7 @@ module.exports = (_, wrap) => {
 					return result;
 				}
 
-				let tableName = `\`${key.tableName}\``;
+				let tableName = `\`${dbName}\`.\`${key.tableName}\``;
 
 				if (!result.tables.includes(tableName)) {
 					result.tables.push(tableName);
