@@ -22,7 +22,11 @@ const applyToInstance = async (connectionInfo, logger, app) => {
 	);
 
 	try {
-		const queries = connectionInfo.script.split('\n\n').map((query) => {
+		const queries = joinFunctionBodies(
+			splitUpDropCreateStatements(
+				connectionInfo.script.split('\n\n'),
+			),
+		).map((query) => {
 			return removeDelimiter(_.trim(query));
 		}).filter(
 			(q) => [
@@ -36,7 +40,7 @@ const applyToInstance = async (connectionInfo, logger, app) => {
 			const message = 'Query: ' + query.split('\n').shift().substr(0, 150);
 			logger.progress({ message });
 			try {
-				await connection.query(query);
+				await connection.rawQuery(query);
 			} catch (e) {
 				logger.log('error', { message: `query ${query} failed with: ${e.message}`, error: e }, 'Apply to instance');
 				throw e;
@@ -48,6 +52,48 @@ const applyToInstance = async (connectionInfo, logger, app) => {
 		throw e;
 	}
 
+};
+
+const joinFunctionBodies = (queries) => {
+	const ACCUMULATING_STATE = 0;
+	const JOINING_STATE = 1;
+	const statements = [];
+	let state = ACCUMULATING_STATE;
+
+	for (let i = 0; i < queries.length; i++) {
+		const query = queries[i];
+
+		if (state === ACCUMULATING_STATE) {
+			if (/^create\s+(function|procedure)/i.test(query)) {
+				state = JOINING_STATE;
+			}
+
+			statements.push(query);
+			continue;
+		}
+
+		if (/\bend\s+(.+)/i.test(query)) {
+			state = ACCUMULATING_STATE;
+		}
+
+		statements[statements.length - 1] += '\n\n' + query;
+	}
+
+	return statements;
+};
+
+const splitUpDropCreateStatements = (queries) => {
+	return queries.flatMap((query) => {
+		if (!(
+			/^\s*drop\s+[\s\S]+?\s+create/i.test(query)
+			|| /^\s*alter\s+table\s+\`?([\s\S]+?)\`\.\`?([\s\S]+?)\`?\s+drop\s+[\s\S]+?\s+(add|create)/i.test(query)
+		)) {
+			return query;
+		}
+		const divided = query.trim().split('\n');
+
+		return [divided[0], divided.slice(1).join('\n')]
+	});
 };
 
 module.exports = { applyToInstance };

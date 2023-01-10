@@ -1,6 +1,8 @@
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
+const getAdditionalOptions = require('./helpers/getAdditionalOptions');
+const dropStatementProxy = require('./helpers/dropStatementProxy');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -12,8 +14,9 @@ module.exports = (baseProvider, options, app) => {
 		hasType,
 		wrap,
 		clean,
+		getDifferentProperties,
 	} = app.require('@hackolade/ddl-fe-utils').general;
-	const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
+	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn } = require('./helpers/columnDefinitionHelper')(
 		_,
 		wrap,
@@ -31,8 +34,9 @@ module.exports = (baseProvider, options, app) => {
 		});
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
 	const { processIndexKeyName } = require('./helpers/indexHelper')(wrap);
+	const additionalOptions = getAdditionalOptions(options.additionalOptions);
 
-	return {
+	return dropStatementProxy({ commentIfDeactivated })(additionalOptions.applyDropStatements, {
 		createDatabase({
 			databaseName,
 			ifNotExist,
@@ -58,6 +62,131 @@ module.exports = (baseProvider, options, app) => {
 			const procStatements = procedures.map(procedure => this.createProcedure(databaseName, procedure));
 
 			return [databaseStatement, ...udfStatements, ...procStatements].join('\n');
+		},
+
+		dropDatabase(dropDbData) {
+			return assignTemplates(templates.dropDatabase, dropDbData);
+		},
+
+		alterDatabase(alterDbData) {
+			const alterStatements = [];
+			const databaseName = alterDbData.name;
+
+			if (additionalOptions.excludeContainerAlterStatements) {
+				return '';
+			}
+
+			if (alterDbData.collation || alterDbData.characterSet) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseCharset, {
+						name: databaseName,
+						characterSet: alterDbData.characterSet,
+						collation: alterDbData.collation,
+					}),
+				);
+			}
+
+			if (alterDbData.encryption) {
+				alterStatements.push(
+					assignTemplates(templates.alterDatabaseEncryption, {
+						name: databaseName,
+						encryption: alterDbData.encryption,
+					}),
+				);
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.deleted)) {
+				alterDbData.udfs?.deleted.forEach((udf) => {
+					alterStatements.push(this.dropUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.added)) {
+				alterDbData.udfs.added.forEach((udf) => {
+					alterStatements.push(this.createUdf(databaseName, udf));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.udfs?.modified)) {
+				alterDbData.udfs.modified.forEach((udf) => {
+					alterStatements.push(
+						this.dropUdf(databaseName, udf.old) + '\n' +
+						this.createUdf(databaseName, udf.new),
+					);
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.deleted)) {
+				alterDbData.procedures?.deleted.forEach((procedure) => {
+					alterStatements.push(this.dropProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.added)) {
+				alterDbData.procedures.added.forEach((procedure) => {
+					alterStatements.push(this.createProcedure(databaseName, procedure));
+				});
+			}
+
+			if (!_.isEmpty(alterDbData.procedures?.modified)) {
+				alterDbData.procedures.modified.forEach((procedure) => {
+					alterStatements.push(
+						this.dropProcedure(databaseName, procedure.old) + '\n' +
+						this.createProcedure(databaseName, procedure.new),
+					);
+				});
+			}
+
+			return alterStatements.join('\n\n');
+		},
+
+		createUdf(databaseName, udf) {
+			const characteristics = getCharacteristics(udf.characteristics);
+			let startDelimiter = udf.delimiter ? `DELIMITER ${udf.delimiter}\n` : '';
+			let endDelimiter = udf.delimiter ? `DELIMITER ;\n` : '';
+
+			return (
+				startDelimiter +
+				assignTemplates(templates.createFunction, {
+					name: getTableName(udf.name, databaseName),
+					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
+					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
+					characteristics: characteristics.join('\n\t'),
+					type: udf.type,
+					parameters: udf.parameters,
+					body: udf.body,
+					delimiter: udf.delimiter || ';',
+				}) +
+				endDelimiter
+			);
+		},
+
+		createProcedure(databaseName, procedure) {
+			const characteristics = getCharacteristics(procedure.characteristics);
+			let startDelimiter = procedure.delimiter ? `DELIMITER ${procedure.delimiter}\n` : '';
+			let endDelimiter = procedure.delimiter ? `DELIMITER ;\n` : '';
+
+			return (
+				startDelimiter +
+				assignTemplates(templates.createProcedure, {
+					name: getTableName(procedure.name, databaseName),
+					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
+					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
+					parameters: procedure.parameters,
+					characteristics: characteristics.join('\n\t'),
+					body: procedure.body,
+					delimiter: procedure.delimiter || ';',
+				}) +
+				endDelimiter
+			);
+		},
+
+		dropUdf(databaseName, udf) {
+			return assignTemplates(templates.dropUdf, { name: getTableName(udf.name, databaseName) });
+		},
+
+		dropProcedure(databaseName, procedure) {
+			return assignTemplates(templates.dropProcedure, { name: getTableName(procedure.name, databaseName) });
 		},
 
 		createTable(
@@ -119,6 +248,33 @@ module.exports = (baseProvider, options, app) => {
 			return commentIfDeactivated(tableStatement, { isActivated });
 		},
 
+		dropTable({ name, dbName, temporary }) {
+			return assignTemplates(templates.dropTable, {
+				name: getTableName(name, dbName),
+				temporary: temporary ? ' TEMPORARY' : '',
+			});
+		},
+
+		alterTable({ name, collationOptions }, dbData) {
+			const table = getTableName(name, dbData.databaseName);
+
+			if (!collationOptions) {
+				return '';
+			}
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(
+					templates.alterCharset,
+					{
+						charset: collationOptions.characterSet,
+						default: collationOptions.defaultCharSet ? 'DEFAULT ' : '',
+						collation: collationOptions.collation ? ` COLLATE='${collationOptions.collation}'` : '',
+					},
+				),
+			});
+		},
+
 		convertColumnDefinition(columnDefinition) {
 			const type = _.toUpper(columnDefinition.type);
 			const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
@@ -128,7 +284,7 @@ module.exports = (baseProvider, options, app) => {
 			const autoIncrement = columnDefinition.autoIncrement ? ' AUTO_INCREMENT' : '';
 			const invisible = columnDefinition.invisible ? ' INVISIBLE' : '';
 			const national = columnDefinition.national && canBeNational(type) ? 'NATIONAL ' : '';
-			const comment = columnDefinition.comment ? ` COMMENT='${escapeQuotes(columnDefinition.comment)}'` : '';
+			const comment = columnDefinition.comment ? ` COMMENT '${escapeQuotes(columnDefinition.comment)}'` : '';
 			const charset = type !== 'JSON' && columnDefinition.charset ? ` CHARSET ${columnDefinition.charset}` : '';
 			const collate =
 				type !== 'JSON' && columnDefinition.charset && columnDefinition.collation
@@ -168,6 +324,54 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
+		addColumn(tableName, columnDefinition, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.addColumn, {
+					columnDefinition: this.convertColumnDefinition(columnDefinition),
+				}),
+			});
+		},
+
+		dropColumn(tableName, columnData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.dropColumn, {
+					name: wrap(columnData.name, '`', '`'),
+				}),
+			});
+		},
+
+		alterColumn(tableName, columnData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+			let alterStatement = '';
+
+			if (columnData.oldName && !columnData.newOptions) {
+				alterStatement = assignTemplates(templates.renameColumn, {
+					oldName: wrap(columnData.oldName, '`', '`'),
+					newName: wrap(columnData.name, '`', '`'),
+				});
+			} else if (columnData.oldName && columnData.newOptions) {
+				alterStatement = assignTemplates(templates.changeColumn, {
+					oldName: wrap(columnData.oldName, '`', '`'),
+					columnDefinition: this.convertColumnDefinition({ ...columnData, isActivated: true }),
+				});
+			} else {
+				alterStatement = assignTemplates(templates.modifyColumn, {
+					columnDefinition: this.convertColumnDefinition({ ...columnData, isActivated: true }),
+				});
+			}
+
+			return commentIfDeactivated(assignTemplates(templates.alterTable, {
+				table,
+				alterStatement,
+			}), { isActivated: columnData.isActivated });
+		},
+
 		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
 			if ((_.isEmpty(index.indxKey) && _.isEmpty(index.indxExpression)) || !index.indxName) {
 				return '';
@@ -175,7 +379,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
-			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
+			const indexType = index.indexType && _.toUpper(index.indexType) !== 'KEY' ? `${_.toUpper(index.indexType)} ` : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
@@ -235,12 +439,61 @@ module.exports = (baseProvider, options, app) => {
 			}
 		},
 
+		dropIndex(tableName, indexData, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+			const indexName = wrap(indexData.indxName, '`', '`');
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.dropIndex, { indexName }),
+			});
+		},
+
+		alterIndex(tableName, { new: newIndexData, old: oldIndexData }, dbData) {
+			return [
+				this.dropIndex(tableName, oldIndexData, dbData),
+				this.createIndex(tableName, {
+					...newIndexData,
+					indxKey: newIndexData.indxKey.filter(key => !(key.isActivated === false))
+				}, dbData),
+			].join('\n');
+		},
+
 		createCheckConstraint(checkConstraint) {
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `${wrap(checkConstraint.name, '`', '`')} ` : '',
 				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
 				enforcement: checkConstraint.enforcement ? ` ${checkConstraint.enforcement}` : '',
 			});
+		},
+
+		createCheckConstraintStatement(tableName, checkConstraint, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.addCheckConstraint, {
+					checkConstraint: this.createCheckConstraint(checkConstraint),
+				}),
+			});
+		},
+
+		dropCheckConstraint(tableName, checkConstraint, dbData) {
+			const table = getTableName(tableName, dbData.databaseName);
+
+			return assignTemplates(templates.alterTable, {
+				table,
+				alterStatement: assignTemplates(templates.dropCheckConstraint, {
+					name: wrap(checkConstraint.name, '`', '`'),
+				}),
+			});
+		},
+
+		alterCheckConstraint(tableName, { new: newCheck, old: oldCheck }, dbData) {
+			return [
+				this.dropCheckConstraint(tableName, oldCheck, dbData),
+				this.createCheckConstraintStatement(tableName, newCheck, dbData),
+			].join('\n');
 		},
 
 		createForeignKeyConstraint(
@@ -290,10 +543,10 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createView(viewData, dbData, isActivated) {
-			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(viewData, isActivated);
+			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(viewData, isActivated, dbData);
 
 			const algorithm =
-				viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM ${viewData.algorithm} ` : '';
+				viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM=${viewData.algorithm} ` : '';
 
 			return commentIfDeactivated(
 				assignTemplates(templates.createView, {
@@ -307,6 +560,59 @@ module.exports = (baseProvider, options, app) => {
 				}),
 				{ isActivated: !deactivatedWholeStatement },
 			);
+		},
+
+		viewSelectStatement(viewData, isActivated = true, dbData) {
+			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
+			const deactivatedWholeStatement = allDeactivated || !isActivated;
+			const { columns, tables } = getViewData(viewData.keys, dbData.databaseName);
+			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
+
+			if (!deactivatedWholeStatement) {
+				const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
+				const deactivatedColumnsString = dividedColumns.deactivatedItems.length
+					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
+							isActivated: false,
+							isPartOfLine: true,
+					  })
+					: '';
+				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
+			}
+
+			const selectStatement = _.trim(viewData.selectStatement)
+				? _.trim(tab(viewData.selectStatement))
+				: assignTemplates(templates.viewSelectStatement, {
+						tableName: tables.join(', '),
+						keys: columnsAsString,
+				  });
+
+			return { deactivatedWholeStatement, selectStatement };
+		},
+
+		dropView({ name, dbData }) {
+			const viewName = getTableName(name, dbData.databaseName);
+
+			return assignTemplates(templates.dropView, {
+				viewName,
+			});
+		},
+
+		alterView(alterData, dbData) {
+			if (_.isEmpty(alterData.options)) {
+				return '';
+			}
+
+			const viewName = getTableName(alterData.name, dbData.databaseName);
+			const { selectStatement } = this.viewSelectStatement(alterData, true, dbData);
+			const options = alterData.options || {};
+
+			return assignTemplates(templates.alterView, {
+				name: viewName,
+				selectStatement,
+				algorithm: options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM=${options.algorithm}` : '',
+				sqlSecurity: options.sqlSecurity ? ` SQL SECURITY ${options.sqlSecurity}` : '',
+				checkOption: options.checkOption ? `\nWITH ${options.checkOption} CHECK OPTION` : '',
+			});
 		},
 
 		createViewIndex(viewName, index, dbData, isParentActivated) {
@@ -358,8 +664,54 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
+		hydrateDropColumn({ name }) {
+			return {
+				name,
+			};
+		},
+
+		hydrateAlterColumn({
+			newColumn,
+			oldColumn,
+			newColumnSchema,
+			oldColumnSchema,
+			oldCompData,
+			newCompData,
+		}) {
+			const diff = getDifferentProperties(newColumn, oldColumn, ['name', 'type']);
+
+			const result = {...newColumn};
+
+			if (oldCompData.name !== newCompData.name) {
+				result.oldName = oldCompData.name;
+			}
+
+			if (oldCompData.type !== newCompData.type) {
+				result.oldType = oldCompData.type;
+			}
+
+			if (!_.isEmpty(diff)) {
+				result.newOptions = diff;
+			}
+
+			return result;
+		},
+
 		hydrateIndex(indexData, tableData) {
-			return indexData;
+			return {
+				indxName: indexData?.indxName,
+				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type, isActivated: key.isActivated })),
+				indxExpression: indexData?.indxExpression?.map(key => ({ value: key.value })),
+				isActivated: indexData?.isActivated,
+				indexType: indexData?.indexType,
+				indexCategory: indexData?.indexCategory,
+				indxKeyBlockSize: indexData?.indxKeyBlockSize,
+				indxParser: indexData?.indxParser,
+				indexComment: indexData?.indexComment,
+				indxVisibility: indexData?.indxVisibility,
+				indexLock: indexData?.indexLock,
+				indexAlgorithm: indexData?.indexAlgorithm,
+			};
 		},
 
 		hydrateViewIndex(indexData) {
@@ -404,6 +756,16 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
+		hydrateDropTable({ tableData, entityData }) {
+			const detailsTab = entityData[0];
+
+			return {
+				name: tableData.name,
+				dbName: tableData.dbData.databaseName,
+				temporary: detailsTab?.temporary,
+			};
+		},
+
 		hydrateViewColumn(data) {
 			return {
 				name: data.name,
@@ -418,7 +780,6 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				name: viewData.name,
-				tableName: viewData.tableName,
 				keys: viewData.keys,
 				orReplace: detailsTab.orReplace,
 				ifNotExist: detailsTab.ifNotExist,
@@ -426,6 +787,32 @@ module.exports = (baseProvider, options, app) => {
 				sqlSecurity: detailsTab.SQL_SECURITY,
 				algorithm: detailsTab.algorithm,
 				checkOption: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
+			};
+		},
+
+		hydrateDropView({ tableData }) {
+			return {
+				name: tableData.name,
+				dbData: tableData.dbData,
+			};
+		},
+
+		hydrateAlterView({ name, newEntityData, oldEntityData, viewData, jsonSchema }) {
+			const newData = this.hydrateView({
+				viewData: {},
+				entityData: newEntityData,
+			});
+			const oldData = this.hydrateView({
+				viewData: {},
+				entityData: oldEntityData,
+			});
+			const options = getDifferentProperties(newData, oldData);
+
+			return {
+				name,
+				keys: viewData.keys,
+				selectStatement: options.selectStatement || newEntityData[0]?.selectStatement,
+				options,
 			};
 		},
 
@@ -470,79 +857,57 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		createUdf(databaseName, udf) {
-			const characteristics = getCharacteristics(udf.characteristics);
-			let startDelimiter = udf.delimiter ? `DELIMITER ${udf.delimiter}\n` : '';
-			let endDelimiter = udf.delimiter ? `DELIMITER ;\n` : '';
+		hydrateDropDatabase(containerData) {
+			return {
+				name: containerData[0]?.name || '', 
+			};
+		},
 
-			return (
-				startDelimiter +
-				assignTemplates(templates.createFunction, {
-					name: getTableName(udf.name, databaseName),
-					definer: udf.definer ? `DEFINER=${udf.definer} ` : '',
-					ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
-					characteristics: characteristics.join('\n\t'),
-					type: udf.type,
-					parameters: udf.parameters,
-					body: udf.body,
-					delimiter: udf.delimiter || ';',
-				}) +
-				endDelimiter
+		hydrateAlterDatabase({ containerData, compModeData }) {
+			const data = containerData[0] || {};
+			const isCharacterSetModified = compModeData.new.characterSet !== compModeData.old.characterSet;
+			const isCollationModified = compModeData.new.collation !== compModeData.old.collation;
+			const encryption = compModeData.new.ENCRYPTION !== compModeData.old.ENCRYPTION;
+			const procedures = compareGroupItems(
+				(compModeData.old.Procedures || []).map(this.hydrateProcedure),
+				(compModeData.new.Procedures || []).map(this.hydrateProcedure),
 			);
-		},
-
-		createProcedure(databaseName, procedure) {
-			const characteristics = getCharacteristics(procedure.characteristics);
-			let startDelimiter = procedure.delimiter ? `DELIMITER ${procedure.delimiter}\n` : '';
-			let endDelimiter = procedure.delimiter ? `DELIMITER ;\n` : '';
-
-			return (
-				startDelimiter +
-				assignTemplates(templates.createProcedure, {
-					name: getTableName(procedure.name, databaseName),
-					ifNotExist: procedure.ifNotExist ? 'IF NOT EXISTS ' : '',
-					definer: procedure.definer ? `DEFINER=${procedure.definer} ` : '',
-					parameters: procedure.parameters,
-					characteristics: characteristics.join('\n\t'),
-					body: procedure.body,
-					delimiter: procedure.delimiter || ';',
-				}) +
-				endDelimiter
+			const udfs = compareGroupItems(
+				(compModeData.old.UDFs || []).map(this.hydrateUdf),
+				(compModeData.new.UDFs || []).map(this.hydrateUdf),
 			);
+	
+			return {
+				name: data.name || '',
+				...((isCharacterSetModified || isCollationModified) ? {
+					characterSet: data.characterSet,
+					collation: data.collation,
+				} : {}),
+				...(encryption ? { encryption: data.ENCRYPTION === 'Yes' ? 'Y' : 'N' } : {}),
+				procedures,
+				udfs,
+			};
 		},
 
-		dropIndex(tableName, dbData, index) {
-			const table = getTableName(tableName, dbData.databaseName);
-			const indexName = index.name;
+		hydrateAlterTable({ name, newEntityData, oldEntityData, jsonSchema }) {
+			const newDetailsTab = newEntityData[0];
+			const oldDetailsTab = oldEntityData[0];
+			const collationOptionsChanged = [
+				'defaultCharSet',
+				'characterSet',
+				'collation',
+			].some(
+				optionName => oldDetailsTab.tableOptions?.[optionName] !== newDetailsTab.tableOptions?.[optionName],
+			);
 
-			return `ALTER TABLE ${table} DROP INDEX IF EXISTS \`${indexName}\`;`;
+			return {
+				name,
+				collationOptions: collationOptionsChanged ? {
+					defaultCharSet: newDetailsTab.tableOptions?.defaultCharSet,
+					characterSet: newDetailsTab.tableOptions?.characterSet,
+					collation: newDetailsTab.tableOptions?.collation,
+				} : null,
+			};
 		},
-
-		viewSelectStatement(viewData, isActivated = true) {
-			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
-			const deactivatedWholeStatement = allDeactivated || !isActivated;
-			const { columns, tables } = getViewData(viewData.keys);
-			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
-
-			if (!deactivatedWholeStatement) {
-				const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
-				const deactivatedColumnsString = dividedColumns.deactivatedItems.length
-					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
-							isActivated: false,
-							isPartOfLine: true,
-					  })
-					: '';
-				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
-			}
-
-			const selectStatement = _.trim(viewData.selectStatement)
-				? _.trim(tab(viewData.selectStatement))
-				: assignTemplates(templates.viewSelectStatement, {
-						tableName: tables.join(', '),
-						keys: columnsAsString,
-				  });
-
-			return { deactivatedWholeStatement, selectStatement };
-		},
-	};
+	});
 };

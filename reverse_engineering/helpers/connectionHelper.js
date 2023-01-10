@@ -214,6 +214,10 @@ const createInstance = (connection, logger) => {
 		return rows;
 	};
 
+	const rawQuery = async (sql) => {
+		await connection.query(sql);
+	};
+
 	const serverVersion = async () => {
 		const result = await query('select VERSION() as version;');
 		
@@ -237,6 +241,7 @@ const createInstance = (connection, logger) => {
 		ping,
 		getDatabases,
 		getTables,
+		rawQuery,
 	};
 };
 
