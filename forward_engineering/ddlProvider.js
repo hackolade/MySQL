@@ -865,16 +865,16 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateAlterDatabase({ containerData, compModeData }) {
 			const data = containerData[0] || {};
-			const isCharacterSetModified = compModeData.characterSet?.new !== compModeData.characterSet?.old;
-			const isCollationModified = compModeData.collation?.new !== compModeData.collation?.old;
-			const encryption = compModeData.ENCRYPTION?.new !== compModeData.ENCRYPTION?.old;
+			const isCharacterSetModified = compModeData.new.characterSet !== compModeData.old.characterSet;
+			const isCollationModified = compModeData.new.collation !== compModeData.old.collation;
+			const encryption = compModeData.new.ENCRYPTION !== compModeData.old.ENCRYPTION;
 			const procedures = compareGroupItems(
-				(compModeData.Procedures?.old || []).map(this.hydrateProcedure),
-				(compModeData.Procedures?.new || []).map(this.hydrateProcedure),
+				(compModeData.old.Procedures || []).map(this.hydrateProcedure),
+				(compModeData.new.Procedures || []).map(this.hydrateProcedure),
 			);
 			const udfs = compareGroupItems(
-				(compModeData.UDFs?.old || []).map(this.hydrateUdf),
-				(compModeData.UDFs?.new || []).map(this.hydrateUdf),
+				(compModeData.old.UDFs || []).map(this.hydrateUdf),
+				(compModeData.new.UDFs || []).map(this.hydrateUdf),
 			);
 	
 			return {
