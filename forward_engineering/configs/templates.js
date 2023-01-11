@@ -75,4 +75,6 @@ module.exports = {
 	changeColumn: 'CHANGE ${oldName} ${columnDefinition}',
 
 	modifyColumn: 'MODIFY ${columnDefinition}',
+
+	createTableSpace: 'CREATE${undo} TABLESPACE ${name} ADD DATAFILE ${file}${AUTOEXTEND_SIZE}${FILE_BLOCK_SIZE}${ENCRYPTION}${logFile}${EXTENT_SIZE}${INITIAL_SIZE}${ENGINE};',
 };
