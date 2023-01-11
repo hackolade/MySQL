@@ -224,6 +224,34 @@ const createInstance = (connection, logger) => {
 		return result[0]?.version || '';
 	};
 
+	const getInnoDBTablespaces = async () => {
+		try {
+			const tableSpacesInfo = await query(`
+				SELECT ts.*, tsb.PATH
+				FROM INFORMATION_SCHEMA.INNODB_TABLESPACES_BRIEF tsb JOIN INFORMATION_SCHEMA.INNODB_TABLESPACES ts ON ts.NAME = tsb.NAME
+				WHERE
+					tsb.SPACE_TYPE='General' OR (tsb.SPACE_TYPE='Single' AND tsb.PATH NOT LIKE './%')
+					AND
+					ts.STATE = 'active'
+				;
+			`);
+
+			return tableSpacesInfo;
+		} catch (e) {
+			logger.log('error', { message: '[Warning] ' + e.message, stack: e.stack });
+		}
+	};
+
+	const getNDBTablespaces = async () => {
+		try {
+			const tableSpaces = await query(`SELECT * FROM INFORMATION_SCHEMA.FILES WHERE ENGINE='ndbcluster' && FILE_TYPE='DATAFILE' && TABLESPACE_NAME IS NOT NULL;`);
+
+			return tableSpaces;
+		} catch (e) {
+			logger.log('error', { message: '[Warning] ' + e.message, stack: e.stack });
+		}
+	};
+
 	return {
 		getCount,
 		getRecords,
@@ -242,6 +270,8 @@ const createInstance = (connection, logger) => {
 		getDatabases,
 		getTables,
 		rawQuery,
+		getInnoDBTablespaces,
+		getNDBTablespaces,
 	};
 };
 

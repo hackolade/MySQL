@@ -377,10 +377,41 @@ const prepareIndexExpression = (indexExpression) => {
 	return '(' + indexExpression.replace(/\\'/g, '\'') + ')';
 };
 
+const getTablespaces = ({ innoDb, ndb }) => {
+	const innDbTableSpaces = (innoDb || []).map((data) => {
+		return {
+			name: data['NAME'],
+			DATAFILE: data['PATH'],
+			UNDO: data['SPACE_TYPE'] === 'Undo',
+			AUTOEXTEND_SIZE: data['AUTOEXTEND_SIZE'] || '', 
+			ENGINE: 'InnoDB',
+			FILE_BLOCK_SIZE: data['FS_BLOCK_SIZE'],
+			ENCRYPTION: data['ENCRYPTION'] === 'Y' ? 'Yes' : '',
+		};
+	});
+	const ndbTablespaces = (ndb || []).map((data) => {
+		return {
+			name: data['TABLESPACE_NAME'],
+			DATAFILE: data['FILE_NAME'],
+			AUTOEXTEND_SIZE: data['AUTOEXTEND_SIZE'] || '', 
+			ENGINE: 'NDB',
+			LOGFILE_GROUP: data['LOGFILE_GROUP_NAME'],
+			EXTENT_SIZE: data['EXTENT_SIZE'] + '',
+			INITIAL_SIZE: data['INITIAL_SIZE'] + '',
+		};
+	});
+
+	return [
+		...innDbTableSpaces,
+		...ndbTablespaces,
+	];
+};
+
 module.exports = {
 	parseDatabaseStatement,
 	parseFunctions,
 	parseProcedures,
 	getJsonSchema,
 	parseIndexes,
+	getTablespaces,
 };
