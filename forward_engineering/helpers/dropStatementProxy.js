@@ -16,10 +16,14 @@ const dropStatementProxy = ({ commentIfDeactivated }) => (applyDropStatements, d
 			return {
 				...result,
 				[method]: (...params) => {
-					hasDropStatements = true;
 					const script = ddlProvider[method](...params);
+					hasDropStatements = hasDropStatements || Boolean(script);
 
 					if (applyDropStatements) {
+						return script;
+					}
+
+					if (!script) {
 						return script;
 					}
 

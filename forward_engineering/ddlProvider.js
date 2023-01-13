@@ -479,6 +479,10 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		dropIndex(tableName, indexData, dbData) {
+			if (!indexData.indxName) {
+				return '';
+			}
+
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexName = wrap(indexData.indxName, '`', '`');
 
@@ -738,7 +742,7 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateIndex(indexData, tableData) {
 			return {
-				indxName: indexData?.indxName,
+				indxName: indexData?.indxName || '',
 				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type, isActivated: key.isActivated })),
 				indxExpression: indexData?.indxExpression?.map(key => ({ value: key.value })),
 				isActivated: indexData?.isActivated,
