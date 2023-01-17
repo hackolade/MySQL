@@ -330,7 +330,8 @@ const getVersion = (version) => {
 
 const prepareDdl = (ddl) => {
 	return ddl
-		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1');
+		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1')
+		.replace(/\/\*\!50100 (TABLESPACE `[\s\S]+?`( STORAGE (DISK|MEMORY))?) \*\//i, '$1 ');
 };
 
 const getMajorVersionNumber = (dbVersion) => {

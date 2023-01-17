@@ -1366,6 +1366,31 @@ making sure that you maintain a proper JSON format.
               "key": "ENGINE",
               "value": "InnoDB"
             }
+          },
+          {
+            "propertyName": "Tablespace",
+            "propertyKeyword": "TABLESPACE",
+            "propertyTooltip": "This clause can be used to create an InnoDB table in an existing general tablespace, a file-per-table tablespace, or the system tablespace.",
+            "propertyType": "text",
+            "dependency": {
+              "key": "ENGINE",
+              "value": ["InnoDB", "NDB"]
+            }
+          },
+          {
+            "propertyName": "Storage",
+            "propertyKeyword": "STORAGE",
+            "propertyTooltip": "Determines the type of storage used, and can be either of DISK or MEMORY.",
+            "propertyType": "select",
+            "options": [
+              "",
+              "DISK",
+              "MEMORY"
+            ],
+            "dependency": {
+              "key": "ENGINE",
+              "value": "NDB"
+            }
           }
         ]
       },
