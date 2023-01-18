@@ -89,5 +89,143 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		]
+	},
+	{
+		"lowerTab": "Relationships",
+		"structure": []
+	},
+	{
+		"lowerTab": "Tablespaces",
+		"structure": [
+			{
+				"propertyName": "Tablespaces",
+				"propertyKeyword": "tablespaces",
+				"shouldValidate": false,
+				"propertyTooltip": "",
+				"propertyType": "group",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Activated",
+						"propertyKeyword": "isActivated",
+						"propertyTooltip": "Deactivated item will be not included in FE script",
+						"propertyType": "checkbox",
+						"defaultValue": true
+					  },
+					{
+						"propertyName": "Description",
+						"propertyKeyword": "description",
+						"shouldValidate": false,
+						"propertyTooltip": "description",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Data file",
+						"propertyKeyword": "DATAFILE",
+						"shouldValidate": false,
+						"propertyTooltip": "Defines the name of a tablespace data file",
+						"requiredProperty": true,
+						"propertyType": "text"
+					},
+
+					{
+						"propertyName": "Undo",
+						"propertyKeyword": "UNDO",
+						"shouldValidate": false,
+						"propertyTooltip": "Used for creation undo tablespaces. Introduced in MySQL 8.0.14",
+						"addTimestampButton": false,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "AUTOEXTEND_SIZE",
+						"propertyKeyword": "AUTOEXTEND_SIZE",
+						"shouldValidate": false,
+						"propertyTooltip": "Defines the amount by which InnoDB extends the size of the tablespace when it becomes full. The setting must be a multiple of 4MB.",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Engine",
+						"propertyKeyword": "ENGINE",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "InnoDB",
+						"options": [
+							"",
+							"InnoDB",
+							"NDB"
+						]
+					},
+					{
+						"propertyName": "FILE_BLOCK_SIZE",
+						"propertyKeyword": "FILE_BLOCK_SIZE",
+						"shouldValidate": false,
+						"propertyTooltip": "Defines the block size for the tablespace data file",
+						"propertyType": "text",
+						"dependency": {
+							"key": "ENGINE",
+							"value": "InnoDB"
+						}
+					},
+					{
+						"propertyName": "ENCRYPTION",
+						"propertyKeyword": "ENCRYPTION",
+						"propertyTooltip": "Enables or disables page-level data encryption for an InnoDB general tablespace.",
+						"propertyType": "select",
+						"dependency": {
+						  "key": "ENGINE",
+						  "value": "InnoDB"
+						},
+						"options": [
+							"",
+							"No",
+							"Yes"
+						]
+					  },
+					{
+						"propertyName": "Logfile group",
+						"propertyKeyword": "LOGFILE_GROUP",
+						"shouldValidate": false,
+						"propertyTooltip": "the name of a log file group previously created using CREATE LOGFILE GROUP",
+						"requiredProperty": true,
+						"propertyType": "text",
+						"dependency": {
+							"key": "ENGINE",
+							"value": "NDB"
+						}
+					},
+					{
+						"propertyName": "EXTENT_SIZE",
+						"propertyKeyword": "EXTENT_SIZE",
+						"shouldValidate": false,
+						"propertyTooltip": "Sets the size, in bytes, of the extents used by any files belonging to the tablespace. The default value is 1M.",
+						"propertyType": "text",
+						"dependency": {
+							"key": "ENGINE",
+							"value": "NDB"
+						}
+					},
+					{
+						"propertyName": "INITIAL_SIZE",
+						"propertyKeyword": "INITIAL_SIZE",
+						"shouldValidate": false,
+						"propertyTooltip": "Sets the total size in bytes of the data file that was specific using ADD DATATFILE.",
+						"propertyType": "text",
+						"dependency": {
+							"key": "ENGINE",
+							"value": "NDB"
+						}
+					}
+				]
+			}
+		]
 	}
 ]

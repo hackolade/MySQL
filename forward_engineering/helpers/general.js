@@ -143,6 +143,22 @@ module.exports = (_, wrap) => {
 			tableOptions.push(option);
 		});
 
+		if (['InnoDB', 'NDB'].includes(engine)) {
+			let tableSpaceOption = '';
+
+			if (options.TABLESPACE) {
+				tableSpaceOption = `TABLESPACE ${options.TABLESPACE}`;
+			}
+
+			if (engine === 'NDB' && options.STORAGE) {
+				tableSpaceOption += ` STORAGE ${options.STORAGE}`;
+			}
+
+			if (tableSpaceOption) {
+				tableOptions.push(tableSpaceOption.trim());
+			}
+		}
+
 		if (!tableOptions.length) {
 			return '';
 		}

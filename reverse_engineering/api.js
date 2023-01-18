@@ -120,7 +120,17 @@ module.exports = {
 			const dbVersion = await instance.serverVersion();
 
 			log.info('MySQL version: ' + dbVersion);
-			log.progress('Start reverse engineering ...');			
+			log.progress('Start reverse engineering ...');		
+			const isVersion8 = getMajorVersionNumber(dbVersion) >= 8;
+			
+			let tablespaces = {};
+			
+			if (isVersion8) {
+				tablespaces = mysqlHelper.getTablespaces({
+					innoDb: await instance.getInnoDBTablespaces(),
+					ndb: await instance.getNDBTablespaces(),
+				});
+			}
 
 			const result = await async.mapSeries(dataBaseNames, async (dbName) => {
 				const tables = (collections[dbName] || []).filter(name => !isViewName(name));
@@ -233,7 +243,10 @@ module.exports = {
 				return result;
 			});
 
-			callback(null, result.flat(), { version: getVersion(dbVersion) });
+			callback(null, result.flat(), {
+				version: getVersion(dbVersion),
+				tablespaces,
+			});
 		} catch(error) {
 			log.error(error);
 			callback({ message: error.message, stack: error.stack });
@@ -308,7 +321,7 @@ const containsJson = (columns) => {
 };
 
 const getVersion = (version) => {
-	if (/^8./.test(String(version))) {
+	if (/^8\./.test(String(version))) {
 		return 'v8.x';
 	} else {
 		return 'v5.x';
@@ -317,5 +330,10 @@ const getVersion = (version) => {
 
 const prepareDdl = (ddl) => {
 	return ddl
-		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1');
+		.replace(/\/\*\!80016 ((NOT )?ENFORCED) \*\//g, '$1')
+		.replace(/\/\*\!50100 (TABLESPACE `[\s\S]+?`( STORAGE (DISK|MEMORY))?) \*\//i, '$1 ');
+};
+
+const getMajorVersionNumber = (dbVersion) => {
+	return Number(dbVersion.split('.')[0])
 };

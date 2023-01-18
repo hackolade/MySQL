@@ -45,6 +45,7 @@ module.exports = (baseProvider, options, app) => {
 			encryption,
 			udfs,
 			procedures,
+			tablespaces,
 			useDb = true,
 		}) {
 			let dbOptions = '';
@@ -60,8 +61,9 @@ module.exports = (baseProvider, options, app) => {
 			});
 			const udfStatements = udfs.map(udf => this.createUdf(databaseName, udf));
 			const procStatements = procedures.map(procedure => this.createProcedure(databaseName, procedure));
+			const tableSpaceStatements = tablespaces.map(tableSpace => this.createTableSpace(tableSpace)).filter(Boolean);
 
-			return [databaseStatement, ...udfStatements, ...procStatements].join('\n');
+			return [...tableSpaceStatements, databaseStatement, ...udfStatements, ...procStatements].join('\n');
 		},
 
 		dropDatabase(dropDbData) {
@@ -138,6 +140,43 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			return alterStatements.join('\n\n');
+		},
+
+		createTableSpace(tableSpace) {
+			if (!tableSpace.name || !tableSpace.DATAFILE) {
+				return '';
+			}
+
+			if (tableSpace.ENGINE === 'NDB' && !tableSpace.LOGFILE_GROUP) {
+				return '';
+			}
+
+			let statement = '';
+
+			if (tableSpace.ENGINE === 'NDB') {
+				statement = assignTemplates(templates.createTableSpace, {
+					undo: tableSpace.UNDO ? ' UNDO' : '',
+					name: tableSpace.name,
+					file: wrap(tableSpace.DATAFILE, '\'', '\''),
+					AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE ? ` AUTOEXTEND_SIZE=${tableSpace.AUTOEXTEND_SIZE}` : '',
+					logFile: ` USE LOGFILE GROUP ${tableSpace.LOGFILE_GROUP}`,
+					EXTENT_SIZE: tableSpace.EXTENT_SIZE ? ` EXTENT_SIZE=${tableSpace.EXTENT_SIZE}` : '',
+					INITIAL_SIZE: tableSpace.INITIAL_SIZE ? ` INITIAL_SIZE=${tableSpace.INITIAL_SIZE}` : '',
+					ENGINE: ' ENGINE=NDB',
+				});
+			} else {
+				statement = assignTemplates(templates.createTableSpace, {
+					undo: tableSpace.UNDO ? ' UNDO' : '',
+					name: tableSpace.name,
+					file: wrap(tableSpace.DATAFILE, '\'', '\''),
+					AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE ? ` AUTOEXTEND_SIZE=${tableSpace.AUTOEXTEND_SIZE}` : '',
+					FILE_BLOCK_SIZE: tableSpace.FILE_BLOCK_SIZE ? ` FILE_BLOCK_SIZE=${tableSpace.FILE_BLOCK_SIZE}` : '',
+					ENCRYPTION: tableSpace.ENCRYPTION ? ` ENCRYPTION=${tableSpace.ENCRYPTION}` : '',
+					ENGINE: ' ENGINE=InnoDB',
+				});
+			}
+
+			return commentIfDeactivated(statement, { isActivated: tableSpace.isActivated }) + '\n';
 		},
 
 		createUdf(databaseName, udf) {
@@ -739,6 +778,23 @@ module.exports = (baseProvider, options, app) => {
 				encryption: containerData.ENCRYPTION === 'Yes' ? true : false,
 				udfs: (data?.udfs || []).map(this.hydrateUdf),
 				procedures: (data?.procedures || []).map(this.hydrateProcedure),
+				tablespaces: (data?.modelData?.[2]?.tablespaces || []).map(this.hydrateTableSpace),
+			};
+		},
+
+		hydrateTableSpace(tableSpace) {
+			return {
+				name: tableSpace.name,
+				isActivated: tableSpace.isActivated,
+				DATAFILE: tableSpace.DATAFILE,
+				UNDO: tableSpace.UNDO,
+				AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE,
+				ENGINE: tableSpace.ENGINE,
+				FILE_BLOCK_SIZE: tableSpace.FILE_BLOCK_SIZE,
+				ENCRYPTION: ({ 'Yes': 'Y', 'No': 'N' })[tableSpace.ENCRYPTION] || '',
+				LOGFILE_GROUP: tableSpace.LOGFILE_GROUP,
+				EXTENT_SIZE: tableSpace.EXTENT_SIZE,
+				INITIAL_SIZE: tableSpace.INITIAL_SIZE,
 			};
 		},
 
