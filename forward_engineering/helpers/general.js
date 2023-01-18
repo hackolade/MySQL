@@ -62,6 +62,7 @@ module.exports = (_, wrap) => {
 		Archive: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE'],
 		Federated: ['CONNECTION', 'KEY_BLOCK_SIZE'],
 		EXAMPLE: [],
+		BLACKHOLE: [],
 		HEAP: ['AUTO_INCREMENT', 'KEY_BLOCK_SIZE', 'MIN_ROWS', 'MAX_ROWS'],
 		NDB: ['KEY_BLOCK_SIZE'],
 	};

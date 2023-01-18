@@ -186,7 +186,8 @@ making sure that you maintain a proper JSON format.
               "EXAMPLE",
               "HEAP",
               "MERGE",
-              "NDB"
+              "NDB",
+              "BLACKHOLE"
             ]
           },
           {
