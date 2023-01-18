@@ -1811,8 +1811,7 @@ making sure that you maintain a proper JSON format.
             "options": [
               "",
               "BTREE",
-              "HASH",
-              "RTREE"
+              "HASH"
             ]
           },
           {
@@ -1882,8 +1881,7 @@ making sure that you maintain a proper JSON format.
             "options": [
               "",
               "BTREE",
-              "HASH",
-              "RTREE"
+              "HASH"
             ]
           },
           {
@@ -1942,7 +1940,6 @@ making sure that you maintain a proper JSON format.
             "defaultValue": "",
             "options": [
               "",
-              "PRIMARY",
               "KEY",
               "UNIQUE",
               "FULLTEXT",
