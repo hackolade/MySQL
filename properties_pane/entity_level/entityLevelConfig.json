@@ -186,7 +186,8 @@ making sure that you maintain a proper JSON format.
               "EXAMPLE",
               "HEAP",
               "MERGE",
-              "NDB"
+              "NDB",
+              "BLACKHOLE"
             ]
           },
           {
@@ -1811,8 +1812,7 @@ making sure that you maintain a proper JSON format.
             "options": [
               "",
               "BTREE",
-              "HASH",
-              "RTREE"
+              "HASH"
             ]
           },
           {
@@ -1882,8 +1882,7 @@ making sure that you maintain a proper JSON format.
             "options": [
               "",
               "BTREE",
-              "HASH",
-              "RTREE"
+              "HASH"
             ]
           },
           {
@@ -1925,7 +1924,10 @@ making sure that you maintain a proper JSON format.
             "propertyName": "Name",
             "propertyKeyword": "indxName",
             "propertyTooltip": "Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
-            "propertyType": "text"
+            "propertyType": "text",
+            "validation": {
+              "required": true
+            }
           },
           {
             "propertyName": "Activated",
@@ -1942,7 +1944,6 @@ making sure that you maintain a proper JSON format.
             "defaultValue": "",
             "options": [
               "",
-              "PRIMARY",
               "KEY",
               "UNIQUE",
               "FULLTEXT",

@@ -290,8 +290,6 @@ const getIndexCategory = (index) => {
 		return 'BTREE';
 	} else if (index['Index_type'] === 'HASH') {
 		return 'HASH';
-	} else if (index['Index_type'] === 'RTREE') {
-		return 'RTREE';
 	} else {
 		return '';
 	}
