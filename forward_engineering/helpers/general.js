@@ -155,7 +155,7 @@ module.exports = (_, wrap) => {
 			}
 
 			if (tableSpaceOption) {
-				tableOptions.push(tableSpaceOption);
+				tableOptions.push(tableSpaceOption.trim());
 			}
 		}
 
