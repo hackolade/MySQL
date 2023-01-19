@@ -790,7 +790,7 @@ module.exports = (baseProvider, options, app) => {
 				UNDO: tableSpace.UNDO,
 				AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE,
 				ENGINE: tableSpace.ENGINE,
-				FILE_BLOCK_SIZE: tableSpace.FILE_BLOCK_SIZE,
+				FILE_BLOCK_SIZE: tableSpace.UNDO ? '' : tableSpace.FILE_BLOCK_SIZE,
 				ENCRYPTION: ({ 'Yes': 'Y', 'No': 'N' })[tableSpace.ENCRYPTION] || '',
 				LOGFILE_GROUP: tableSpace.LOGFILE_GROUP,
 				EXTENT_SIZE: tableSpace.EXTENT_SIZE,

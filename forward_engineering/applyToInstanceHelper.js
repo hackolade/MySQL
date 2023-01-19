@@ -1,5 +1,7 @@
 const connectionHelper = require('../reverse_engineering/helpers/connectionHelper');
 
+const TABLESPACE_EXISTS_ERROR = 1813;
+
 const removeDelimiter = (statement) => {
 	const regExp = /delimiter (.*)/i;
 
@@ -43,7 +45,9 @@ const applyToInstance = async (connectionInfo, logger, app) => {
 				await connection.rawQuery(query);
 			} catch (e) {
 				logger.log('error', { message: `query ${query} failed with: ${e.message}`, error: e }, 'Apply to instance');
-				throw e;
+				if (![TABLESPACE_EXISTS_ERROR].includes(e.errno)) {
+					throw e;
+				}
 			}
 		});
 
