@@ -14,7 +14,11 @@ module.exports = (_, clean) => {
 	};
 
 	const isInlineUnique = column => {
-		return isUniqueKey(column) && _.isEmpty(column.uniqueKeyOptions);
+		return (
+			isUniqueKey(column) &&
+			((column.uniqueKeyOptions?.length === 1 && !_.first(column.uniqueKeyOptions)?.constraintName) ||
+				_.isEmpty(column.uniqueKeyOptions))
+		);
 	};	
 
 	const isPrimaryKey = column => {
@@ -30,7 +34,7 @@ module.exports = (_, clean) => {
 	};
 
 	const isInlinePrimaryKey = column => {
-		return isPrimaryKey(column) && _.isEmpty(column.primaryKeyOptions);
+		return isPrimaryKey(column) && !column.primaryKeyOptions?.constraintName;
 	};
 	
 	const getOrder = order => {
@@ -50,7 +54,7 @@ module.exports = (_, clean) => {
 			columns: [
 				{
 					name: columnName,
-					order: getOrder(options['order']),
+					order: getOrder(options['order'] || options['indexOrder']),
 					isActivated: isActivated,
 				},
 			],
@@ -67,7 +71,7 @@ module.exports = (_, clean) => {
 			columns: [
 				{
 					name: columnName,
-					order: getOrder(options['order']),
+					order: getOrder(options['order'] || options['indexOrder']),
 					isActivated: isActivated,
 				},
 			],
@@ -134,9 +138,7 @@ module.exports = (_, clean) => {
 		}
 
 		const primaryKeyConstraints = mapProperties(jsonSchema, ([ name, schema ]) => {
-			if (!isPrimaryKey(schema)) {
-				return;
-			} else if (_.isEmpty(schema.primaryKeyOptions)) {
+			if (!isPrimaryKey(schema) || isInlinePrimaryKey(schema)) {
 				return;
 			}
 
@@ -144,13 +146,11 @@ module.exports = (_, clean) => {
 		}).filter(Boolean);
 
 		const uniqueKeyConstraints = _.flatten(mapProperties(jsonSchema, ([ name, schema ]) => {
-			if (!isUniqueKey(schema)) {
-				return [];
-			} else if (_.isEmpty(schema.uniqueKeyOptions) || !Array.isArray(schema.uniqueKeyOptions)) {
+			if (!isUniqueKey(schema) || isInlineUnique(schema)) {
 				return [];
 			}
 
-			return schema.uniqueKeyOptions.map(uniqueKey => (
+			return (schema.uniqueKeyOptions || []).map(uniqueKey => (
 				hydrateUniqueOptions(uniqueKey, name, schema.isActivated)
 			));
 		})).filter(Boolean);
@@ -167,5 +167,7 @@ module.exports = (_, clean) => {
 		getTableKeyConstraints,
 		isInlineUnique,
 		isInlinePrimaryKey,
+		hydratePrimaryKeyOptions,
+		hydrateUniqueOptions
 	};
 };
