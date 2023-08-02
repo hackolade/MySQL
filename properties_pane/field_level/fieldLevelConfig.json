@@ -2746,6 +2746,29 @@ making sure that you maintain a proper JSON format.
         "data": "options",
         "valueType": "string"
       },
+      {
+        "propertyName": "Fractional seconds part",
+        "propertyKeyword": "fractionalSecondsPart",
+        "propertyType": "numeric",
+        "valueType": "number",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "mode",
+              "value": "time"
+            },
+            {
+              "key": "mode",
+              "value": "datetime"
+            },
+            {
+              "key": "mode",
+              "value": "timestamp"
+            }
+          ]
+        }
+      },
 			{
 				"propertyName": "Generated as",
 				"propertyTooltip": "",
