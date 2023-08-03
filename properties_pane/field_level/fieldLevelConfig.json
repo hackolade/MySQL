@@ -2748,7 +2748,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Fractional seconds part",
-				"propertyKeyword": "fractionalSecondsPart",
+				"propertyKeyword": "microSecPrecision",
 				"propertyType": "numeric",
 				"valueType": "number",
 				"dependency": {
