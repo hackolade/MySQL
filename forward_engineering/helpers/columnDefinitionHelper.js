@@ -72,7 +72,7 @@ module.exports = (_, wrap) => {
 
 	const decorateDefault = (type, defaultValue) => {
 		const defaultValuesRegExp = /^(null|current_timestamp(\s+on\s+update\s+current_timestamp)?)$/i
-		if ((isString(type) || isDateTime(type)) && !defaultValuesRegExp.test(_.toLower(defaultValue))) {
+		if ((isString(type) || isDateTime(type)) && !defaultValuesRegExp.test(_.trim(defaultValue))) {
 			return wrap(escapeQuotes(defaultValue));
 		} else {
 			return defaultValue;
