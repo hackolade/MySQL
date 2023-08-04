@@ -71,7 +71,7 @@ module.exports = (_, wrap) => {
 	const escapeQuotes = str => _.trim(str).replace(/(\')+/g, "'$1");
 
 	const decorateDefault = (type, defaultValue) => {
-		const defaultValuesRegExp = /^(null|current_timestamp(\s+on\s+update\s+current_timestamp)?)$/i
+		const defaultValuesRegExp = /^(null|current_timestamp(\((\d+)\))?(\s+on\s+update\s+current_timestamp(\((\d+)\))?)?)$/i
 		if ((isString(type) || isDateTime(type)) && !defaultValuesRegExp.test(_.trim(defaultValue))) {
 			return wrap(escapeQuotes(defaultValue));
 		} else {
