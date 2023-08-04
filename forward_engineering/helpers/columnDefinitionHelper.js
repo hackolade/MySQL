@@ -2,7 +2,7 @@ module.exports = (_, wrap) => {
 	const addLength = (type, length) => {
 		return `${type}(${length})`;
 	};
-	
+
 	const addScalePrecision = (type, precision, scale) => {
 		if (_.isNumber(scale)) {
 			return `${type}(${precision},${scale})`;
@@ -10,13 +10,13 @@ module.exports = (_, wrap) => {
 			return `${type}(${precision})`;
 		}
 	};
-	
+
 	const addPrecision = (type, precision) => {
 		return `${type}(${precision})`;
 	};
-	
+
 	const canHaveLength = type => ['CHAR', 'VARCHAR', 'BINARY', 'CHAR BYTE', 'VARBINARY', 'BLOB'].includes(type);
-	
+
 	const isNumeric = type =>
 		[
 			'TINYINT',
@@ -41,14 +41,14 @@ module.exports = (_, wrap) => {
 			'DOUBLE PRECISION',
 			'BIT',
 		].includes(type);
-	
+
 	const canHavePrecision = type => isNumeric(type);
-	
+
 	const canHaveMicrosecondPrecision = type => ['TIME', 'DATETIME', 'TIMESTAMP'].includes(type);
-	
+
 	const canHaveScale = type =>
 		['DECIMAL', 'FLOAT', 'DOUBLE', 'DEC', 'FIXED', 'NUMERIC', 'NUMBER', 'DOUBLE PRECISION', 'REAL'].includes(type);
-	
+
 	const decorateType = (type, columnDefinition) => {
 		if (canHaveLength(type) && _.isNumber(columnDefinition.length)) {
 			return addLength(type, columnDefinition.length);
@@ -61,37 +61,37 @@ module.exports = (_, wrap) => {
 		} else if (['ENUM', 'SET'].includes(type) && !_.isEmpty(columnDefinition.enum)) {
 			return `${type}('${columnDefinition.enum.join("', '")}')`;
 		}
-	
+
 		return type;
 	};
-	
+
 	const isString = type => ['CHAR', 'VARCHAR', 'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT'].includes(_.toUpper(type));
 	const isDateTime = type => ['TIME', 'DATE', 'DATETIME', 'TIMESTAMP'].includes(type);
-	
+
 	const escapeQuotes = str => _.trim(str).replace(/(\')+/g, "'$1");
-	
+
 	const decorateDefault = (type, defaultValue) => {
-		const constantsValues = ['current_timestamp', 'null'];
-		if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue))) {
+		const defaultValuesRegExp = /^(null|current_timestamp(\s+on\s+update\s+current_timestamp)?)$/i
+		if ((isString(type) || isDateTime(type)) && !defaultValuesRegExp.test(_.trim(defaultValue))) {
 			return wrap(escapeQuotes(defaultValue));
 		} else {
 			return defaultValue;
 		}
 	};
-	
+
 	const canBeNational = type => {
 		return ['CHAR', 'VARCHAR'].includes(type);
 	};
-	
+
 	const getSign = (type, signed) => {
 		if (!isNumeric(type)) {
 			return '';
 		}
-	
+
 		if (signed === false) {
 			return ' UNSIGNED';
 		}
-	
+
 		return '';
 	};
 
@@ -113,7 +113,7 @@ module.exports = (_, wrap) => {
 			storage,
 		].filter(Boolean).join(' ');
 	};
-	
+
 	return {
 		decorateType,
 		decorateDefault,
