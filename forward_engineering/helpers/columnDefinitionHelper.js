@@ -114,6 +114,11 @@ module.exports = (_, wrap) => {
 		].filter(Boolean).join(' ');
 	};
 
+	const canHaveAutoIncrement = (type) => {
+		const typesAllowedToHaveAutoIncrement = ["tinyint", "smallint", "mediumint", "int", "bigint"]
+		return typesAllowedToHaveAutoIncrement.includes(type)
+	}
+
 	return {
 		decorateType,
 		decorateDefault,
@@ -121,5 +126,6 @@ module.exports = (_, wrap) => {
 		isNumeric,
 		getSign,
 		createGeneratedColumn,
+		canHaveAutoIncrement,
 	};
 };
