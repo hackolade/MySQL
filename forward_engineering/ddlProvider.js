@@ -694,7 +694,6 @@ module.exports = (baseProvider, options, app) => {
 				default: columnDefinition.default,
 				comment: columnDefinition.description || jsonSchema.refDescription || jsonSchema.description,
 				isActivated: columnDefinition.isActivated,
-				length: columnDefinition.enum,
 				scale: columnDefinition.scale,
 				precision: columnDefinition.precision,
 				length: columnDefinition.length,
