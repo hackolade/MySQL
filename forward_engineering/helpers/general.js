@@ -269,7 +269,7 @@ module.exports = (_, wrap) => {
 					return result;
 				}
 
-				let tableName = `\`${dbName}\`.\`${key.tableName}\``;
+				let tableName = `\`${key.dbName || dbName}\`.\`${key.tableName}\``;
 
 				if (!result.tables.includes(tableName)) {
 					result.tables.push(tableName);
