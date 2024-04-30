@@ -10,16 +10,17 @@ BigInt.prototype.toJSON = function () {
 const ACCESS_DENIED_ERROR = 1045;
 
 module.exports = {
-	async connect(connectionInfo) {
-		
-		const connection = await connectionHelper.connect(connectionInfo);
+	async connect(connectionInfo, sshService) {
+		const connection = await connectionHelper.connect(connectionInfo, sshService);
 
 		return connection;
 	},
 
 	disconnect(connectionInfo, logger, callback, app) {
-		connectionHelper.close();
-		
+		const sshService = app.require('@hackolade/ssh-service');
+
+		connectionHelper.close(sshService);
+
 		callback();
 	},
 
@@ -34,7 +35,9 @@ module.exports = {
 			logger.clear();
 			logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
-			const connection = await this.connect(connectionInfo);
+			const sshService = app.require('@hackolade/ssh-service');
+
+			const connection = await this.connect(connectionInfo, sshService);
 			const instance = connectionHelper.createInstance(connection, logger);
 
 			await instance.ping();
@@ -64,10 +67,12 @@ module.exports = {
 			logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 			const systemDatabases = connectionInfo.includeSystemCollection ? [] : ['information_schema', 'mysql', 'performance_schema'];
 
-			const connection = await this.connect(connectionInfo);
+			const sshService = app.require('@hackolade/ssh-service');
+
+			const connection = await this.connect(connectionInfo, sshService);
 			const instance = connectionHelper.createInstance(connection, logger);
 			const databases = connectionInfo.databaseName ? [connectionInfo.databaseName] : await instance.getDatabases(systemDatabases);
-			
+
 			const collections = await databases.reduce(async (next, dbName) => {
 				const result = await next;
 				try {
@@ -113,18 +118,20 @@ module.exports = {
 		try {
 			logger.log('info', data, 'data', data.hiddenKeys);
 
+			const sshService = app.require('@hackolade/ssh-service');
+
 			const collections = data.collectionData.collections;
 			const dataBaseNames = data.collectionData.dataBaseNames;
-			const connection = await this.connect(data);
+			const connection = await this.connect(data, sshService);
 			const instance = await connectionHelper.createInstance(connection, logger);
 			const dbVersion = await instance.serverVersion();
 
 			log.info('MySQL version: ' + dbVersion);
-			log.progress('Start reverse engineering ...');		
+			log.progress('Start reverse engineering ...');
 			const isVersion8 = getMajorVersionNumber(dbVersion) >= 8;
-			
+
 			let tablespaces = {};
-			
+
 			if (isVersion8) {
 				tablespaces = mysqlHelper.getTablespaces({
 					innoDb: await instance.getInnoDBTablespaces(),
@@ -135,16 +142,16 @@ module.exports = {
 			const result = await async.mapSeries(dataBaseNames, async (dbName) => {
 				const tables = (collections[dbName] || []).filter(name => !isViewName(name));
 				const views = (collections[dbName] || []).filter(isViewName).map(getViewName);
-	
+
 				log.info(`Parsing database "${dbName}"`);
-				log.progress(`Parsing database "${dbName}"`, dbName);			
+				log.progress(`Parsing database "${dbName}"`, dbName);
 
 				const containerData = mysqlHelper.parseDatabaseStatement(
 					await instance.describeDatabase(dbName)
 				);
 
 				log.info(`Parsing functions`);
-				log.progress(`Parsing functions`, dbName);	
+				log.progress(`Parsing functions`, dbName);
 
 				const UDFs = mysqlHelper.parseFunctions(
 					await instance.getFunctions(dbName), log
@@ -164,15 +171,15 @@ module.exports = {
 
 					const columns = await instance.getColumns(dbName, tableName);
 					let records = [];
-					
+
 					if (containsJson(columns)) {
 						log.info(`Sampling table "${tableName}"`);
 						log.progress(`Sampling table`, dbName, tableName);
-	
+
 						const count = await instance.getCount(dbName, tableName);
 						records = await instance.getRecords(dbName, tableName, getSampleDocSize(count, data.recordSamplingSettings));
 					}
-					
+
 					log.info(`Get create table statement "${tableName}"`);
 					log.progress(`Get create table statement`, dbName, tableName);
 
@@ -213,7 +220,7 @@ module.exports = {
 						},
 					};
 				});
-				
+
 				const viewData = await async.mapSeries(views, async (viewName) => {
 					log.info(`Getting data from view "${viewName}"`);
 					log.progress(`Getting data from view`, dbName, viewName);
@@ -239,7 +246,7 @@ module.exports = {
 						},
 					];
 				}
-				
+
 				return result;
 			});
 

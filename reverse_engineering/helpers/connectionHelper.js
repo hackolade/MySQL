@@ -1,48 +1,47 @@
 const mysql2 = require('mysql2/promise');
 const fs = require('fs');
-const ssh = require('tunnel-ssh');
 
 let connection;
-let sshTunnel;
+let useSshTunnel;
 
-const getSshConfig = (info) => {
-	const config = {
-		username: info.ssh_user,
-		host: info.ssh_host,
-		port: info.ssh_port,
-		dstHost: info.host,
-		dstPort: info.port,
-		localHost: '127.0.0.1',
-		localPort: info.port,
-		keepAlive: true
-	};
+// const getSshConfig = (info) => {
+// 	const config = {
+// 		username: info.ssh_user,
+// 		host: info.ssh_host,
+// 		port: info.ssh_port,
+// 		dstHost: info.host,
+// 		dstPort: info.port,
+// 		localHost: '127.0.0.1',
+// 		localPort: info.port,
+// 		keepAlive: true
+// 	};
+//
+// 	if (info.ssh_method === 'privateKey') {
+// 		return Object.assign({}, config, {
+// 			privateKey: fs.readFileSync(info.ssh_key_file),
+// 			passphrase: info.ssh_key_passphrase
+// 		});
+// 	} else {
+// 		return Object.assign({}, config, {
+// 			password: info.ssh_password
+// 		});
+// 	}
+// };
 
-	if (info.ssh_method === 'privateKey') {
-		return Object.assign({}, config, {
-			privateKey: fs.readFileSync(info.ssh_key_file),
-			passphrase: info.ssh_key_passphrase
-		});
-	} else {
-		return Object.assign({}, config, {
-			password: info.ssh_password
-		});
-	}
-};
-
-const connectViaSsh = (info) => new Promise((resolve, reject) => {
-	ssh(getSshConfig(info), (err, tunnel) => {
-		if (err) {
-			reject(err);
-		} else {
-			resolve({
-				tunnel,
-				info: Object.assign({}, info, {
-					host: '127.0.0.1',
-				})
-			});
-		}
-	});
-});
+// const connectViaSsh = (info) => new Promise((resolve, reject) => {
+// 	ssh(getSshConfig(info), (err, tunnel) => {
+// 		if (err) {
+// 			reject(err);
+// 		} else {
+// 			resolve({
+// 				tunnel,
+// 				info: Object.assign({}, info, {
+// 					host: '127.0.0.1',
+// 				})
+// 			});
+// 		}
+// 	});
+// });
 
 const getSslOptions = (connectionInfo) => {
 	if (connectionInfo.sslType === 'Off') {
@@ -70,17 +69,31 @@ const getSslOptions = (connectionInfo) => {
 	}
 };
 
-const createConnection = async (connectionInfo) => {
+const createConnection = async (connectionInfo, sshService) => {
 	if (connectionInfo.ssh) {
-		const { info, tunnel } = await connectViaSsh(connectionInfo);
-		sshTunnel = tunnel;
-		connectionInfo = info;
+		useSshTunnel = true;
+		const { options } = await sshService.openTunnel({
+			sshAuthMethod: connectionInfo.ssh_method === 'privateKey' ? 'IDENTITY_FILE' : 'USER_PASSWORD',
+			sshTunnelHostname: connectionInfo.ssh_host,
+			sshTunnelPort: connectionInfo.ssh_port,
+			sshTunnelUsername: connectionInfo.ssh_user,
+			sshTunnelPassword: connectionInfo.ssh_password,
+			sshTunnelIdentityFile: connectionInfo.ssh_key_file,
+			sshTunnelPassphrase: connectionInfo.ssh_key_passphrase,
+			host: connectionInfo.host,
+			port: connectionInfo.port,
+		});
+		connectionInfo = {
+			...connectionInfo,
+			host: options.host,
+			port: options.port.toString(),
+		};
 	}
 
-	return await mysql2.createConnection({ 
+	return await mysql2.createConnection({
 		host: connectionInfo.host,
-		user: connectionInfo.userName, 
-		password: connectionInfo.userPassword, 
+		user: connectionInfo.userName,
+		password: connectionInfo.userPassword,
 		port: connectionInfo.port,
 		metaAsArray: false,
 		ssl: getSslOptions(connectionInfo),
@@ -92,12 +105,12 @@ const createConnection = async (connectionInfo) => {
 	});
 };
 
-const connect = async (connectionInfo) => {
+const connect = async (connectionInfo, sshService) => {
 	if (connection) {
 		return connection;
 	}
- 
-	connection = await createConnection(connectionInfo);
+
+	connection = await createConnection(connectionInfo, sshService);
 
 	return connection;
 };
@@ -109,13 +122,13 @@ const createInstance = (connection, logger) => {
 
 	const getDatabases = async (systemDatabases) => {
 		const databases = await query('show databases;');
-		
+
 		return databases.map(item => item.Database).filter(dbName => !systemDatabases.includes(dbName));
 	};
-	
+
 	const getTables = async (dbName) => {
 		const tables = await query(`show full tables from \`${dbName}\`;`);
-	
+
 		return tables;
 	};
 
@@ -124,7 +137,7 @@ const createInstance = (connection, logger) => {
 
 		return Number(count[0]?.count || 0);
 	};
-	
+
 	const getRecords = async (dbName, tableName, limit) => {
 		const result = await query({
 			sql: `SELECT * FROM \`${dbName}\`.\`${tableName}\` LIMIT ${limit};`
@@ -143,7 +156,7 @@ const createInstance = (connection, logger) => {
 		const data = await query(`show create database \`${dbName}\`;`);
 
 		return data[0]['Create Database'];
-	}; 
+	};
 
 	const getFunctions = async (dbName) => {
 		const functions = await query(`show function status WHERE Db = '${dbName}'`);
@@ -180,7 +193,7 @@ const createInstance = (connection, logger) => {
 	const getConstraints = async (dbName, tableName) => {
 		try {
 			const result = await query(`select * from information_schema.TABLE_CONSTRAINTS where CONSTRAINT_SCHEMA='${dbName}' AND TABLE_NAME='${tableName}';`);
-	
+
 			return result;
 		} catch (error) {
 			logger.log('error', {
@@ -220,7 +233,7 @@ const createInstance = (connection, logger) => {
 
 	const serverVersion = async () => {
 		const result = await query('select VERSION() as version;');
-		
+
 		return result[0]?.version || '';
 	};
 
@@ -275,15 +288,15 @@ const createInstance = (connection, logger) => {
 	};
 };
 
-const close = () => {
+const close = async (sshService) => {
 	if (connection) {
 		connection.end();
 		connection = null;
 	}
 
-	if (sshTunnel) {
-		sshTunnel.close();
-		sshTunnel = null;
+	if (useSshTunnel) {
+		useSshTunnel = false;
+		await sshService.closeConsumer();
 	}
 };
 
