@@ -4,8 +4,7 @@
   "description": "Mysql reverse engineering module",
   "author": "Hackolade",
   "dependencies": {
-    "mysql2": "^2.3.3",
-    "tunnel-ssh": "^4.1.6"
+    "mysql2": "^2.3.3"
   },
   "installed": true
 }
