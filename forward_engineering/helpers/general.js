@@ -89,10 +89,12 @@ module.exports = (_, wrap) => {
 		}
 
 		if (['YES', 'NO', 'DEFAULT'].includes(_.toUpper(value))) {
-			return ({
-				YES: '\'Y\'',
-				NO: '\'N\'',
-			})[_.toUpper(value)] || _.toUpper(value);
+			return (
+				{
+					YES: "'Y'",
+					NO: "'N'",
+				}[_.toUpper(value)] || _.toUpper(value)
+			);
 		}
 		if (typeof value === 'number') {
 			return value;
@@ -101,13 +103,13 @@ module.exports = (_, wrap) => {
 		} else if (typeof value === 'string' && value) {
 			return wrap(value);
 		} else if (typeof value === 'boolean') {
-			return value ? '\'Y\'' : '\'N\'';
+			return value ? "'Y'" : "'N'";
 		}
 	};
 
 	const encodeStringLiteral = (str = '') => {
 		return str.replace(/(?<!\\)('|"|`)/gi, '\\$1').replace(/\n/gi, '\\n');
-	}
+	};
 
 	const getTableOptions = (options = {}) => {
 		const tableOptions = [];
@@ -170,7 +172,7 @@ module.exports = (_, wrap) => {
 	const addLinear = linear => (linear ? 'LINEAR ' : '');
 
 	const getPartitionBy = partitioning => {
-		let expression =` (${_.trim(partitioning.partitioning_expression)})`;
+		let expression = ` (${_.trim(partitioning.partitioning_expression)})`;
 		let algorithm = '';
 
 		if (['RANGE', 'LIST'].includes(partitioning.partitionType) && partitioning.partitioning_columns) {

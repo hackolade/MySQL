@@ -62,9 +62,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyTooltip": "DB vendor",
 				"propertyType": "select",
-				"options": [
-					"MySQL"
-				],
+				"options": ["MySQL"],
 				"disabledOption": true
 			},
 			{
@@ -73,10 +71,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyTooltip": "DB version",
 				"propertyType": "select",
-				"options": [
-					"v5.x",
-					"v8.x"
-				],
+				"options": ["v5.x", "v8.x"],
 				"disabledOption": false
 			},
 			{
@@ -117,7 +112,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Deactivated item will be not included in FE script",
 						"propertyType": "checkbox",
 						"defaultValue": true
-					  },
+					},
 					{
 						"propertyName": "Description",
 						"propertyKeyword": "description",
@@ -158,11 +153,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "InnoDB",
-						"options": [
-							"",
-							"InnoDB",
-							"NDB"
-						]
+						"options": ["", "InnoDB", "NDB"]
 					},
 					{
 						"propertyName": "FILE_BLOCK_SIZE",
@@ -181,15 +172,11 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Enables or disables page-level data encryption for an InnoDB general tablespace.",
 						"propertyType": "select",
 						"dependency": {
-						  "key": "ENGINE",
-						  "value": "InnoDB"
+							"key": "ENGINE",
+							"value": "InnoDB"
 						},
-						"options": [
-							"",
-							"No",
-							"Yes"
-						]
-					  },
+						"options": ["", "No", "Yes"]
+					},
 					{
 						"propertyName": "Logfile group",
 						"propertyKeyword": "LOGFILE_GROUP",

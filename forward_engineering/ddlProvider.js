@@ -17,10 +17,8 @@ module.exports = (baseProvider, options, app) => {
 		getDifferentProperties,
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
-	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } = require('./helpers/columnDefinitionHelper')(
-		_,
-		wrap,
-	);
+	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
+		require('./helpers/columnDefinitionHelper')(_, wrap);
 	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes } =
 		require('./helpers/general')(_, wrap);
 	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
@@ -61,7 +59,9 @@ module.exports = (baseProvider, options, app) => {
 			});
 			const udfStatements = udfs.map(udf => this.createUdf(databaseName, udf));
 			const procStatements = procedures.map(procedure => this.createProcedure(databaseName, procedure));
-			const tableSpaceStatements = tablespaces.map(tableSpace => this.createTableSpace(tableSpace)).filter(Boolean);
+			const tableSpaceStatements = tablespaces
+				.map(tableSpace => this.createTableSpace(tableSpace))
+				.filter(Boolean);
 
 			return [...tableSpaceStatements, databaseStatement, ...udfStatements, ...procStatements].join('\n');
 		},
@@ -98,43 +98,43 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			if (!_.isEmpty(alterDbData.udfs?.deleted)) {
-				alterDbData.udfs?.deleted.forEach((udf) => {
+				alterDbData.udfs?.deleted.forEach(udf => {
 					alterStatements.push(this.dropUdf(databaseName, udf));
 				});
 			}
 
 			if (!_.isEmpty(alterDbData.udfs?.added)) {
-				alterDbData.udfs.added.forEach((udf) => {
+				alterDbData.udfs.added.forEach(udf => {
 					alterStatements.push(this.createUdf(databaseName, udf));
 				});
 			}
 
 			if (!_.isEmpty(alterDbData.udfs?.modified)) {
-				alterDbData.udfs.modified.forEach((udf) => {
+				alterDbData.udfs.modified.forEach(udf => {
 					alterStatements.push(
-						this.dropUdf(databaseName, udf.old) + '\n' +
-						this.createUdf(databaseName, udf.new),
+						this.dropUdf(databaseName, udf.old) + '\n' + this.createUdf(databaseName, udf.new),
 					);
 				});
 			}
 
 			if (!_.isEmpty(alterDbData.procedures?.deleted)) {
-				alterDbData.procedures?.deleted.forEach((procedure) => {
+				alterDbData.procedures?.deleted.forEach(procedure => {
 					alterStatements.push(this.dropProcedure(databaseName, procedure));
 				});
 			}
 
 			if (!_.isEmpty(alterDbData.procedures?.added)) {
-				alterDbData.procedures.added.forEach((procedure) => {
+				alterDbData.procedures.added.forEach(procedure => {
 					alterStatements.push(this.createProcedure(databaseName, procedure));
 				});
 			}
 
 			if (!_.isEmpty(alterDbData.procedures?.modified)) {
-				alterDbData.procedures.modified.forEach((procedure) => {
+				alterDbData.procedures.modified.forEach(procedure => {
 					alterStatements.push(
-						this.dropProcedure(databaseName, procedure.old) + '\n' +
-						this.createProcedure(databaseName, procedure.new),
+						this.dropProcedure(databaseName, procedure.old) +
+							'\n' +
+							this.createProcedure(databaseName, procedure.new),
 					);
 				});
 			}
@@ -157,7 +157,7 @@ module.exports = (baseProvider, options, app) => {
 				statement = assignTemplates(templates.createTableSpace, {
 					undo: tableSpace.UNDO ? ' UNDO' : '',
 					name: tableSpace.name,
-					file: wrap(tableSpace.DATAFILE, '\'', '\''),
+					file: wrap(tableSpace.DATAFILE, "'", "'"),
 					AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE ? ` AUTOEXTEND_SIZE=${tableSpace.AUTOEXTEND_SIZE}` : '',
 					logFile: ` USE LOGFILE GROUP ${tableSpace.LOGFILE_GROUP}`,
 					EXTENT_SIZE: tableSpace.EXTENT_SIZE ? ` EXTENT_SIZE=${tableSpace.EXTENT_SIZE}` : '',
@@ -168,7 +168,7 @@ module.exports = (baseProvider, options, app) => {
 				statement = assignTemplates(templates.createTableSpace, {
 					undo: tableSpace.UNDO ? ' UNDO' : '',
 					name: tableSpace.name,
-					file: wrap(tableSpace.DATAFILE, '\'', '\''),
+					file: wrap(tableSpace.DATAFILE, "'", "'"),
 					AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE ? ` AUTOEXTEND_SIZE=${tableSpace.AUTOEXTEND_SIZE}` : '',
 					FILE_BLOCK_SIZE: tableSpace.FILE_BLOCK_SIZE ? ` FILE_BLOCK_SIZE=${tableSpace.FILE_BLOCK_SIZE}` : '',
 					ENCRYPTION: tableSpace.ENCRYPTION ? ` ENCRYPTION=${tableSpace.ENCRYPTION}` : '',
@@ -252,12 +252,15 @@ module.exports = (baseProvider, options, app) => {
 			const ifNotExistTable = ifNotExist ? 'IF NOT EXISTS ' : '';
 
 			if (likeTableName) {
-				return commentIfDeactivated(assignTemplates(templates.createLikeTable, {
-					name: tableName,
-					likeTableName: getTableName(likeTableName, dbData.databaseName),
-					temporary: temporaryTable,
-					ifNotExist: ifNotExistTable,
-				}), { isActivated });
+				return commentIfDeactivated(
+					assignTemplates(templates.createLikeTable, {
+						name: tableName,
+						likeTableName: getTableName(likeTableName, dbData.databaseName),
+						temporary: temporaryTable,
+						ifNotExist: ifNotExistTable,
+					}),
+					{ isActivated },
+				);
 			}
 
 			const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
@@ -268,7 +271,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
 			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
-			const ignoreReplace = selectStatement ? selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '' : '';
+			const ignoreReplace = selectStatement ? (selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '') : '';
 
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
@@ -303,14 +306,11 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.alterTable, {
 				table,
-				alterStatement: assignTemplates(
-					templates.alterCharset,
-					{
-						charset: collationOptions.characterSet,
-						default: collationOptions.defaultCharSet ? 'DEFAULT ' : '',
-						collation: collationOptions.collation ? ` COLLATE='${collationOptions.collation}'` : '',
-					},
-				),
+				alterStatement: assignTemplates(templates.alterCharset, {
+					charset: collationOptions.characterSet,
+					default: collationOptions.defaultCharSet ? 'DEFAULT ' : '',
+					collation: collationOptions.collation ? ` COLLATE='${collationOptions.collation}'` : '',
+				}),
 			});
 		},
 
@@ -334,9 +334,10 @@ module.exports = (baseProvider, options, app) => {
 					? ` COLLATE ${columnDefinition.collation}`
 					: '';
 			const generatedDefaultValue = createGeneratedColumn(columnDefinition.generatedDefaultValue);
-			const defaultValue = (!_.isUndefined(columnDefinition.default) && !generatedDefaultValue)
-				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
-				: '';
+			const defaultValue =
+				!_.isUndefined(columnDefinition.default) && !generatedDefaultValue
+					? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
+					: '';
 			const compressed = columnDefinition.compressionMethod
 				? ` COMPRESSED=${columnDefinition.compressionMethod}`
 				: '';
@@ -409,10 +410,13 @@ module.exports = (baseProvider, options, app) => {
 				});
 			}
 
-			return commentIfDeactivated(assignTemplates(templates.alterTable, {
-				table,
-				alterStatement,
-			}), { isActivated: columnData.isActivated });
+			return commentIfDeactivated(
+				assignTemplates(templates.alterTable, {
+					table,
+					alterStatement,
+				}),
+				{ isActivated: columnData.isActivated },
+			);
 		},
 
 		createIndex(tableName, index, dbData, isParentActivated = true, jsonSchema) {
@@ -422,23 +426,25 @@ module.exports = (baseProvider, options, app) => {
 
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
-			const indexType = index.indexType && _.toUpper(index.indexType) !== 'KEY' ? `${_.toUpper(index.indexType)} ` : '';
+			const indexType =
+				index.indexType && _.toUpper(index.indexType) !== 'KEY' ? `${_.toUpper(index.indexType)} ` : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
 			let indexOptions = [];
 
-			const dividedKeys = divideIntoActivatedAndDeactivated(
-				index.indxKey || [],
-				key => processIndexKeyName({ name: key.name, type: key.type, jsonSchema }),
+			const dividedKeys = divideIntoActivatedAndDeactivated(index.indxKey || [], key =>
+				processIndexKeyName({ name: key.name, type: key.type, jsonSchema }),
 			);
 			const commentedKeys = dividedKeys.deactivatedItems.length
 				? commentIfDeactivated(dividedKeys.deactivatedItems.join(', '), {
 						isActivated: wholeStatementCommented,
 						isPartOfLine: true,
-				  })
+					})
 				: '';
-			const expressionKeys = (index.indxExpression || []).map(item => item.value?.replace(/\\/g, '\\\\')).filter(Boolean);
+			const expressionKeys = (index.indxExpression || [])
+				.map(item => item.value?.replace(/\\/g, '\\\\'))
+				.filter(Boolean);
 
 			if (index.indxKeyBlockSize) {
 				indexOptions.push(`KEY_BLOCK_SIZE = ${index.indxKeyBlockSize}`);
@@ -463,11 +469,12 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const indexStatement = assignTemplates(templates.index, {
-				keys: expressionKeys.length ? `${expressionKeys.join(', ')}` :
-					dividedKeys.activatedItems.join(', ') +
-					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
-						? ', ' + commentedKeys
-						: commentedKeys),
+				keys: expressionKeys.length
+					? `${expressionKeys.join(', ')}`
+					: dividedKeys.activatedItems.join(', ') +
+						(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
+							? ', ' + commentedKeys
+							: commentedKeys),
 				indexOptions: indexOptions.length ? '\n\t' + indexOptions.join('\n\t') : '',
 				name,
 				table,
@@ -499,10 +506,14 @@ module.exports = (baseProvider, options, app) => {
 		alterIndex(tableName, { new: newIndexData, old: oldIndexData }, dbData) {
 			return [
 				this.dropIndex(tableName, oldIndexData, dbData),
-				this.createIndex(tableName, {
-					...newIndexData,
-					indxKey: newIndexData.indxKey.filter(key => !(key.isActivated === false))
-				}, dbData),
+				this.createIndex(
+					tableName,
+					{
+						...newIndexData,
+						indxKey: newIndexData.indxKey.filter(key => !(key.isActivated === false)),
+					},
+					dbData,
+				),
 			].join('\n');
 		},
 
@@ -590,7 +601,11 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createView(viewData, dbData, isActivated) {
-			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(viewData, isActivated, dbData);
+			const { deactivatedWholeStatement, selectStatement } = this.viewSelectStatement(
+				viewData,
+				isActivated,
+				dbData,
+			);
 
 			const algorithm =
 				viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM=${viewData.algorithm} ` : '';
@@ -621,7 +636,7 @@ module.exports = (baseProvider, options, app) => {
 					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
 							isActivated: false,
 							isPartOfLine: true,
-					  })
+						})
 					: '';
 				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
 			}
@@ -631,7 +646,7 @@ module.exports = (baseProvider, options, app) => {
 				: assignTemplates(templates.viewSelectStatement, {
 						tableName: tables.join(', '),
 						keys: columnsAsString,
-				  });
+					});
 
 			return { deactivatedWholeStatement, selectStatement };
 		},
@@ -656,7 +671,8 @@ module.exports = (baseProvider, options, app) => {
 			return assignTemplates(templates.alterView, {
 				name: viewName,
 				selectStatement,
-				algorithm: options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM=${options.algorithm}` : '',
+				algorithm:
+					options.algorithm && options.algorithm !== 'UNDEFINED' ? ` ALGORITHM=${options.algorithm}` : '',
 				sqlSecurity: options.sqlSecurity ? ` SQL SECURITY ${options.sqlSecurity}` : '',
 				checkOption: options.checkOption ? `\nWITH ${options.checkOption} CHECK OPTION` : '',
 			});
@@ -687,9 +703,15 @@ module.exports = (baseProvider, options, app) => {
 				name: columnDefinition.name,
 				type: columnDefinition.type,
 				primaryKey: keyHelper.isInlinePrimaryKey(jsonSchema),
-				primaryKeyOptions: _.omit(keyHelper.hydratePrimaryKeyOptions(jsonSchema.primaryKeyOptions || {}), 'columns'),
+				primaryKeyOptions: _.omit(
+					keyHelper.hydratePrimaryKeyOptions(jsonSchema.primaryKeyOptions || {}),
+					'columns',
+				),
 				unique: keyHelper.isInlineUnique(jsonSchema),
-				uniqueKeyOptions: _.omit(keyHelper.hydrateUniqueOptions(_.first(jsonSchema.uniqueKeyOptions) || {}), 'columns'),
+				uniqueKeyOptions: _.omit(
+					keyHelper.hydrateUniqueOptions(_.first(jsonSchema.uniqueKeyOptions) || {}),
+					'columns',
+				),
 				nullable: columnDefinition.nullable,
 				default: columnDefinition.default,
 				comment: columnDefinition.description || jsonSchema.refDescription || jsonSchema.description,
@@ -708,7 +730,7 @@ module.exports = (baseProvider, options, app) => {
 				charset: jsonSchema.characterSet,
 				collation: jsonSchema.collation,
 				generatedDefaultValue: jsonSchema.generatedDefaultValue,
-				...(canHaveAutoIncrement(columnDefinition.type) && {autoIncrement: jsonSchema.autoincrement})
+				...(canHaveAutoIncrement(columnDefinition.type) && { autoIncrement: jsonSchema.autoincrement }),
 			};
 		},
 
@@ -718,17 +740,10 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateAlterColumn({
-			newColumn,
-			oldColumn,
-			newColumnSchema,
-			oldColumnSchema,
-			oldCompData,
-			newCompData,
-		}) {
+		hydrateAlterColumn({ newColumn, oldColumn, newColumnSchema, oldColumnSchema, oldCompData, newCompData }) {
 			const diff = getDifferentProperties(newColumn, oldColumn, ['name', 'type']);
 
-			const result = {...newColumn};
+			const result = { ...newColumn };
 
 			if (oldCompData.name !== newCompData.name) {
 				result.oldName = oldCompData.name;
@@ -748,7 +763,11 @@ module.exports = (baseProvider, options, app) => {
 		hydrateIndex(indexData, tableData) {
 			return {
 				indxName: indexData?.indxName || '',
-				indxKey: indexData?.indxKey?.map(key => ({ name: key.name, type: key.type, isActivated: key.isActivated })),
+				indxKey: indexData?.indxKey?.map(key => ({
+					name: key.name,
+					type: key.type,
+					isActivated: key.isActivated,
+				})),
 				indxExpression: indexData?.indxExpression?.map(key => ({ value: key.value })),
 				isActivated: indexData?.isActivated,
 				indexType: indexData?.indexType,
@@ -796,7 +815,7 @@ module.exports = (baseProvider, options, app) => {
 				AUTOEXTEND_SIZE: tableSpace.AUTOEXTEND_SIZE,
 				ENGINE: tableSpace.ENGINE,
 				FILE_BLOCK_SIZE: tableSpace.UNDO ? '' : tableSpace.FILE_BLOCK_SIZE,
-				ENCRYPTION: ({ 'Yes': 'Y', 'No': 'N' })[tableSpace.ENCRYPTION] || '',
+				ENCRYPTION: { 'Yes': 'Y', 'No': 'N' }[tableSpace.ENCRYPTION] || '',
 				LOGFILE_GROUP: tableSpace.LOGFILE_GROUP,
 				EXTENT_SIZE: tableSpace.EXTENT_SIZE,
 				INITIAL_SIZE: tableSpace.INITIAL_SIZE,
@@ -925,7 +944,7 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateDropDatabase(containerData) {
 			return {
-				name: containerData[0]?.name || '', 
+				name: containerData[0]?.name || '',
 			};
 		},
 
@@ -942,13 +961,15 @@ module.exports = (baseProvider, options, app) => {
 				(compModeData.old.UDFs || []).map(this.hydrateUdf),
 				(compModeData.new.UDFs || []).map(this.hydrateUdf),
 			);
-	
+
 			return {
 				name: data.name || '',
-				...((isCharacterSetModified || isCollationModified) ? {
-					characterSet: data.characterSet,
-					collation: data.collation,
-				} : {}),
+				...(isCharacterSetModified || isCollationModified
+					? {
+							characterSet: data.characterSet,
+							collation: data.collation,
+						}
+					: {}),
 				...(encryption ? { encryption: data.ENCRYPTION === 'Yes' ? 'Y' : 'N' } : {}),
 				procedures,
 				udfs,
@@ -958,21 +979,19 @@ module.exports = (baseProvider, options, app) => {
 		hydrateAlterTable({ name, newEntityData, oldEntityData, jsonSchema }) {
 			const newDetailsTab = newEntityData[0];
 			const oldDetailsTab = oldEntityData[0];
-			const collationOptionsChanged = [
-				'defaultCharSet',
-				'characterSet',
-				'collation',
-			].some(
+			const collationOptionsChanged = ['defaultCharSet', 'characterSet', 'collation'].some(
 				optionName => oldDetailsTab.tableOptions?.[optionName] !== newDetailsTab.tableOptions?.[optionName],
 			);
 
 			return {
 				name,
-				collationOptions: collationOptionsChanged ? {
-					defaultCharSet: newDetailsTab.tableOptions?.defaultCharSet,
-					characterSet: newDetailsTab.tableOptions?.characterSet,
-					collation: newDetailsTab.tableOptions?.collation,
-				} : null,
+				collationOptions: collationOptionsChanged
+					? {
+							defaultCharSet: newDetailsTab.tableOptions?.defaultCharSet,
+							characterSet: newDetailsTab.tableOptions?.characterSet,
+							collation: newDetailsTab.tableOptions?.collation,
+						}
+					: null,
 			};
 		},
 	});

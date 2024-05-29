@@ -125,14 +125,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"propertyType": "select",
-				"options": [
-					"char",
-					"varchar",
-					"tinytext",
-					"text",
-					"mediumtext",
-					"longtext"
-				],
+				"options": ["char", "varchar", "tinytext", "text", "mediumtext", "longtext"],
 				"data": "options",
 				"valueType": "string",
 				"cleanDependency": true
@@ -190,10 +183,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "synonym",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"",
-					"json"
-				],
+				"options": ["", "json"],
 				"dependency": {
 					"key": "mode",
 					"value": "longtext"
@@ -281,11 +271,7 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"options": [
-					"",
-					"armscii8_general_ci",
-					"armscii8_bin"
-				],
+				"options": ["", "armscii8_general_ci", "armscii8_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "armscii8"
@@ -296,11 +282,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"ascii_bin",
-					"ascii_general_ci"
-				],
+				"options": ["", "ascii_bin", "ascii_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "ascii"
@@ -311,11 +293,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"big5_bin",
-					"big5_chinese_ci"
-				],
+				"options": ["", "big5_bin", "big5_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "big5"
@@ -326,10 +304,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"binary"
-				],
+				"options": ["", "binary"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "binary"
@@ -376,11 +351,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp1256_bin",
-					"cp1256_general_ci"
-				],
+				"options": ["", "cp1256_bin", "cp1256_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp1256"
@@ -391,12 +362,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp1257_general_ci",
-					"cp1257_bin",
-					"cp1257_lithuanian_ci"
-				],
+				"options": ["", "cp1257_general_ci", "cp1257_bin", "cp1257_lithuanian_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp1257"
@@ -407,11 +373,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp850_bin",
-					"cp850_general_ci"
-				],
+				"options": ["", "cp850_bin", "cp850_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp850"
@@ -422,11 +384,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp852_general_ci",
-					"cp852_bin"
-				],
+				"options": ["", "cp852_general_ci", "cp852_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp852"
@@ -437,11 +395,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp866_bin",
-					"cp866_general_ci"
-				],
+				"options": ["", "cp866_bin", "cp866_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp866"
@@ -452,11 +406,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp932_bin",
-					"cp932_japanese_ci"
-				],
+				"options": ["", "cp932_bin", "cp932_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp932"
@@ -467,11 +417,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"dec8_bin",
-					"dec8_swedish_ci"
-				],
+				"options": ["", "dec8_bin", "dec8_swedish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "dec8"
@@ -482,11 +428,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"eucjpms_bin",
-					"eucjpms_japanese_ci"
-				],
+				"options": ["", "eucjpms_bin", "eucjpms_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "eucjpms"
@@ -497,11 +439,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"euckr_bin",
-					"euckr_korean_ci"
-				],
+				"options": ["", "euckr_bin", "euckr_korean_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "euckr"
@@ -512,12 +450,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gb18030_unicode_520_ci",
-					"gb18030_bin",
-					"gb18030_chinese_ci"
-				],
+				"options": ["", "gb18030_unicode_520_ci", "gb18030_bin", "gb18030_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gb18030"
@@ -528,11 +461,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gb2312_bin",
-					"gb2312_chinese_ci"
-				],
+				"options": ["", "gb2312_bin", "gb2312_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gb2312"
@@ -543,11 +472,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gbk_bin",
-					"gbk_chinese_ci"
-				],
+				"options": ["", "gbk_bin", "gbk_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gbk"
@@ -558,11 +483,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"geostd8_bin",
-					"geostd8_general_ci"
-				],
+				"options": ["", "geostd8_bin", "geostd8_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "geostd8"
@@ -573,11 +494,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"greek_general_ci",
-					"greek_bin"
-				],
+				"options": ["", "greek_general_ci", "greek_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "greek"
@@ -588,11 +505,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"hebrew_bin",
-					"hebrew_general_ci"
-				],
+				"options": ["", "hebrew_bin", "hebrew_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "hebrew"
@@ -603,11 +516,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"hp8_bin",
-					"hp8_english_ci"
-				],
+				"options": ["", "hp8_bin", "hp8_english_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "hp8"
@@ -618,11 +527,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"keybcs2_bin",
-					"keybcs2_general_ci"
-				],
+				"options": ["", "keybcs2_bin", "keybcs2_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "keybcs2"
@@ -633,11 +538,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"koi8r_bin",
-					"koi8r_general_ci"
-				],
+				"options": ["", "koi8r_bin", "koi8r_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "koi8r"
@@ -648,11 +549,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"koi8u_bin",
-					"koi8u_general_ci"
-				],
+				"options": ["", "koi8u_bin", "koi8u_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "koi8u"
@@ -702,11 +599,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"latin5_bin",
-					"latin5_turkish_ci"
-				],
+				"options": ["", "latin5_bin", "latin5_turkish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "latin5"
@@ -717,13 +610,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"latin7_bin",
-					"latin7_general_cs",
-					"latin7_general_ci",
-					"latin7_estonian_cs"
-				],
+				"options": ["", "latin7_bin", "latin7_general_cs", "latin7_general_ci", "latin7_estonian_cs"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "latin7"
@@ -734,11 +621,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"macce_bin",
-					"macce_general_ci"
-				],
+				"options": ["", "macce_bin", "macce_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "macce"
@@ -749,11 +632,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"macroman_bin",
-					"macroman_general_ci"
-				],
+				"options": ["", "macroman_bin", "macroman_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "macroman"
@@ -764,11 +643,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"sjis_bin",
-					"sjis_japanese_ci"
-				],
+				"options": ["", "sjis_bin", "sjis_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "sjis"
@@ -779,11 +654,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"swe7_bin",
-					"swe7_swedish_ci"
-				],
+				"options": ["", "swe7_bin", "swe7_swedish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "swe7"
@@ -794,11 +665,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"tis620_bin",
-					"tis620_thai_ci"
-				],
+				"options": ["", "tis620_bin", "tis620_thai_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "tis620"
@@ -849,11 +716,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"ujis_bin",
-					"ujis_japanese_ci"
-				],
+				"options": ["", "ujis_bin", "ujis_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "ujis"
@@ -903,11 +766,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"utf16le_bin",
-					"utf16le_general_ci"
-				],
+				"options": ["", "utf16le_bin", "utf16le_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "utf16le"
@@ -1058,10 +917,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -1076,11 +932,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -1298,23 +1150,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -1465,23 +1308,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -1534,17 +1368,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"propertyType": "select",
-				"options": [
-					"tinyint",
-					"smallint",
-					"mediumint",
-					"int",
-					"bigint",
-					"bit",
-					"float",
-					"double",
-					"decimal"
-				],
+				"options": ["tinyint", "smallint", "mediumint", "int", "bigint", "bit", "float", "double", "decimal"],
 				"data": "options",
 				"valueType": "string"
 			},
@@ -1553,10 +1377,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "synonym",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"",
-					"integer"
-				],
+				"options": ["", "integer"],
 				"dependency": {
 					"key": "mode",
 					"value": "int"
@@ -1567,13 +1388,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "synonym",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"",
-					"dec",
-					"fixed",
-					"numeric",
-					"number"
-				],
+				"options": ["", "dec", "fixed", "numeric", "number"],
 				"dependency": {
 					"key": "mode",
 					"value": "decimal"
@@ -1584,11 +1399,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "synonym",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"",
-					"double precision",
-					"real"
-				],
+				"options": ["", "double precision", "real"],
 				"dependency": {
 					"key": "mode",
 					"value": "double"
@@ -1665,10 +1476,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -1682,11 +1490,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -1904,23 +1708,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -2102,23 +1897,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -2178,14 +1964,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"propertyType": "select",
-				"options": [
-					"binary",
-					"varbinary",
-					"tinyblob",
-					"blob",
-					"mediumblob",
-					"longblob"
-				],
+				"options": ["binary", "varbinary", "tinyblob", "blob", "mediumblob", "longblob"],
 				"data": "options",
 				"valueType": "string"
 			},
@@ -2242,10 +2021,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "synonym",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"",
-					"char byte"
-				],
+				"options": ["", "char byte"],
 				"dependency": {
 					"key": "mode",
 					"value": "binary"
@@ -2261,10 +2037,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -2278,11 +2051,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -2506,23 +2275,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -2673,23 +2433,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -2736,13 +2487,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"propertyType": "select",
-				"options": [
-					"date",
-					"time",
-					"datetime",
-					"timestamp",
-					"year"
-				],
+				"options": ["date", "time", "datetime", "timestamp", "year"],
 				"data": "options",
 				"valueType": "string"
 			},
@@ -2779,10 +2524,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -2796,11 +2538,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -3025,23 +2763,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -3192,23 +2921,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"BTREE",
-							"HASH",
-							"RTREE"
-						]
+						"options": ["", "BTREE", "HASH", "RTREE"]
 					},
 					{
 						"propertyName": "Key order",
 						"propertyKeyword": "indexOrder",
 						"propertyTooltip": "",
 						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"options": ["", "ASC", "DESC"]
 					},
 					{
 						"propertyName": "Key block size",
@@ -3282,10 +3002,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -3299,11 +3016,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -3386,10 +3099,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -3403,11 +3113,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -3456,10 +3162,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -3473,11 +3176,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
@@ -3547,10 +3246,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Type",
 						"propertyKeyword": "generatedType",
 						"propertyType": "select",
-						"options": [
-							"",
-							"always"
-						]
+						"options": ["", "always"]
 					},
 					{
 						"propertyName": "Expression",
@@ -3564,11 +3260,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "generated_storage",
 						"propertyTooltip": "Allows to specifying if a generated column is stored or virtual, e.g. recomputed at query time. Stored generated columns can be indexed.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"VIRTUAL",
-							"STORED"
-						]
+						"options": ["", "VIRTUAL", "STORED"]
 					}
 				]
 			},
