@@ -110,5 +110,19 @@
 				}
 			}
 		]
+	},
+	"postConvert": {
+		"modify": {
+			"field": [
+				{
+					"from": {
+						"type": "jsonObject"
+					},
+					"to": {
+						"subtype": "object"
+					}
+				}
+			]	
+		}
 	}
 }
