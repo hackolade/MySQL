@@ -110,12 +110,5 @@
 				}
 			}
 		]
-	},
-	"postConvert": {
-		"modify": {
-			"field": [
-				
-			]	
-		}
 	}
 }
