@@ -114,22 +114,7 @@
 	"postConvert": {
 		"modify": {
 			"field": [
-				{
-					"from": {
-						"type": "jsonObject"
-					},
-					"to": {
-						"subtype": "object"
-					}
-				},
-				{
-					"from": {
-						"type": "jsonArray"
-					},
-					"to": {
-						"subtype": "array"
-					}
-				}
+				
 			]	
 		}
 	}
