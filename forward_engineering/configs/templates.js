@@ -21,9 +21,7 @@ module.exports = {
 	createForeignKey:
 		'ALTER TABLE ${foreignTable} ADD CONSTRAINT `${name}` FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey});',
 
-	index:
-		'CREATE ${indexType}INDEX ${name}${indexCategory}\n' +
-		'\tON ${table} ( ${keys} )${indexOptions};\n',
+	index: 'CREATE ${indexType}INDEX ${name}${indexCategory}\n' + '\tON ${table} ( ${keys} )${indexOptions};\n',
 
 	createView:
 		'CREATE ${orReplace}${algorithm}${sqlSecurity}VIEW ${ifNotExist}${name} AS ${selectStatement}${checkOption};\n',
@@ -38,15 +36,17 @@ module.exports = {
 		'${body} ${delimiter}\n',
 
 	createProcedure:
-		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' + '\t${characteristics}\n' + '${body} ${delimiter}\n',
+		'CREATE ${definer}PROCEDURE ${ifNotExist}${name}\n(${parameters})\n' +
+		'\t${characteristics}\n' +
+		'${body} ${delimiter}\n',
 
 	alterView: 'ALTER${algorithm}${sqlSecurity} VIEW ${name}\nAS ${selectStatement}${checkOption};',
 
-	dropDatabase: 'DROP DATABASE IF EXISTS \`${name}\`;',
+	dropDatabase: 'DROP DATABASE IF EXISTS `${name}`;',
 
-	alterDatabaseCharset: 'ALTER DATABASE \`${name}\` CHARACTER SET=\'${characterSet}\' COLLATE=\'${collation}\';',
+	alterDatabaseCharset: "ALTER DATABASE `${name}` CHARACTER SET='${characterSet}' COLLATE='${collation}';",
 
-	alterDatabaseEncryption: 'ALTER DATABASE \`${name}\` ENCRYPTION=\'${encryption}\';',
+	alterDatabaseEncryption: "ALTER DATABASE `${name}` ENCRYPTION='${encryption}';",
 
 	dropUdf: 'DROP FUNCTION IF EXISTS ${name};',
 
@@ -62,7 +62,7 @@ module.exports = {
 
 	addCheckConstraint: 'ADD ${checkConstraint}',
 
-	alterCharset: '${default}CHARACTER SET=\'${charset}\'${collation}',
+	alterCharset: "${default}CHARACTER SET='${charset}'${collation}",
 
 	dropView: 'DROP VIEW IF EXISTS ${viewName};',
 
@@ -76,5 +76,6 @@ module.exports = {
 
 	modifyColumn: 'MODIFY ${columnDefinition}',
 
-	createTableSpace: 'CREATE${undo} TABLESPACE ${name} ADD DATAFILE ${file}${AUTOEXTEND_SIZE}${FILE_BLOCK_SIZE}${ENCRYPTION}${logFile}${EXTENT_SIZE}${INITIAL_SIZE}${ENGINE};',
+	createTableSpace:
+		'CREATE${undo} TABLESPACE ${name} ADD DATAFILE ${file}${AUTOEXTEND_SIZE}${FILE_BLOCK_SIZE}${ENCRYPTION}${logFile}${EXTENT_SIZE}${INITIAL_SIZE}${ENGINE};',
 };

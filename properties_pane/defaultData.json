@@ -19,8 +19,7 @@
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"
 	},
-	"multipleField": {
-	},
+	"multipleField": {},
 	"subschema": {},
 	"arrayItem": {},
 	"choice": {},

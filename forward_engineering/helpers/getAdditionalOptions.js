@@ -1,4 +1,4 @@
-const getAdditionalOptions = (additionalOptions) => {
+const getAdditionalOptions = additionalOptions => {
 	if (!Array.isArray(additionalOptions)) {
 		return {};
 	}

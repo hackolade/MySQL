@@ -65,13 +65,15 @@ module.exports = (_, wrap) => {
 		return type;
 	};
 
-	const isString = type => ['CHAR', 'VARCHAR', 'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT'].includes(_.toUpper(type));
+	const isString = type =>
+		['CHAR', 'VARCHAR', 'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT'].includes(_.toUpper(type));
 	const isDateTime = type => ['TIME', 'DATE', 'DATETIME', 'TIMESTAMP'].includes(type);
 
 	const escapeQuotes = str => _.trim(str).replace(/(\')+/g, "'$1");
 
 	const decorateDefault = (type, defaultValue) => {
-		const defaultValuesRegExp = /^(null|current_timestamp(\(\d+\))?)(\s+on\s+update\s+current_timestamp(\(\d+\))?)?$/i
+		const defaultValuesRegExp =
+			/^(null|current_timestamp(\(\d+\))?)(\s+on\s+update\s+current_timestamp(\(\d+\))?)?$/i;
 		if ((isString(type) || isDateTime(type)) && !defaultValuesRegExp.test(_.trim(defaultValue))) {
 			return wrap(escapeQuotes(defaultValue));
 		} else {
@@ -95,7 +97,7 @@ module.exports = (_, wrap) => {
 		return '';
 	};
 
-	const createGeneratedColumn = (generatedDefaultValue) => {
+	const createGeneratedColumn = generatedDefaultValue => {
 		if (!generatedDefaultValue) {
 			return '';
 		}
@@ -107,17 +109,13 @@ module.exports = (_, wrap) => {
 		const storage = _.toUpper(generatedDefaultValue.generated_storage || '');
 		const generatedType = generatedDefaultValue.generatedType === 'always' ? 'GENERATED ALWAYS' : '';
 
-		return ' ' + [
-			generatedType,
-			`AS (${generatedDefaultValue.expression})`,
-			storage,
-		].filter(Boolean).join(' ');
+		return ' ' + [generatedType, `AS (${generatedDefaultValue.expression})`, storage].filter(Boolean).join(' ');
 	};
 
-	const canHaveAutoIncrement = (type) => {
-		const typesAllowedToHaveAutoIncrement = ["tinyint", "smallint", "mediumint", "int", "bigint"]
-		return typesAllowedToHaveAutoIncrement.includes(type)
-	}
+	const canHaveAutoIncrement = type => {
+		const typesAllowedToHaveAutoIncrement = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
+		return typesAllowedToHaveAutoIncrement.includes(type);
+	};
 
 	return {
 		decorateType,
