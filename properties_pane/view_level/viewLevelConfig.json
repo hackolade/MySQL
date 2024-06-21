@@ -135,23 +135,14 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "algorithm",
 				"propertyTooltip": "Affects how MySQL will process the view. MERGE is usually more efficient, and a view can only be updated with this algorithm. TEMPTABLE can be useful in certain situations, as locks on the underlying tables can be released before the statement is finished processing.",
 				"propertyType": "select",
-				"options": [
-					"",
-					"UNDEFINED",
-					"MERGE",
-					"TEMPTABLE"
-				]
+				"options": ["", "UNDEFINED", "MERGE", "TEMPTABLE"]
 			},
 			{
 				"propertyName": "SQL Security",
 				"propertyKeyword": "SQL_SECURITY",
 				"propertyTooltip": "Indicates that the required privileges must be held by the user who defined or invoked the view, respectively. The default SQL SECURITY value is DEFINER.",
 				"propertyType": "select",
-				"options": [
-					"",
-					"DEFINER",
-					"INVOKER"
-				]
+				"options": ["", "DEFINER", "INVOKER"]
 			},
 			{
 				"propertyName": "Select statement",
@@ -172,17 +163,15 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "checkTestingScope",
 				"propertyTooltip": "Determines the scope of check testing when the view is defined in terms of another view. The LOCAL keyword restricts the CHECK OPTION only to the view being defined. CASCADED causes the checks for underlying views to be evaluated as well. When neither keyword is given, the default is CASCADED.",
 				"propertyType": "select",
-				"options": [
-					"",
-					"LOCAL",
-					"CASCADED"
-				],
+				"options": ["", "LOCAL", "CASCADED"],
 				"dependency": {
 					"type": "or",
-					"values": [{
-						"key": "withCheckOption",
-						"value": true
-					}]
+					"values": [
+						{
+							"key": "withCheckOption",
+							"value": true
+						}
+					]
 				}
 			},
 			{

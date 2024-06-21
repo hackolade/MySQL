@@ -162,11 +162,7 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"options": [
-					"",
-					"armscii8_general_ci",
-					"armscii8_bin"
-				],
+				"options": ["", "armscii8_general_ci", "armscii8_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "armscii8"
@@ -177,11 +173,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"ascii_bin",
-					"ascii_general_ci"
-				],
+				"options": ["", "ascii_bin", "ascii_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "ascii"
@@ -192,11 +184,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"big5_bin",
-					"big5_chinese_ci"
-				],
+				"options": ["", "big5_bin", "big5_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "big5"
@@ -207,10 +195,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"binary"
-				],
+				"options": ["", "binary"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "binary"
@@ -257,11 +242,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp1256_bin",
-					"cp1256_general_ci"
-				],
+				"options": ["", "cp1256_bin", "cp1256_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp1256"
@@ -272,12 +253,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp1257_general_ci",
-					"cp1257_bin",
-					"cp1257_lithuanian_ci"
-				],
+				"options": ["", "cp1257_general_ci", "cp1257_bin", "cp1257_lithuanian_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp1257"
@@ -288,11 +264,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp850_bin",
-					"cp850_general_ci"
-				],
+				"options": ["", "cp850_bin", "cp850_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp850"
@@ -303,11 +275,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp852_general_ci",
-					"cp852_bin"
-				],
+				"options": ["", "cp852_general_ci", "cp852_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp852"
@@ -318,11 +286,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp866_bin",
-					"cp866_general_ci"
-				],
+				"options": ["", "cp866_bin", "cp866_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp866"
@@ -333,11 +297,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"cp932_bin",
-					"cp932_japanese_ci"
-				],
+				"options": ["", "cp932_bin", "cp932_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "cp932"
@@ -348,11 +308,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"dec8_bin",
-					"dec8_swedish_ci"
-				],
+				"options": ["", "dec8_bin", "dec8_swedish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "dec8"
@@ -363,11 +319,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"eucjpms_bin",
-					"eucjpms_japanese_ci"
-				],
+				"options": ["", "eucjpms_bin", "eucjpms_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "eucjpms"
@@ -378,11 +330,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"euckr_bin",
-					"euckr_korean_ci"
-				],
+				"options": ["", "euckr_bin", "euckr_korean_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "euckr"
@@ -393,12 +341,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gb18030_unicode_520_ci",
-					"gb18030_bin",
-					"gb18030_chinese_ci"
-				],
+				"options": ["", "gb18030_unicode_520_ci", "gb18030_bin", "gb18030_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gb18030"
@@ -409,11 +352,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gb2312_bin",
-					"gb2312_chinese_ci"
-				],
+				"options": ["", "gb2312_bin", "gb2312_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gb2312"
@@ -424,11 +363,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"gbk_bin",
-					"gbk_chinese_ci"
-				],
+				"options": ["", "gbk_bin", "gbk_chinese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "gbk"
@@ -439,11 +374,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"geostd8_bin",
-					"geostd8_general_ci"
-				],
+				"options": ["", "geostd8_bin", "geostd8_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "geostd8"
@@ -454,11 +385,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"greek_general_ci",
-					"greek_bin"
-				],
+				"options": ["", "greek_general_ci", "greek_bin"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "greek"
@@ -469,11 +396,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"hebrew_bin",
-					"hebrew_general_ci"
-				],
+				"options": ["", "hebrew_bin", "hebrew_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "hebrew"
@@ -484,11 +407,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"hp8_bin",
-					"hp8_english_ci"
-				],
+				"options": ["", "hp8_bin", "hp8_english_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "hp8"
@@ -499,11 +418,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"keybcs2_bin",
-					"keybcs2_general_ci"
-				],
+				"options": ["", "keybcs2_bin", "keybcs2_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "keybcs2"
@@ -514,11 +429,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"koi8r_bin",
-					"koi8r_general_ci"
-				],
+				"options": ["", "koi8r_bin", "koi8r_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "koi8r"
@@ -529,11 +440,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"koi8u_bin",
-					"koi8u_general_ci"
-				],
+				"options": ["", "koi8u_bin", "koi8u_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "koi8u"
@@ -583,11 +490,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"latin5_bin",
-					"latin5_turkish_ci"
-				],
+				"options": ["", "latin5_bin", "latin5_turkish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "latin5"
@@ -598,13 +501,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"latin7_bin",
-					"latin7_general_cs",
-					"latin7_general_ci",
-					"latin7_estonian_cs"
-				],
+				"options": ["", "latin7_bin", "latin7_general_cs", "latin7_general_ci", "latin7_estonian_cs"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "latin7"
@@ -615,11 +512,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"macce_bin",
-					"macce_general_ci"
-				],
+				"options": ["", "macce_bin", "macce_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "macce"
@@ -630,11 +523,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"macroman_bin",
-					"macroman_general_ci"
-				],
+				"options": ["", "macroman_bin", "macroman_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "macroman"
@@ -645,11 +534,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"sjis_bin",
-					"sjis_japanese_ci"
-				],
+				"options": ["", "sjis_bin", "sjis_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "sjis"
@@ -660,11 +545,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"swe7_bin",
-					"swe7_swedish_ci"
-				],
+				"options": ["", "swe7_bin", "swe7_swedish_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "swe7"
@@ -675,11 +556,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"tis620_bin",
-					"tis620_thai_ci"
-				],
+				"options": ["", "tis620_bin", "tis620_thai_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "tis620"
@@ -730,11 +607,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"ujis_bin",
-					"ujis_japanese_ci"
-				],
+				"options": ["", "ujis_bin", "ujis_japanese_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "ujis"
@@ -784,11 +657,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Select from list of options"
 			},
 			{
-				"options": [
-					"",
-					"utf16le_bin",
-					"utf16le_general_ci"
-				],
+				"options": ["", "utf16le_bin", "utf16le_general_ci"],
 				"dependency": {
 					"key": "characterSet",
 					"value": "utf16le"
@@ -921,11 +790,8 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "ENCRYPTION",
 				"propertyType": "select",
 				"defaultValue": "No",
-				"options": [
-				  "No",
-				  "Yes"
-				]
-			  },
+				"options": ["No", "Yes"]
+			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -1008,10 +874,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "language",
 						"propertyType": "select",
 						"defaultValue": "SQL",
-						"options": [
-							"",
-							"SQL"
-						]
+						"options": ["", "SQL"]
 					},
 					{
 						"propertyName": "Deterministic",
@@ -1019,11 +882,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "An IN parameter passes a value into a procedure. An OUT parameter passes a value from the procedure back to the caller. An INOUT parameter is initialized by the caller, can be modified by the procedure, and any change made by the procedure is visible to the caller when the procedure returns.",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"DETERMINISTIC",
-							"NOT DETERMINISTIC"
-						]
+						"options": ["", "DETERMINISTIC", "NOT DETERMINISTIC"]
 					},
 					{
 						"propertyName": "Contains",
@@ -1031,13 +890,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Informative clauses that tell the server what the procedure does. MySQL does not check in any way whether the specified clause is correct. If none of these clauses are specified, CONTAINS SQL is used by default.",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"CONTAINS SQL",
-							"NO SQL",
-							"READS SQL DATA",
-							"MODIFIES SQL DATA"
-						]
+						"options": ["", "CONTAINS SQL", "NO SQL", "READS SQL DATA", "MODIFIES SQL DATA"]
 					},
 					{
 						"propertyName": "SQL Security",
@@ -1045,11 +898,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Clause specifying what privileges are used when a procedure is called. If SQL SECURITY is INVOKER, the procedure body will be evaluated using the privileges of the user calling the procedure. If SQL SECURITY is DEFINER, the procedure body is always evaluated using the privileges of the definer account. DEFINER is the default.",
 						"propertyType": "select",
 						"defaultValue": "DEFINER",
-						"options": [
-							"",
-							"DEFINER",
-							"INVOKER"
-						]
+						"options": ["", "DEFINER", "INVOKER"]
 					},
 					{
 						"propertyName": "Remarks",
@@ -1120,10 +969,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "language",
 						"propertyType": "select",
 						"defaultValue": "SQL",
-						"options": [
-							"",
-							"SQL"
-						]
+						"options": ["", "SQL"]
 					},
 					{
 						"propertyName": "Deterministic",
@@ -1131,11 +977,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "An IN parameter passes a value into a procedure. An OUT parameter passes a value from the procedure back to the caller. An INOUT parameter is initialized by the caller, can be modified by the procedure, and any change made by the procedure is visible to the caller when the procedure returns.",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"DETERMINISTIC",
-							"NOT DETERMINISTIC"
-						]
+						"options": ["", "DETERMINISTIC", "NOT DETERMINISTIC"]
 					},
 					{
 						"propertyName": "Contains",
@@ -1143,13 +985,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Informative clauses that tell the server what the procedure does. MySQL does not check in any way whether the specified clause is correct. If none of these clauses are specified, CONTAINS SQL is used by default.",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"CONTAINS SQL",
-							"NO SQL",
-							"READS SQL DATA",
-							"MODIFIES SQL DATA"
-						]
+						"options": ["", "CONTAINS SQL", "NO SQL", "READS SQL DATA", "MODIFIES SQL DATA"]
 					},
 					{
 						"propertyName": "SQL Security",
@@ -1157,11 +993,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Clause specifying what privileges are used when a procedure is called. If SQL SECURITY is INVOKER, the procedure body will be evaluated using the privileges of the user calling the procedure. If SQL SECURITY is DEFINER, the procedure body is always evaluated using the privileges of the definer account. DEFINER is the default.",
 						"propertyType": "select",
 						"defaultValue": "DEFINER",
-						"options": [
-							"",
-							"DEFINER",
-							"INVOKER"
-						]
+						"options": ["", "DEFINER", "INVOKER"]
 					},
 					{
 						"propertyName": "Comments",
