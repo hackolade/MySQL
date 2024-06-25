@@ -45,7 +45,7 @@
     "disabled": false,
     "dependencies": {
         "lodash": "4.17.21",
-        "mysql2": "2.3.3"
+        "mysql2": "3.10.1"
     },
     "lint-staged": {
         "*.{js,json}": "prettier --write"
