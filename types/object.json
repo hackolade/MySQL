@@ -18,7 +18,8 @@
 				"numeric",
 				"set",
 				"reference",
-				"multiple"
+				"multiple",
+				"object"
 			]
 		}
 	}
