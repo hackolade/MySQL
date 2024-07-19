@@ -1,17 +1,17 @@
 {
 	"model": {
-		"modelName": "New model",
+		"modelName": "new_model",
 		"dbVersion": "v5.x",
 		"dbVendor": "MySQL"
 	},
 	"container": {
-		"name": "New database"
+		"name": "new_database"
 	},
 	"collection": {
-		"collectionName": "New table"
+		"collectionName": "new_table"
 	},
 	"field": {
-		"name": "New column",
+		"name": "new_column",
 		"signed": true,
 		"primaryKey": false,
 		"unique": false
@@ -32,7 +32,7 @@
 		"pipeline": ""
 	},
 	"UDFs": {
-		"name": "New UDF",
+		"name": "new_udf",
 		"udfID": "",
 		"udfDescription": "",
 		"udfFunction": "",
