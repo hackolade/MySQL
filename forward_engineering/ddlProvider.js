@@ -17,7 +17,6 @@ module.exports = (baseProvider, options, app) => {
 		getDifferentProperties,
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
-	const { joinActivatedAndDeactivatedStatements } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
 		require('./helpers/columnDefinitionHelper')(_, wrap);
 	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes } =
@@ -273,21 +272,10 @@ module.exports = (baseProvider, options, app) => {
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
 			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
 			const ignoreReplace = selectStatement ? (selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '') : '';
-			const columnStatementDtos = columns.map(column => {
-				return {
-					statement: column,
-					isActivated: !column.startsWith('--'),
-				};
-			});
-			const columnDefinitions = joinActivatedAndDeactivatedStatements({
-				statementDtos: columnStatementDtos,
-				delimiter: ',',
-				indent: '\n\t',
-			});
 
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
-				column_definitions: columnDefinitions,
+				column_definitions: columns.join(',\n\t'),
 				selectStatement: selectStatement ? ` AS ${selectStatement}` : '',
 				temporary: temporaryTable,
 				ifNotExist: ifNotExistTable,
