@@ -3,6 +3,7 @@ const types = require('./configs/types');
 const templates = require('./configs/templates');
 const getAdditionalOptions = require('./helpers/getAdditionalOptions');
 const dropStatementProxy = require('./helpers/dropStatementProxy');
+const { joinActivatedAndDeactivatedStatements } = require('./utils/joinActivatedAndDeactivatedStatements');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -272,10 +273,11 @@ module.exports = (baseProvider, options, app) => {
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
 			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
 			const ignoreReplace = selectStatement ? (selectIgnore ? ' IGNORE' : selectReplace ? ' REPLACE' : '') : '';
+			const columnStatements = joinActivatedAndDeactivatedStatements({ statements: columns, indent: '\n\t' });
 
 			const tableStatement = assignTemplates(templates.createTable, {
 				name: tableName,
-				column_definitions: columns.join(',\n\t'),
+				column_definitions: columnStatements,
 				selectStatement: selectStatement ? ` AS ${selectStatement}` : '',
 				temporary: temporaryTable,
 				ifNotExist: ifNotExistTable,
