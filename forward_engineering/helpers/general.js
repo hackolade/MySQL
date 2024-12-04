@@ -73,7 +73,7 @@ module.exports = (_, wrap) => {
 	 * @param {string} params.schemaName
 	 * @returns {string}
 	 * */
-	const getNamePrefixedWithSchemaName = ({name, schemaName}) => {
+	const getNamePrefixedWithSchemaName = ({ name, schemaName }) => {
 		if (schemaName) {
 			return `\`${schemaName}\`.\`${name}\``;
 		}
@@ -86,7 +86,7 @@ module.exports = (_, wrap) => {
 	 * @return {string}
 	 * */
 	const getTableName = (tableName, schemaName) => {
-		return getNamePrefixedWithSchemaName({name: tableName, schemaName});
+		return getNamePrefixedWithSchemaName({ name: tableName, schemaName });
 	};
 
 	/**
