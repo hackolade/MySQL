@@ -96,7 +96,7 @@ module.exports = (_, wrap) => {
 	 * @returns {string}
 	 */
 	const getIndexName = ({ name, schemaName }) => {
-		return getNamePrefixedWithSchemaName({name, schemaName});
+		return getNamePrefixedWithSchemaName({ name, schemaName });
 	}
 
 	const getOptionValue = (keyword, value) => {
