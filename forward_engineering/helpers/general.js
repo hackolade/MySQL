@@ -67,37 +67,13 @@ module.exports = (_, wrap) => {
 		NDB: ['KEY_BLOCK_SIZE'],
 	};
 
-	/**
-	 * @param {Object} params
-	 * @param {string} params.name
-	 * @param {string} params.schemaName
-	 * @returns {string}
-	 * */
-	const getNamePrefixedWithSchemaName = ({ name, schemaName }) => {
-		if (schemaName) {
-			return `\`${schemaName}\`.\`${name}\``;
-		}
-		return `\`${name}\``;
-	};
-
-	/**
-	 * @param schemaName {string}
-	 * @param tableName {string}
-	 * @return {string}
-	 * */
 	const getTableName = (tableName, schemaName) => {
-		return getNamePrefixedWithSchemaName({ name: tableName, schemaName });
+		if (schemaName) {
+			return `\`${schemaName}\`.\`${tableName}\``;
+		} else {
+			return `\`${tableName}\``;
+		}
 	};
-
-	/**
-	 * @param {Object} params
-	 * @param {string} params.name
-	 * @param {string} params.schemaName
-	 * @returns {string}
-	 */
-	const getIndexName = ({ name, schemaName }) => {
-		return getNamePrefixedWithSchemaName({ name, schemaName });
-	}
 
 	const getOptionValue = (keyword, value) => {
 		if (['ROW_FORMAT', 'INSERT_METHOD'].includes(keyword)) {
@@ -347,7 +323,6 @@ module.exports = (_, wrap) => {
 
 	return {
 		getTableName,
-		getIndexName,
 		getTableOptions,
 		getPartitions,
 		getViewData,
