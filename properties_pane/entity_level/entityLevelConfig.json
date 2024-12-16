@@ -1742,7 +1742,11 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "indxKey",
 						"propertyType": "fieldList",
 						"template": "orderedList",
-						"attributeList": ["", "ASC", "DESC"]
+						"attributeList": ["", "ASC", "DESC"],
+						"validation": {
+							"required": true,
+							"minLength": 1
+						}
 					},
 					{
 						"propertyName": "Expressions",
