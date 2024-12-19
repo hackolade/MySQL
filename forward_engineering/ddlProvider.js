@@ -46,7 +46,7 @@ module.exports = (baseProvider, options, app) => {
 			procedures,
 			tablespaces,
 			useDb = true,
-			isActivated,
+			isActivated = true,
 		}) {
 			let dbOptions = '';
 			dbOptions += characterSet ? tab(`\nCHARACTER SET = '${characterSet}'`) : '';
