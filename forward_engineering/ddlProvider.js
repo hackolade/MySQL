@@ -46,6 +46,7 @@ module.exports = (baseProvider, options, app) => {
 			procedures,
 			tablespaces,
 			useDb = true,
+			isActivated,
 		}) {
 			let dbOptions = '';
 			dbOptions += characterSet ? tab(`\nCHARACTER SET = '${characterSet}'`) : '';
@@ -64,7 +65,10 @@ module.exports = (baseProvider, options, app) => {
 				.map(tableSpace => this.createTableSpace(tableSpace))
 				.filter(Boolean);
 
-			return [...tableSpaceStatements, databaseStatement, ...udfStatements, ...procStatements].join('\n');
+			return commentIfDeactivated(
+				[...tableSpaceStatements, databaseStatement, ...udfStatements, ...procStatements].join('\n'),
+				{ isActivated },
+			);
 		},
 
 		dropDatabase(dropDbData) {
@@ -805,6 +809,7 @@ module.exports = (baseProvider, options, app) => {
 				udfs: (data?.udfs || []).map(this.hydrateUdf),
 				procedures: (data?.procedures || []).map(this.hydrateProcedure),
 				tablespaces: (data?.modelData?.[2]?.tablespaces || []).map(this.hydrateTableSpace),
+				isActivated: containerData.isActivated,
 			};
 		},
 
