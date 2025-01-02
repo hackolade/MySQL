@@ -432,8 +432,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
 			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
-			const indexType =
-				index.indexType && _.toUpper(index.indexType) !== 'KEY' ? `${_.toUpper(index.indexType)} ` : '';
+			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
 			const name = wrap(index.indxName || '', '`', '`');
 			const table = getTableName(tableName, dbData.databaseName);
 			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
