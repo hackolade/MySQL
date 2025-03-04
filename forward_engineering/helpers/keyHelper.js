@@ -1,4 +1,12 @@
-module.exports = (_, clean) => {
+/**
+ * @typedef {import('../types').ColumnDefinition} ColumnDefinition
+ * @typedef {import('../types').JsonSchema} JsonSchema
+ * @typedef {import('../types').ConstraintDto} ConstraintDto
+ */
+
+const _ = require('lodash');
+
+module.exports = clean => {
 	const mapProperties = (jsonSchema, iteratee) => {
 		return Object.entries(jsonSchema.properties).map(iteratee);
 	};
@@ -166,11 +174,67 @@ module.exports = (_, clean) => {
 		];
 	};
 
+	/**
+	 * @param {{ jsonSchema: JsonSchema }}
+	 * @returns {ConstraintDto[]}
+	 */
+	const getCompositeKeyConstraints = ({ jsonSchema }) => {
+		const compositePrimaryKeys = getCompositePrimaryKeys(jsonSchema);
+		const compositeUniqueKeys = getCompositeUniqueKeys(jsonSchema);
+
+		return [...compositePrimaryKeys, ...compositeUniqueKeys];
+	};
+
+	/**
+	 * @param {{ columnDefinition: ColumnDefinition }}
+	 * @returns {ConstraintDto | undefined}
+	 */
+	const getPrimaryKeyConstraint = ({ columnDefinition }) => {
+		if (!isPrimaryKey(columnDefinition)) {
+			return;
+		}
+
+		return hydratePrimaryKeyOptions(columnDefinition.primaryKeyOptions ?? {}, '', columnDefinition.isActivated);
+	};
+
+	/**
+	 * @param {{ columnDefinition: ColumnDefinition }}
+	 * @returns {ConstraintDto[]}
+	 */
+	const getUniqueKeyConstraints = ({ columnDefinition }) => {
+		if (!isUniqueKey(columnDefinition)) {
+			return [];
+		}
+
+		if (isInlineUnique(columnDefinition)) {
+			const constraint = hydrateUniqueOptions({}, '', columnDefinition.isActivated);
+
+			return [constraint];
+		}
+
+		return columnDefinition.uniqueKeyOptions.map(uniqueKeyOption => {
+			return hydrateUniqueOptions(uniqueKeyOption, '', columnDefinition.isActivated);
+		});
+	};
+
+	/**
+	 * @param {{ columnDefinition: ColumnDefinition }}
+	 * @returns {ConstraintDto[]}
+	 */
+	const getColumnConstraints = ({ columnDefinition }) => {
+		const primaryKeyConstraint = getPrimaryKeyConstraint({ columnDefinition });
+		const uniqueKeyConstraints = getUniqueKeyConstraints({ columnDefinition });
+
+		return [primaryKeyConstraint, ...uniqueKeyConstraints].filter(Boolean);
+	};
+
 	return {
 		getTableKeyConstraints,
 		isInlineUnique,
 		isInlinePrimaryKey,
 		hydratePrimaryKeyOptions,
 		hydrateUniqueOptions,
+		getColumnConstraints,
+		getCompositeKeyConstraints,
 	};
 };
