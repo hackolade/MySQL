@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
@@ -6,7 +7,6 @@ const dropStatementProxy = require('./helpers/dropStatementProxy');
 const { joinActivatedAndDeactivatedStatements } = require('./utils/joinActivatedAndDeactivatedStatements');
 
 module.exports = (baseProvider, options, app) => {
-	const _ = app.require('lodash');
 	const {
 		tab,
 		commentIfDeactivated,
@@ -19,7 +19,7 @@ module.exports = (baseProvider, options, app) => {
 	} = app.require('@hackolade/ddl-fe-utils').general;
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
-		require('./helpers/columnDefinitionHelper')(_, wrap);
+		require('./helpers/columnDefinitionHelper')(wrap);
 	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes } =
 		require('./helpers/general')(_, wrap);
 	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
@@ -31,7 +31,7 @@ module.exports = (baseProvider, options, app) => {
 			assignTemplates,
 			escapeQuotes,
 		});
-	const keyHelper = require('./helpers/keyHelper')(_, clean);
+	const keyHelper = require('./helpers/keyHelper')(clean);
 	const { processIndexKeyName } = require('./helpers/indexHelper')(wrap);
 	const additionalOptions = getAdditionalOptions(options.additionalOptions);
 
