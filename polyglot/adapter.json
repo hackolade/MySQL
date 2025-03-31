@@ -108,8 +108,7 @@
 				"to": {
 					"mode": "point"
 				}
-<<<<<<< Updated upstream
-=======
+
 			},
 			{
 				"from": {
@@ -147,7 +146,6 @@
 				"to": {
 					"length": 21844
 				}
->>>>>>> Stashed changes
 			}
 		]
 	}
