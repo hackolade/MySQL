@@ -1,4 +1,6 @@
-module.exports = (_, wrap) => {
+const _ = require('lodash');
+
+module.exports = wrap => {
 	const addLength = (type, length) => {
 		return `${type}(${length})`;
 	};

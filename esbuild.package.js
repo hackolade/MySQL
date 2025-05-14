@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const esbuild = require('esbuild');
 const { clean } = require('esbuild-plugin-clean');
+const { copy } = require('esbuild-plugin-copy');
 const { copyFolderFiles, addReleaseFlag } = require('@hackolade/hck-esbuild-plugins-pack');
 const { EXCLUDED_EXTENSIONS, EXCLUDED_FILES, DEFAULT_RELEASE_FOLDER_PATH } = require('./buildConstants');
 
@@ -13,6 +14,7 @@ esbuild
 		entryPoints: [
 			path.resolve(__dirname, 'forward_engineering', 'api.js'),
 			path.resolve(__dirname, 'forward_engineering', 'ddlProvider.js'),
+			path.resolve(__dirname, 'forward_engineering', 'dbtProvider.js'),
 			path.resolve(__dirname, 'reverse_engineering', 'api.js'),
 		],
 		bundle: true,
@@ -22,9 +24,16 @@ esbuild
 		outdir: RELEASE_FOLDER_PATH,
 		minify: true,
 		logLevel: 'info',
+		external: ['lodash'],
 		plugins: [
 			clean({
 				patterns: [DEFAULT_RELEASE_FOLDER_PATH],
+			}),
+			copy({
+				assets: {
+					from: [path.join('node_modules', 'lodash', '**', '*')],
+					to: [path.join('node_modules', 'lodash')],
+				},
 			}),
 			copyFolderFiles({
 				fromPath: __dirname,
