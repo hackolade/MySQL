@@ -1,3 +1,5 @@
+'use strict';
+
 const connectionHelper = require('./helpers/connectionHelper');
 const mysqlHelper = require('./helpers/mysqlHelper');
 
@@ -28,7 +30,11 @@ module.exports = {
 			hiddenKeys: connectionInfo.hiddenKeys,
 			logger,
 		});
+
 		try {
+			logger.clear();
+			logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
 			const sshService = app.require('@hackolade/ssh-service');
 
 			const connection = await this.connect(connectionInfo, sshService);
@@ -60,6 +66,8 @@ module.exports = {
 		});
 
 		try {
+			logger.clear();
+			logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 			const systemDatabases = connectionInfo.includeSystemCollection
 				? []
 				: ['information_schema', 'mysql', 'performance_schema'];
@@ -119,7 +127,10 @@ module.exports = {
 		});
 
 		try {
+			logger.log('info', data, 'data', data.hiddenKeys);
+
 			const sshService = app.require('@hackolade/ssh-service');
+
 			const collections = data.collectionData.collections;
 			const dataBaseNames = data.collectionData.dataBaseNames;
 			const connection = await this.connect(data, sshService);
