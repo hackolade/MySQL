@@ -12,7 +12,8 @@
             "title": "MySQL",
             "versions": [
                 "v5.x",
-                "v8.x"
+                "v8.x",
+				"v9.x"
             ]
         },
         "features": {
