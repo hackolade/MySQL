@@ -1,6 +1,6 @@
 {
     "name": "MySQL",
-    "version": "0.2.17",
+    "version": "0.2.18",
     "author": "hackolade",
     "engines": {
         "hackolade": "7.7.10",
@@ -13,7 +13,7 @@
             "versions": [
                 "v5.x",
                 "v8.x",
-				"v9.x"
+                "v9.x"
             ]
         },
         "features": {
