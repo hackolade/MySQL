@@ -20,7 +20,7 @@ module.exports = (baseProvider, options, app) => {
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
 		require('./helpers/columnDefinitionHelper')(wrap);
-	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes } =
+	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes, wrapInTicks } =
 		require('./helpers/general')(_, wrap);
 	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
 		require('./helpers/constraintsHelper')({
@@ -36,7 +36,7 @@ module.exports = (baseProvider, options, app) => {
 	const additionalOptions = getAdditionalOptions(options.additionalOptions);
 
 	return dropStatementProxy({ commentIfDeactivated })(additionalOptions.applyDropStatements, {
-		createDatabase({
+		createSchema({
 			databaseName,
 			ifNotExist,
 			collation,
@@ -798,7 +798,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateDatabase(containerData, data) {
+		hydrateSchema(containerData, data) {
 			return {
 				databaseName: containerData.name,
 				ifNotExist: containerData.ifNotExist,
@@ -909,6 +909,14 @@ module.exports = (baseProvider, options, app) => {
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return statement;
+		},
+
+		commentStatement(statement) {
+			return commentIfDeactivated(statement, { isActivated: false });
+		},
+
+		prepareName(name) {
+			return wrapInTicks(name);
 		},
 
 		hydrateUdf(udf) {
