@@ -67,6 +67,8 @@ module.exports = (_, wrap) => {
 		NDB: ['KEY_BLOCK_SIZE'],
 	};
 
+	const wrapInTicks = name => `\`${name}\``;
+
 	const getTableName = (tableName, schemaName) => {
 		if (schemaName) {
 			return `\`${schemaName}\`.\`${tableName}\``;
@@ -328,5 +330,6 @@ module.exports = (_, wrap) => {
 		getViewData,
 		getCharacteristics,
 		escapeQuotes,
+		wrapInTicks,
 	};
 };

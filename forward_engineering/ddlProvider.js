@@ -20,7 +20,7 @@ module.exports = (baseProvider, options, app) => {
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
 		require('./helpers/columnDefinitionHelper')(wrap);
-	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes } =
+	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes, wrapInTicks } =
 		require('./helpers/general')(_, wrap);
 	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
 		require('./helpers/constraintsHelper')({
@@ -36,7 +36,7 @@ module.exports = (baseProvider, options, app) => {
 	const additionalOptions = getAdditionalOptions(options.additionalOptions);
 
 	return dropStatementProxy({ commentIfDeactivated })(additionalOptions.applyDropStatements, {
-		createDatabase({
+		createSchema({
 			databaseName,
 			ifNotExist,
 			collation,
@@ -71,11 +71,11 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		dropDatabase(dropDbData) {
+		dropSchema(dropDbData) {
 			return assignTemplates(templates.dropDatabase, dropDbData);
 		},
 
-		alterDatabase(alterDbData) {
+		alterSchema(alterDbData) {
 			const alterStatements = [];
 			const databaseName = alterDbData.name;
 
@@ -798,7 +798,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateDatabase(containerData, data) {
+		hydrateSchema(containerData, data) {
 			return {
 				databaseName: containerData.name,
 				ifNotExist: containerData.ifNotExist,
@@ -810,6 +810,11 @@ module.exports = (baseProvider, options, app) => {
 				tablespaces: (data?.modelData?.[2]?.tablespaces || []).map(this.hydrateTableSpace),
 				isActivated: containerData.isActivated,
 			};
+		},
+
+		// Keep it because it was used to hydrate `dbData` for the API
+		hydrateDatabase(containerData, data) {
+			return this.hydrateSchema(containerData, data);
 		},
 
 		hydrateTableSpace(tableSpace) {
@@ -911,6 +916,14 @@ module.exports = (baseProvider, options, app) => {
 			return statement;
 		},
 
+		commentStatement(statement) {
+			return commentIfDeactivated(statement, { isActivated: false });
+		},
+
+		prepareName(name) {
+			return wrapInTicks(name);
+		},
+
 		hydrateUdf(udf) {
 			return {
 				name: udf.name,
@@ -948,13 +961,13 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateDropDatabase(containerData) {
+		hydrateDropSchema(containerData) {
 			return {
 				name: containerData[0]?.name || '',
 			};
 		},
 
-		hydrateAlterDatabase({ containerData, compModeData }) {
+		hydrateAlterSchema({ containerData, compModeData }) {
 			const data = containerData[0] || {};
 			const isCharacterSetModified = compModeData.new.characterSet !== compModeData.old.characterSet;
 			const isCollationModified = compModeData.new.collation !== compModeData.old.collation;
