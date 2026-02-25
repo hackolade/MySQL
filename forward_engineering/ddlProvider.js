@@ -812,6 +812,11 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
+		// Keep it because it was used to hydrate `dbData` for the API
+		hydrateDatabase(containerData, data) {
+			return this.hydrateSchema(containerData, data).bind(this);
+		},
+
 		hydrateTableSpace(tableSpace) {
 			return {
 				name: tableSpace.name,
