@@ -71,11 +71,11 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
-		dropDatabase(dropDbData) {
+		dropSchema(dropDbData) {
 			return assignTemplates(templates.dropDatabase, dropDbData);
 		},
 
-		alterDatabase(alterDbData) {
+		alterSchema(alterDbData) {
 			const alterStatements = [];
 			const databaseName = alterDbData.name;
 
@@ -961,13 +961,13 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateDropDatabase(containerData) {
+		hydrateDropSchema(containerData) {
 			return {
 				name: containerData[0]?.name || '',
 			};
 		},
 
-		hydrateAlterDatabase({ containerData, compModeData }) {
+		hydrateAlterSchema({ containerData, compModeData }) {
 			const data = containerData[0] || {};
 			const isCharacterSetModified = compModeData.new.characterSet !== compModeData.old.characterSet;
 			const isCollationModified = compModeData.new.collation !== compModeData.old.collation;
