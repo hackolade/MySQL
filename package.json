@@ -81,7 +81,7 @@
         "esbuild-plugin-clean": "1.0.1",
         "esbuild-plugin-copy": "2.1.1",
         "lint-staged": "16.2.7",
-        "minimatch": "10.2.1",
+        "minimatch": "10.2.4",
         "oxlint": "1.38.0",
         "oxlint-tsgolint": "0.10.1",
         "prettier": "3.8.1",
@@ -89,6 +89,6 @@
         "@ianvs/prettier-plugin-sort-imports": "4.7.1"
     },
     "overrides": {
-        "minimatch": "10.2.1"
+        "minimatch": "10.2.4"
     }
 }
