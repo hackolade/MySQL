@@ -182,10 +182,6 @@ making sure that you maintain a proper JSON format.
 		]
 	},
 	{
-		"lowerTab": "Relationships",
-		"structure": []
-	},
-	{
 		"lowerTab": "Tablespaces",
 		"structure": [
 			{
@@ -308,6 +304,23 @@ making sure that you maintain a proper JSON format.
 						}
 					}
 				]
+			}
+		]
+	},
+	{
+		"lowerTab": "Relationships",
+		"structure": [
+			{
+				"propertyName": "On Delete",
+				"propertyKeyword": "relationshipOnDelete",
+				"propertyType": "select",
+				"options": ["", "NO ACTION", "CASCADE", "SET NULL", "SET DEFAULT", "RESTRICT"]
+			},
+			{
+				"propertyName": "On Update",
+				"propertyKeyword": "relationshipOnUpdate",
+				"propertyType": "select",
+				"options": ["", "NO ACTION", "CASCADE", "SET NULL", "SET DEFAULT", "RESTRICT"]
 			}
 		]
 	}

@@ -20,8 +20,16 @@ module.exports = (baseProvider, options, app) => {
 	const { assignTemplates, compareGroupItems } = app.require('@hackolade/ddl-fe-utils');
 	const { decorateDefault, decorateType, canBeNational, getSign, createGeneratedColumn, canHaveAutoIncrement } =
 		require('./helpers/columnDefinitionHelper')(wrap);
-	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics, escapeQuotes, wrapInTicks } =
-		require('./helpers/general')(_, wrap);
+	const {
+		getTableName,
+		getTableOptions,
+		getPartitions,
+		getViewData,
+		getCharacteristics,
+		escapeQuotes,
+		wrapInTicks,
+		additionalPropertiesForForeignKey,
+	} = require('./helpers/general')(_, wrap);
 	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
 		require('./helpers/constraintsHelper')({
 			_,
@@ -560,7 +568,15 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createForeignKeyConstraint(
-			{ name, foreignKey, primaryTable, primaryKey, primaryTableActivated, foreignTableActivated },
+			{
+				name,
+				foreignKey,
+				primaryTable,
+				primaryKey,
+				primaryTableActivated,
+				foreignTableActivated,
+				customProperties,
+			},
 			dbData,
 		) {
 			const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
@@ -571,23 +587,38 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
+			const { foreignOnDelete, foreignOnUpdate } = additionalPropertiesForForeignKey(customProperties);
+
 			return {
 				statement: assignTemplates(templates.createForeignKeyConstraint, {
 					primaryTable: getTableName(primaryTable, dbData.databaseName),
 					name,
 					foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
 					primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+					onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
+					onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				}),
 				isActivated,
 			};
 		},
 
 		createForeignKey(
-			{ name, foreignTable, foreignKey, primaryTable, primaryKey, primaryTableActivated, foreignTableActivated },
+			{
+				name,
+				foreignTable,
+				foreignKey,
+				primaryTable,
+				primaryKey,
+				primaryTableActivated,
+				foreignTableActivated,
+				customProperties,
+			},
 			dbData,
 		) {
 			const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
 			const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
+
+			const { foreignOnDelete, foreignOnUpdate } = additionalPropertiesForForeignKey(customProperties);
 
 			return {
 				statement: assignTemplates(templates.createForeignKey, {
@@ -596,6 +627,8 @@ module.exports = (baseProvider, options, app) => {
 					name,
 					foreignKey: foreignKeysToString(foreignKey),
 					primaryKey: foreignKeysToString(primaryKey),
+					onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
+					onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				}),
 				isActivated:
 					!isAllPrimaryKeysDeactivated &&

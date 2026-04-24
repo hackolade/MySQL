@@ -323,6 +323,12 @@ module.exports = (_, wrap) => {
 		return str.replace(/(')/gi, "'$1").replace(/\n/gi, '\\n');
 	};
 
+	const additionalPropertiesForForeignKey = customProperties => {
+		const foreignOnDelete = customProperties?.relationshipOnDelete ?? '';
+		const foreignOnUpdate = customProperties?.relationshipOnUpdate ?? '';
+		return { foreignOnDelete, foreignOnUpdate };
+	};
+
 	return {
 		getTableName,
 		getTableOptions,
@@ -331,5 +337,6 @@ module.exports = (_, wrap) => {
 		getCharacteristics,
 		escapeQuotes,
 		wrapInTicks,
+		additionalPropertiesForForeignKey,
 	};
 };
