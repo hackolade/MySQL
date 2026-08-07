@@ -82,14 +82,14 @@
         "esbuild-plugin-clean": "1.0.1",
         "esbuild-plugin-copy": "2.1.1",
         "lint-staged": "17.0.7",
-        "minimatch": "10.2.4",
+        "minimatch": "10.2.6",
         "oxlint": "1.70.0",
         "oxlint-tsgolint": "0.23.0",
         "prettier": "3.8.4",
         "simple-git-hooks": "2.13.1"
     },
     "overrides": {
-        "minimatch": "10.2.4",
-        "brace-expansion": "5.0.8"
+        "minimatch": "10.2.6",
+        "brace-expansion": "5.0.9"
     }
 }
