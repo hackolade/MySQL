@@ -576,6 +576,7 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated,
 				foreignTableActivated,
 				customProperties,
+				isActivated: isRelationshipActivated,
 			},
 			dbData,
 		) {
@@ -598,7 +599,7 @@ module.exports = (baseProvider, options, app) => {
 					onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
 					onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				}),
-				isActivated,
+				isActivated: isActivated && isRelationshipActivated !== false,
 			};
 		},
 
@@ -612,6 +613,7 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated,
 				foreignTableActivated,
 				customProperties,
+				isActivated: isRelationshipActivated,
 			},
 			dbData,
 		) {
@@ -634,7 +636,8 @@ module.exports = (baseProvider, options, app) => {
 					!isAllPrimaryKeysDeactivated &&
 					!isAllForeignKeysDeactivated &&
 					primaryTableActivated &&
-					foreignTableActivated,
+					foreignTableActivated &&
+					isRelationshipActivated !== false,
 			};
 		},
 
